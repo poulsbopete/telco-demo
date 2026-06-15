@@ -1,0 +1,169 @@
+{
+  "taxonomy": [
+    {
+      "id": "accounts",
+      "name": "Accounts",
+      "children": [
+        {
+          "id": "personal",
+          "name": "Personal Accounts",
+          "children": [
+            { "id": "setup", "name": "Account Setup" },
+            { "id": "security", "name": "Security" },
+            { "id": "limits", "name": "Account Limits" }
+          ]
+        },
+        {
+          "id": "business",
+          "name": "Business Accounts",
+          "children": [
+            { "id": "multi-user", "name": "Multi-user Management" },
+            { "id": "invoicing", "name": "Invoicing" },
+            { "id": "advanced", "name": "Advanced Tools" }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "payment-products",
+      "name": "Payment Products",
+      "children": [
+        { "id": "paypal-credit", "name": "Telco Credit" },
+        { "id": "debit-card", "name": "Debit Card" },
+        { "id": "checkout", "name": "Checkout Solutions" }
+      ]
+    },
+    {
+      "id": "compliance",
+      "name": "Compliance & Legal",
+      "children": [
+        { "id": "pci", "name": "PCI Compliance" },
+        { "id": "kyc-aml", "name": "KYC/AML Requirements" },
+        { "id": "regional", "name": "Regional Regulations" }
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "doc_id": "account_email_verification",
+      "title": "Email Verification for New Accounts",
+      "product": "Personal Accounts",
+      "domain_path": ["Accounts", "Personal Accounts", "Account Setup"],
+      "content": "New Telco accounts require email confirmation within 72 hours. Customers with unconfirmed email cannot send money or receive payments. Automated IVR can guide users through the verification link sent to their registered email address.",
+      "keywords": ["email", "verification", "confirm", "new account", "unconfirmed", "setup", "onboarding"],
+      "eligibility_rules": ["account_age < 7d"],
+      "resolution_type": "automated_guide",
+      "legal_context": null
+    },
+    {
+      "doc_id": "account_security_lockout",
+      "title": "Account Lockout and Password Reset",
+      "product": "Personal Accounts",
+      "domain_path": ["Accounts", "Personal Accounts", "Security"],
+      "content": "Accounts may be locked after 5 failed login attempts. Password reset requires identity verification via SMS or security questions. Two-factor authentication (2FA) adds an extra layer of protection for high-value transactions.",
+      "keywords": ["password", "reset", "locked", "lockout", "2fa", "security", "login failed", "authentication"],
+      "eligibility_rules": ["verified_email"],
+      "resolution_type": "guided_reset",
+      "legal_context": null
+    },
+    {
+      "doc_id": "account_withdrawal_limits",
+      "title": "Withdrawal and Transaction Limits",
+      "product": "Personal Accounts",
+      "domain_path": ["Accounts", "Personal Accounts", "Account Limits"],
+      "content": "Unverified accounts have a $500 rolling 30-day sending limit. Verified accounts can send up to $60,000 per transaction. Business accounts have custom limits based on account history and risk profile.",
+      "keywords": ["limit", "withdrawal", "transaction cap", "send money", "transfer limit"],
+      "eligibility_rules": ["verified_email", "identity_verified"],
+      "resolution_type": "information",
+      "legal_context": null
+    },
+    {
+      "doc_id": "paypal_credit_limits",
+      "title": "Telco Credit Limits and Eligibility",
+      "product": "Telco Credit",
+      "domain_path": ["Payment Products", "Telco Credit"],
+      "content": "Telco Credit limits are based on creditworthiness, ranging from $250 to $10,000. Eligibility requires age 18+, US residency, verified email, and soft credit check. Credit line increases are reviewed every 6 months based on payment history.",
+      "keywords": ["credit", "credit limit", "paypal credit", "line of credit", "eligibility", "apr", "financing"],
+      "eligibility_rules": ["age >= 18", "us_resident", "verified_email"],
+      "resolution_type": "eligibility_check",
+      "legal_context": "FCRA compliance required. APR disclosure must be provided before account opening. Equal Credit Opportunity Act applies."
+    },
+    {
+      "doc_id": "paypal_credit_legal",
+      "title": "Telco Credit Legal Disclosures",
+      "product": "Telco Credit",
+      "domain_path": ["Payment Products", "Telco Credit"],
+      "content": "Telco Credit is issued by Synchrony Bank. Standard APR is variable. Late payment fees apply. Customers must receive Schumer Box disclosure before acceptance. State-specific regulations may apply in CA, NY, and TX.",
+      "keywords": ["legal", "disclosure", "apr", "fcra", "compliance", "credit agreement", "terms"],
+      "eligibility_rules": [],
+      "resolution_type": "compliance_routing",
+      "legal_context": "Reg Z (TILA), FCRA, state usury laws. Mandatory disclosure before credit extension."
+    },
+    {
+      "doc_id": "debit_card_activation",
+      "title": "Telco Debit Card Activation",
+      "product": "Debit Card",
+      "domain_path": ["Payment Products", "Debit Card"],
+      "content": "Telco Debit Card can be activated via mobile app or by calling the number on the card sticker. PIN setup is required for ATM withdrawals. Daily ATM limit is $400; purchase limit is $3,000.",
+      "keywords": ["debit card", "activate", "pin", "atm", "card activation"],
+      "eligibility_rules": ["verified_email", "identity_verified"],
+      "resolution_type": "automated_guide",
+      "legal_context": null
+    },
+    {
+      "doc_id": "checkout_integration",
+      "title": "Telco Checkout Integration Guide",
+      "product": "Checkout Solutions",
+      "domain_path": ["Payment Products", "Checkout Solutions"],
+      "content": "Telco Checkout supports Smart Payment Buttons, hosted fields, and Braintree SDK. Integration requires REST API credentials and webhook configuration. Average checkout completion time is 12 seconds with One Touch enabled.",
+      "keywords": ["checkout", "integration", "api", "regions", "payment button", "braintree"],
+      "eligibility_rules": ["business_account"],
+      "resolution_type": "information",
+      "legal_context": null
+    },
+    {
+      "doc_id": "pci_compliance_overview",
+      "title": "PCI DSS Compliance Requirements",
+      "product": "PCI Compliance",
+      "domain_path": ["Compliance & Legal", "PCI Compliance"],
+      "content": "Telco maintains PCI DSS Level 1 certification. Merchants using Telco hosted checkout inherit SAQ A eligibility. Cardholder data must never be stored on regions servers. Quarterly vulnerability scans required for Level 2+ regions.",
+      "keywords": ["pci", "compliance", "dss", "cardholder data", "security standard", "audit"],
+      "eligibility_rules": [],
+      "resolution_type": "compliance_routing",
+      "legal_context": "PCI DSS v4.0. Mandatory 92-day log retention for cardholder data environments."
+    },
+    {
+      "doc_id": "kyc_aml_requirements",
+      "title": "KYC and AML Verification",
+      "product": "KYC/AML",
+      "domain_path": ["Compliance & Legal", "KYC/AML Requirements"],
+      "content": "Know Your Customer verification requires government-issued ID and proof of address. Anti-Money Laundering monitoring flags transactions over $10,000 and unusual patterns. Enhanced due diligence applies to high-risk jurisdictions.",
+      "keywords": ["kyc", "aml", "identity", "verification", "money laundering", "compliance", "due diligence"],
+      "eligibility_rules": [],
+      "resolution_type": "compliance_routing",
+      "legal_context": "Bank Secrecy Act, USA PATRIOT Act, FinCEN regulations."
+    },
+    {
+      "doc_id": "regional_eu_gdpr",
+      "title": "EU GDPR and Regional Regulations",
+      "product": "Regional Regulations",
+      "domain_path": ["Compliance & Legal", "Regional Regulations"],
+      "content": "EU customers have right to data portability and erasure under GDPR. PSD2 requires Strong Customer Authentication for online payments. UK FCA regulations apply post-Brexit. Data residency requirements vary by region.",
+      "keywords": ["gdpr", "eu", "regional", "psd2", "data privacy", "regulation", "fca"],
+      "eligibility_rules": ["eu_resident"],
+      "resolution_type": "compliance_routing",
+      "legal_context": "GDPR Article 17 (right to erasure), PSD2 SCA requirements."
+    },
+    {
+      "doc_id": "business_multi_user",
+      "title": "Business Account Multi-User Management",
+      "product": "Business Accounts",
+      "domain_path": ["Accounts", "Business Accounts", "Multi-user Management"],
+      "content": "Business accounts support role-based access for up to 200 users. Roles include Admin, Finance, Developer, and Customer Support. Activity logs track all user actions for audit compliance.",
+      "keywords": ["business", "multi-user", "roles", "permissions", "team", "admin"],
+      "eligibility_rules": ["business_account"],
+      "resolution_type": "information",
+      "legal_context": null
+    }
+  ]
+}

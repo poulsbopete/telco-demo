@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-elastic-teal: #00bfb3;
+  --color-elastic-blue: #0077cc;
+  --color-elastic-dark: #343741;
+  --color-elastic-gray: #69707d;
+  --color-elastic-light: #f5f7fa;
+  --color-telco-magenta: #e20074;
+  --color-telco-purple: #6b2c91;
+  --color-telco-cyan: #00d4ff;
+  --color-success: #017d73;
+  --color-warning: #f5a700;
+  --color-danger: #bd271e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: var(--color-elastic-light);
+  color: var(--color-elastic-dark);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d3dae6;
+  border-radius: 3px;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes count-up {
+  from { opacity: 0.6; transform: translateY(2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count {
+  animation: count-up 0.3s ease-out;
+}

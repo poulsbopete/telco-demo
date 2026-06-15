@@ -1,0 +1,68 @@
+[
+  {
+    "id": "rule-brute-force",
+    "name": "Brute Force Authentication Detection",
+    "severity": "high",
+    "description": "Detects >10 failed login attempts from single IP within 5 minutes",
+    "mitre_tactic": "Credential Access",
+    "rule_type": "threshold",
+    "index": ".alerts-security.alerts-default",
+    "enabled": true,
+    "matches_last_hour": 23
+  },
+  {
+    "id": "rule-lateral-movement",
+    "name": "Lateral Movement Indicators",
+    "severity": "critical",
+    "description": "Unusual RDP/SSH connections between internal hosts",
+    "mitre_tactic": "Lateral Movement",
+    "rule_type": "eql",
+    "index": ".alerts-security.alerts-default",
+    "enabled": true,
+    "matches_last_hour": 7
+  },
+  {
+    "id": "rule-data-exfil",
+    "name": "Data Exfiltration Pattern",
+    "severity": "critical",
+    "description": "Large outbound data transfer to unknown external IPs",
+    "mitre_tactic": "Exfiltration",
+    "rule_type": "esql",
+    "index": ".alerts-security.alerts-default",
+    "enabled": true,
+    "matches_last_hour": 3
+  },
+  {
+    "id": "rule-anomalous-user",
+    "name": "Anomalous User Behavior",
+    "severity": "medium",
+    "description": "Login from new geo + privilege escalation within 1 hour",
+    "mitre_tactic": "Persistence",
+    "rule_type": "ml",
+    "index": ".alerts-security.alerts-default",
+    "enabled": true,
+    "matches_last_hour": 15
+  },
+  {
+    "id": "rule-pci-unauthorized",
+    "name": "PCI Unauthorized Access",
+    "severity": "critical",
+    "description": "Access to PCI-scoped systems without proper authorization",
+    "mitre_tactic": "Initial Access",
+    "rule_type": "threshold",
+    "index": ".alerts-security.alerts-default",
+    "enabled": true,
+    "matches_last_hour": 2
+  },
+  {
+    "id": "rule-failed-auth-spike",
+    "name": "Failed Auth Spike (PCI)",
+    "severity": "high",
+    "description": "Failed authentication spike in cardholder data environment",
+    "mitre_tactic": "Credential Access",
+    "rule_type": "threshold",
+    "index": ".alerts-security.alerts-default",
+    "enabled": true,
+    "matches_last_hour": 11
+  }
+]

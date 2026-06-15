@@ -1,0 +1,43 @@
+version: "1"
+name: Telco 5G Core Latency Auto-Remediation
+description: Telco network region 5G core signaling latency remediation — ML anomaly, A2A federation (Datadog, Security, Search), and auto-remediation.
+enabled: true
+tags:
+  - Telco
+  - telco-o11y
+  - 5g-core
+  - DEMO
+triggers:
+  - type: manual
+inputs:
+  - name: regionId
+    type: string
+    required: false
+  - name: traceId
+    type: string
+    required: false
+steps:
+  - name: ingest_ml_anomaly
+    type: console
+    with:
+      message: "ML anomaly core-signaling-latency-v2 score 0.94 — region {{ inputs.regionId | default: 'REG-8847291' }}"
+
+  - name: correlate_traces_logs
+    type: console
+    with:
+      message: "Correlated {{ inputs.traceId | default: 'trace-signaling-001' }} — db.query critical path 612ms, pool 48/50"
+
+  - name: a2a_federation_complete
+    type: console
+    with:
+      message: "A2A federation complete — Datadog metrics/traces, Security cleared, Search NOC runbooks loaded"
+
+  - name: execute_remediation
+    type: console
+    with:
+      message: "Remediation — scale AMF/SMF pods +30%, enable per-region circuit breaker for {{ inputs.regionId | default: 'REG-8847291' }}"
+
+  - name: verify_slo
+    type: console
+    with:
+      message: "SLO watch — target p99 < 250ms for 5 minutes"

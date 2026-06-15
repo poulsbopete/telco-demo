@@ -1,0 +1,55 @@
+[
+  {
+    "trace_id": "trace-checkout-001",
+    "service": "checkout-api",
+    "version": "2.3.1",
+    "duration_ms": 847,
+    "status": "error",
+    "timestamp": "2026-06-05T14:30:00Z",
+    "spans": [
+      { "name": "POST /api/v2/checkout", "duration_ms": 847, "status": "ERROR", "service": "checkout-api" },
+      { "name": "validate.cart", "duration_ms": 12, "status": "OK", "service": "checkout-api" },
+      { "name": "fraud.check", "duration_ms": 89, "status": "OK", "service": "fraud-service" },
+      { "name": "payment.process", "duration_ms": 156, "status": "OK", "service": "payment-gateway" },
+      { "name": "db.query", "duration_ms": 612, "status": "ERROR", "service": "checkout-api", "critical_path": true },
+      { "name": "db.connection.pool", "duration_ms": 45, "status": "OK", "service": "checkout-api" },
+      { "name": "notification.send", "duration_ms": 0, "status": "SKIPPED", "service": "notification-service" }
+    ],
+    "related_logs": [
+      { "level": "ERROR", "message": "Connection pool exhausted: max 50 connections reached", "timestamp": "2026-06-05T14:30:00.612Z" },
+      { "level": "WARN", "message": "Slow query detected: SELECT * FROM transactions WHERE cart_id = ? (612ms)", "timestamp": "2026-06-05T14:30:00.580Z" },
+      { "level": "INFO", "message": "Checkout request received for cart_id=CRT-8847291", "timestamp": "2026-06-05T14:30:00.001Z" }
+    ],
+    "root_cause": "Database connection pool exhaustion causing 612ms query latency"
+  },
+  {
+    "trace_id": "trace-payment-002",
+    "service": "payment-gateway",
+    "version": "v1.8.0",
+    "duration_ms": 234,
+    "status": "ok",
+    "timestamp": "2026-06-05T14:29:45Z",
+    "spans": [
+      { "name": "POST /api/v1/payments", "duration_ms": 234, "status": "OK", "service": "payment-gateway" },
+      { "name": "tokenize.card", "duration_ms": 45, "status": "OK", "service": "payment-gateway" },
+      { "name": "processor.submit", "duration_ms": 167, "status": "OK", "service": "payment-gateway" }
+    ],
+    "related_logs": [],
+    "root_cause": null
+  },
+  {
+    "trace_id": "trace-fraud-003",
+    "service": "fraud-service",
+    "version": "v3.1.2",
+    "duration_ms": 156,
+    "status": "ok",
+    "timestamp": "2026-06-05T14:29:30Z",
+    "spans": [
+      { "name": "fraud.evaluate", "duration_ms": 156, "status": "OK", "service": "fraud-service" },
+      { "name": "ml.score", "duration_ms": 89, "status": "OK", "service": "fraud-service" },
+      { "name": "rules.evaluate", "duration_ms": 67, "status": "OK", "service": "fraud-service" }
+    ],
+    "related_logs": [],
+    "root_cause": null
+  }
+]
