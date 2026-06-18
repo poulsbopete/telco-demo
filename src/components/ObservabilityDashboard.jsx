@@ -170,7 +170,7 @@ export function ObservabilityDashboard() {
           }`}
         >
           <RefreshCw className="w-4 h-4" />
-          DR: {drMode === 'primary' ? 'Datadog Primary' : 'Elastic Failover'}
+          DR: {drMode === 'primary' ? 'Primary cluster' : 'Elastic failover'}
         </button>
       </ModuleHeader>
 
@@ -196,7 +196,7 @@ export function ObservabilityDashboard() {
       {drMode === 'failover' && (
         <div className="mt-4 p-3 bg-success/10 border border-success/30 rounded-lg text-sm text-success flex items-center gap-2">
           <Shield className="w-4 h-4" />
-          Elastic DR cluster active — queries routing to backup cluster with 1.2s sync latency. Datadog primary unavailable.
+          Elastic DR cluster active — queries routing to backup cluster with 1.2s sync latency. Primary cluster unavailable.
         </div>
       )}
 
@@ -477,7 +477,7 @@ export function ObservabilityDashboard() {
             <div className="space-y-2 text-xs text-elastic-gray">
               <div className="flex items-center gap-2 p-2 bg-elastic-teal/5 rounded">
                 <Database className="w-4 h-4 text-elastic-teal" />
-                Same OTel agent → metrics, traces, logs — no code changes from Datadog
+                Same OTel agent → metrics, traces, logs — no instrumentation changes required
               </div>
               <div className="p-2 bg-gray-50 rounded font-mono text-[10px]">
                 OTEL_EXPORTER_OTLP_ENDPOINT=elastic-collector:4317

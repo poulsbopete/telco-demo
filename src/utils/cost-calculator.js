@@ -48,8 +48,8 @@ export const ENTERPRISE_DISCOUNTS = {
   onPremPct: 85,
 };
 
-/** Telco production volumes from RFP / modernization planning (June 2026) */
-export const PAYPAL_O11Y_VOLUMES = {
+/** Telco production volumes from capacity planning (June 2026) */
+export const TELCO_O11Y_VOLUMES = {
   logsTBPerDay: 3072,
   logsLabel: '3 PB/day',
   metricsPerMinute: 500_000_000,
@@ -87,9 +87,9 @@ export const OBSERVABILITY_VOLUME_TIERS = [
     id: 'tier3',
     label: 'Tier 3 · Adoption at scale',
     description: '3 PB/day logs · 500M metrics/min · 1.2B spans/min',
-    logsTBPerDay: PAYPAL_O11Y_VOLUMES.logsTBPerDay,
-    metricsPerMinute: PAYPAL_O11Y_VOLUMES.metricsPerMinute,
-    spansPerMinute: PAYPAL_O11Y_VOLUMES.spansPerMinute,
+    logsTBPerDay: TELCO_O11Y_VOLUMES.logsTBPerDay,
+    metricsPerMinute: TELCO_O11Y_VOLUMES.metricsPerMinute,
+    spansPerMinute: TELCO_O11Y_VOLUMES.spansPerMinute,
     serverlessDiscountPct: ENTERPRISE_DISCOUNTS.serverlessPct,
     onPremDiscountPct: ENTERPRISE_DISCOUNTS.onPremPct,
     isTelcoAnchor: true,
@@ -150,7 +150,7 @@ export const HYBRID_DEFAULTS = {
 export const FEDERATION_ARCHITECTURE = {
   todayPattern: 'A2A agent federation + Kibana Workflows',
   todayDetail:
-    'Orchestrator agents call each boundary over HTTPS (Security, Search, Datadog, on-prem ES|QL proxies). '
+    'Orchestrator agents call each boundary over HTTPS (Security, Search, external metrics APIs, on-prem ES|QL proxies). '
     + 'No cluster peering — fits Serverless egress and DC firewall policies.',
   ccsRoadmap: 'Cross-Cluster Search (Self-Managed ↔ Serverless)',
   ccsRoadmapEta: 'FY27+ (long-term roadmap; not available for hybrid production today)',
@@ -163,52 +163,50 @@ export const FEDERATION_ARCHITECTURE = {
 };
 
 const PRICING = {
-  /** Illustrative Datadog enterprise model — no single public GB rate at Telco scale */
-  datadog: {
+  /** Illustrative legacy SaaS observability — optional baseline, not a named vendor */
+  legacySaas: {
     logsPerGB: 0.15,
-    /** Indexed logs + bundled APM/custom metrics on enterprise commits */
     signalUpliftBase: 0.38,
     signalUpliftPerMetricsM: 0.20,
     signalUpliftPerSpansM: 0.22,
     metricsBaselineM: 500,
     spansBaselineM: 1200,
     storagePerGBMonth: 0.048,
-    flexArchivePerGBMonth: 0.012,
     basePlatformFee: 12000,
     maxRetentionDays: 15,
   },
-  splunk: {
-    /** Illustrative model of Telco's current Splunk ES + indexed storage stack */
+  legacySecurity: {
+    /** Illustrative model of a legacy SIEM + indexed storage stack */
     ingestPerGB: 0.15,
     storagePerGBMonth: 0.04,
     basePlatformFee: 8000,
   },
 };
 
-/** Splunk → Elastic Security capability mapping for Telco migration narrative */
-export const SPLUNK_REPLACEMENT_MAP = [
+/** Legacy SIEM → Elastic Security capability mapping */
+export const LEGACY_SECURITY_MAP = [
   {
-    splunk: 'Splunk Enterprise Security',
+    legacy: 'Legacy SIEM platform',
     elastic: 'Elastic Security SIEM',
     detail: 'Detection rules, correlation, and alert triage in Kibana Security',
   },
   {
-    splunk: 'Splunk UBA',
+    legacy: 'User behavior analytics',
     elastic: 'Entity Analytics + ML',
     detail: 'User/host risk scores, blast radius, and anomaly jobs on the same data tier',
   },
   {
-    splunk: 'Splunk SOAR / Phantom',
+    legacy: 'SOAR / playbook automation',
     elastic: 'Kibana Workflows + Cases',
     detail: 'Case management, connector-driven response, and agentic automation',
   },
   {
-    splunk: 'Indexed cold / frozen tiers',
+    legacy: 'Cold / frozen search tiers',
     elastic: 'Search AI Lake',
-    detail: 'Searchable multi-year retention without rehydration — sub-2s at Telco scale',
+    detail: 'Searchable multi-year retention without rehydration — sub-2s at telco scale',
   },
   {
-    splunk: 'Splunk forwarders + add-ons',
+    legacy: 'Custom collectors + add-ons',
     elastic: 'Elastic Agent + 650+ integrations',
     detail: 'Unified collection for logs, cloud audit, endpoint, and PCI-scoped sources',
   },
@@ -219,19 +217,19 @@ export const HYBRID_CAPABILITIES = [
     id: 'a2a',
     title: 'A2A federation (available today)',
     detail: FEDERATION_ARCHITECTURE.todayDetail,
-    datadogLimit: 'Datadog: no native agent-to-agent orchestration across Elastic projects or customer DC boundaries.',
+    consideration: 'Works across Elastic projects, customer DCs, and existing third-party observability tools via scoped agent endpoints.',
   },
   {
     id: 'retention',
     title: 'Split retention economics',
-    detail: '14-day Serverless hot tier on a subset of ingest; full corpus archived on Telco hardware for multi-year retention — separate ingest paths, not CCS-linked.',
-    datadogLimit: 'Datadog: 15-day default log retention; long archive requires costly indexable or flex tiers.',
+    detail: '14-day Serverless hot tier on a subset of ingest; full corpus archived on telco hardware for multi-year retention — separate ingest paths, not CCS-linked.',
+    consideration: 'Optimize cost by matching retention policy to data access patterns instead of indexing everything at the same tier.',
   },
   {
     id: 'ccs-roadmap',
     title: 'CCS Self-Managed ↔ Serverless (roadmap only)',
     detail: `${FEDERATION_ARCHITECTURE.ccsRoadmap} — ${FEDERATION_ARCHITECTURE.ccsRoadmapEta}. ${FEDERATION_ARCHITECTURE.ccsNetworkNote}`,
-    datadogLimit: 'Not a Datadog comparison — future Elastic capability. Use A2A agents or tier-specific queries until CCS ships.',
+    consideration: 'Until CCS ships, use A2A agents or tier-specific ES|QL queries for cross-boundary correlation.',
   },
 ];
 
@@ -573,39 +571,33 @@ export function calculateObservabilityCost({
     enterpriseDiscountPct: serverless.enterpriseDiscountPct,
   };
 
-  function calcDatadog() {
-    const p = PRICING.datadog;
+  function calcLegacySaas() {
+    const p = PRICING.legacySaas;
     const metricsM = metricsPerMinute / 1e6;
     const spansM = spansPerMinute / 1e6;
     const logIngest = logsGBPerMonth * p.logsPerGB;
-
-    // At Telco scale, Datadog is sold on enterprise commits — not list $/million indexed spans
-    // for every trace in the firehose. Model APM/metrics as a bounded uplift on log ingest.
     const signalUplift =
       p.signalUpliftBase
       + p.signalUpliftPerMetricsM * (metricsM / p.metricsBaselineM)
       + p.signalUpliftPerSpansM * (spansM / p.spansBaselineM);
     const ingest = Math.round(logIngest * (1 + signalUplift));
-
-    // SaaS log storage across requested retention window
     const storage = Math.round(logsGBPerMonth * (retentionDays / 30) * p.storagePerGBMonth);
-    const archivePenalty = 0;
 
     return {
       ingest,
       logIngest: Math.round(logIngest),
       signalIngest: Math.round(logIngest * signalUplift),
       storage,
-      archivePenalty,
+      archivePenalty: 0,
       platform: p.basePlatformFee,
       maxRetentionDays: p.maxRetentionDays,
-      total: Math.round(ingest + storage + archivePenalty + p.basePlatformFee),
+      total: Math.round(ingest + storage + p.basePlatformFee),
     };
   }
 
-  const datadog = calcDatadog();
+  const legacySaas = calcLegacySaas();
   const hybridTotal = hybrid.total;
-  const datadogTotal = datadog.total;
+  const serverlessTotal = elastic.total;
   const selfHostedTotal = selfHosted.total;
   const traceVolume = traceVolumeFromSpansPerMinute(spansPerMinute);
   const traceValidation = rfpTraceVolumeValidation(spansPerMinute);
@@ -636,23 +628,21 @@ export function calculateObservabilityCost({
     elastic,
     hybrid,
     selfHosted,
-    datadog,
     serverless,
+    legacySaas,
     savings: {
-      serverlessVsDatadog: {
-        amount: datadogTotal - elastic.total,
-        percent: Math.round((1 - elastic.total / datadogTotal) * 100),
+      hybridVsServerless: {
+        amount: serverlessTotal - hybridTotal,
+        percent: Math.round((1 - hybridTotal / serverlessTotal) * 100),
       },
-      hybridVsDatadog: {
-        amount: datadogTotal - hybridTotal,
-        percent: Math.round((1 - hybridTotal / datadogTotal) * 100),
+      selfHostedVsServerless: {
+        amount: serverlessTotal - selfHostedTotal,
+        percent: Math.round((1 - selfHostedTotal / serverlessTotal) * 100),
       },
-      selfHostedVsDatadog: {
-        amount: datadogTotal - selfHostedTotal,
-        percent: Math.round((1 - selfHostedTotal / datadogTotal) * 100),
+      hybridVsSelfHosted: {
+        amount: selfHostedTotal - hybridTotal,
+        percent: Math.round((1 - hybridTotal / selfHostedTotal) * 100),
       },
-      amount: datadogTotal - hybridTotal,
-      percent: Math.round((1 - hybridTotal / datadogTotal) * 100),
     },
     drNote: '30% enterprise discount on official Serverless Complete list rates and 85% on illustrative on-prem TCO at all volume tiers. Telco anchor: 3 PB/day logs, 500M metrics/min, 1.2B spans/min. Split on-prem costs are illustrative. Cross-boundary correlation uses A2A today — CCS Self-Managed ↔ Serverless is FY27+ roadmap, not GA.',
   };
@@ -684,16 +674,14 @@ export function getTieredPricingMatrix({
         selfHosted: cost.selfHosted.total,
         hybrid: cost.hybrid.total,
         serverless: cost.elastic.total,
-        datadog: cost.datadog.total,
       },
       listMonthly: {
         selfHosted: cost.selfHosted.totalList,
         hybrid: cost.hybrid.totalList,
         serverless: cost.serverless.totalMonthlyList,
-        datadog: cost.datadog.total,
       },
       effectiveRates: cost.effectiveRates,
-      savingsVsDatadog: cost.savings,
+      savings: cost.savings,
     };
   });
 }
@@ -713,22 +701,22 @@ export function calculateSecurityCost({ securityTBPerDay = 300, retentionDays = 
     storedGB * pricing.retentionPerGBMonth
   );
 
-  const splunkMonthly = Math.round(
-    gbPerMonth * PRICING.splunk.ingestPerGB +
-    gbPerMonth * (retentionDays / 30) * PRICING.splunk.storagePerGBMonth +
-    PRICING.splunk.basePlatformFee
+  const legacyMonthly = Math.round(
+    gbPerMonth * PRICING.legacySecurity.ingestPerGB +
+    gbPerMonth * (retentionDays / 30) * PRICING.legacySecurity.storagePerGBMonth +
+    PRICING.legacySecurity.basePlatformFee
   );
 
   return {
     elastic: elasticMonthly,
-    splunk: splunkMonthly,
-    splunkLabel: 'Splunk Enterprise Security',
+    legacy: legacyMonthly,
+    legacyLabel: 'Legacy SIEM (illustrative)',
     elasticLabel: 'Elastic Security Serverless',
     savings: {
-      amount: splunkMonthly - elasticMonthly,
-      percent: Math.round((1 - elasticMonthly / splunkMonthly) * 100),
+      amount: legacyMonthly - elasticMonthly,
+      percent: Math.round((1 - elasticMonthly / legacyMonthly) * 100),
     },
-    migrationNote: 'Splunk figures are an illustrative model of Telco\'s current ES stack. Elastic uses official Serverless Complete rates.',
+    migrationNote: 'Legacy figures are an illustrative model for comparison. Elastic uses official Serverless Complete rates.',
   };
 }
 
@@ -740,7 +728,7 @@ export function getSecurityScenarioComparisons() {
   ];
   return rows.map(({ label, ...inputs }) => {
     const cost = calculateSecurityCost(inputs);
-    return { label, elastic: cost.elastic, splunk: cost.splunk, savings: cost.savings };
+    return { label, elastic: cost.elastic, legacy: cost.legacy, savings: cost.savings };
   });
 }
 
@@ -751,7 +739,6 @@ export function getScenarioComparisons() {
     selfHosted: { total: row.monthly.selfHosted },
     hybrid: { total: row.monthly.hybrid },
     elastic: { total: row.monthly.serverless },
-    datadog: { total: row.monthly.datadog },
   }));
 }
 

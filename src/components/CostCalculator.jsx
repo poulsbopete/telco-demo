@@ -10,7 +10,7 @@ import {
   HYBRID_DEFAULTS,
   FEDERATION_ARCHITECTURE,
   OBSERVABILITY_VOLUME_TIERS,
-  PAYPAL_O11Y_VOLUMES,
+  TELCO_O11Y_VOLUMES,
   getTieredPricingMatrix,
   getVolumeTierById,
   formatNumber,
@@ -25,7 +25,7 @@ function CostTotal({ amount, variant = 'elastic' }) {
     elastic: 'text-elastic-teal',
     hybrid: 'text-telco-magenta',
     onPrem: 'text-elastic-dark',
-    datadog: 'text-elastic-gray',
+    legacy: 'text-elastic-gray',
   };
   const color = colors[variant] || colors.elastic;
   const full = `$${amount.toLocaleString()}`;
@@ -69,12 +69,12 @@ function CostBreakdown({ lines }) {
   );
 }
 
-function SavingsLine({ label, amount, percent }) {
+function SavingsLine({ label, amount, percent, baseline }) {
   return (
     <p className="flex items-start gap-2 text-xs sm:text-sm">
       <TrendingDown className="w-4 h-4 shrink-0 mt-0.5" />
       <span className="min-w-0 break-words">
-        {label} saves {formatCompactUsd(amount)}/mo vs Datadog ({percent}%)
+        {label} saves {formatCompactUsd(amount)}/mo vs {baseline} ({percent}%)
       </span>
     </p>
   );
@@ -91,8 +91,7 @@ function TierPricingTable({ rows }) {
             <th className="py-2 pr-2 font-semibold">Volume tier</th>
             <th className="py-2 px-1 font-semibold text-elastic-dark">Self-hosted</th>
             <th className="py-2 px-1 font-semibold text-telco-magenta">Split + A2A</th>
-            <th className="py-2 px-1 font-semibold text-elastic-teal">Serverless</th>
-            <th className="py-2 pl-1 font-semibold text-elastic-gray">Datadog</th>
+            <th className="py-2 pl-1 font-semibold text-elastic-teal">Serverless</th>
           </tr>
         </thead>
         <tbody>
@@ -114,11 +113,8 @@ function TierPricingTable({ rows }) {
               <td className="py-2.5 px-1 font-semibold text-telco-magenta tabular-nums">
                 {formatCompactUsd(row.monthly.hybrid)}
               </td>
-              <td className="py-2.5 px-1 font-semibold text-elastic-teal tabular-nums">
+              <td className="py-2.5 pl-1 font-semibold text-elastic-teal tabular-nums">
                 {formatCompactUsd(row.monthly.serverless)}
-              </td>
-              <td className="py-2.5 pl-1 text-elastic-gray tabular-nums">
-                {formatCompactUsd(row.monthly.datadog)}
               </td>
             </tr>
           ))}
@@ -214,10 +210,10 @@ export function CostCalculator({ mode = 'observability' }) {
       <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 min-w-0 w-full max-w-full overflow-visible @container">
         <div className="flex items-center gap-2 mb-2">
           <Calculator className="w-5 h-5 text-elastic-teal" />
-          <h3 className="font-semibold text-elastic-dark">Splunk → Elastic Security</h3>
+          <h3 className="font-semibold text-elastic-dark">Security TCO Calculator</h3>
         </div>
         <p className="text-xs text-elastic-gray mb-3">
-          Replace Splunk Enterprise Security at Telco scale. Elastic Security Serverless uses official Complete-tier rates ·{' '}
+          Compare Elastic Security Serverless against an illustrative legacy SIEM model at telco scale. Uses official Complete-tier rates ·{' '}
           <a
             href={ELASTIC_SERVERLESS_PRICING_URL}
             target="_blank"
@@ -229,7 +225,7 @@ export function CostCalculator({ mode = 'observability' }) {
         </p>
         <label className="block text-sm text-elastic-gray mb-2">
           Security data volume: <strong>{logsTB} TB/day</strong>
-          <span className="text-xs text-elastic-gray ml-1">(today on Splunk)</span>
+          <span className="text-xs text-elastic-gray ml-1">(illustrative legacy baseline)</span>
         </label>
         <input
           type="range"
@@ -257,14 +253,14 @@ export function CostCalculator({ mode = 'observability' }) {
             <p className="text-[10px] text-elastic-gray mt-1">Search AI Lake · SIEM + retention</p>
           </div>
           <div className="p-3 rounded-lg bg-gray-50 border border-gray-200 min-w-0">
-            <p className="text-xs text-elastic-gray">Today · {secCost.splunkLabel}</p>
-            <CostTotal amount={secCost.splunk} variant="datadog" />
-            <p className="text-[10px] text-elastic-gray mt-1">Illustrative Splunk ES model</p>
+            <p className="text-xs text-elastic-gray">Baseline · {secCost.legacyLabel}</p>
+            <CostTotal amount={secCost.legacy} variant="legacy" />
+            <p className="text-[10px] text-elastic-gray mt-1">Illustrative legacy SIEM model</p>
           </div>
         </div>
         <div className="flex items-center gap-2 mt-3 text-success text-sm font-medium">
           <TrendingDown className="w-4 h-4" />
-          ${secCost.savings.amount.toLocaleString()}/mo savings replacing Splunk ({secCost.savings.percent}%)
+          ${secCost.savings.amount.toLocaleString()}/mo savings vs illustrative legacy baseline ({secCost.savings.percent}%)
         </div>
         <p className="text-[10px] text-elastic-gray mt-2 italic">{secCost.migrationNote}</p>
 
@@ -276,8 +272,8 @@ export function CostCalculator({ mode = 'observability' }) {
                 <span className="text-elastic-gray shrink-0">{s.label}</span>
                 <span className="text-right">
                   <span className="text-elastic-teal font-medium">${s.elastic.toLocaleString()}</span>
-                  <span className="text-elastic-gray mx-1">vs Splunk</span>
-                  <span className="text-elastic-gray">${s.splunk.toLocaleString()}</span>
+                  <span className="text-elastic-gray mx-1">vs legacy</span>
+                  <span className="text-elastic-gray">${s.legacy.toLocaleString()}</span>
                 </span>
               </div>
             ))}
@@ -302,7 +298,7 @@ export function CostCalculator({ mode = 'observability' }) {
     <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 min-w-0 w-full max-w-full overflow-visible @container">
       <div className="flex items-center gap-2 mb-4">
         <Calculator className="w-5 h-5 text-elastic-teal" />
-        <h3 className="font-semibold text-elastic-dark">Observability Cost Calculator</h3>
+        <h3 className="font-semibold text-elastic-dark">Elastic Deployment TCO Calculator</h3>
       </div>
 
       <div className="flex flex-wrap gap-1.5 mb-4">
@@ -325,8 +321,8 @@ export function CostCalculator({ mode = 'observability' }) {
       <div className="mb-4 p-3 rounded-lg bg-telco-magenta/5 border border-telco-magenta/15">
         <p className="text-xs font-semibold text-elastic-dark mb-2">Volume commitment tiers</p>
         <p className="text-[10px] text-elastic-gray mb-3 leading-relaxed">
-          Tiered pricing anchored on Telco production volumes: {PAYPAL_O11Y_VOLUMES.logsLabel} logs,{' '}
-          {PAYPAL_O11Y_VOLUMES.metricsLabel}, {PAYPAL_O11Y_VOLUMES.spansLabel}.{' '}
+          Tiered pricing anchored on telco production volumes: {TELCO_O11Y_VOLUMES.logsLabel} logs,{' '}
+          {TELCO_O11Y_VOLUMES.metricsLabel}, {TELCO_O11Y_VOLUMES.spansLabel}.{' '}
           Enterprise discount: 30% Serverless · 85% on-prem at all tiers.
         </p>
         <div className="flex flex-wrap gap-1.5 mb-3">
@@ -428,7 +424,7 @@ export function CostCalculator({ mode = 'observability' }) {
           <p className="mt-0.5">{obsCost.volumes.traceValidation.summary}</p>
         </div>
         <div>
-          <label className="text-xs text-elastic-gray">Datadog retention cap: {retention} days requested</label>
+          <label className="text-xs text-elastic-gray">Retention window: {retention} days</label>
           <input
             type="range"
             min={7}
@@ -438,7 +434,7 @@ export function CostCalculator({ mode = 'observability' }) {
             className="w-full accent-elastic-teal mt-1"
           />
           <p className="text-[10px] text-elastic-gray mt-1">
-            Datadog uses an illustrative indexed-log + APM commit model. Elastic Serverless uses published{' '}
+            Elastic Serverless uses published{' '}
             <a
               href={ELASTIC_SERVERLESS_PRICING_URL}
               target="_blank"
@@ -532,7 +528,7 @@ export function CostCalculator({ mode = 'observability' }) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 @3xl:grid-cols-4 gap-3 mt-5 min-w-0 w-full">
+      <div className="grid grid-cols-1 sm:grid-cols-2 @3xl:grid-cols-3 gap-3 mt-5 min-w-0 w-full">
         {showSelfHosted && (
           <CostCard
             title="Self-hosted · Telco DC"
@@ -548,7 +544,6 @@ export function CostCalculator({ mode = 'observability' }) {
               `Ingest ${formatCompactUsd(sh.ingest)} · Retention ${formatCompactUsd(sh.retention)}`,
               `Platform ${formatCompactUsd(sh.platform)}`,
             ]} />
-            <p className="text-[10px] text-success mt-2">{obsCost.savings.selfHostedVsDatadog.percent}% below Datadog</p>
           </CostCard>
         )}
         {showHybrid && (
@@ -569,7 +564,6 @@ export function CostCalculator({ mode = 'observability' }) {
               `Ingest ${formatCompactUsd(h.ingest)} · Retention ${formatCompactUsd(h.storage)} · A2A ${formatCompactUsd(h.platform)}`,
               `List ${formatCompactUsd(h.totalList)} before enterprise discounts`,
             ]} />
-            <p className="text-[10px] text-success mt-2">{obsCost.savings.hybridVsDatadog.percent}% below Datadog</p>
           </CostCard>
         )}
         {(deployMode === 'all' || deployMode === 'self-hosted' || deployMode === 'hybrid') && (
@@ -584,45 +578,34 @@ export function CostCalculator({ mode = 'observability' }) {
               `${formatCompactCount(obsCost.serverless.ingestGBPerMonth)} GB/mo ingested`,
               `${formatCompactCount(obsCost.serverless.storedGB)} GB stored`,
             ]} />
-            <p className="text-[10px] text-success mt-2">{obsCost.savings.serverlessVsDatadog.percent}% below Datadog</p>
           </CostCard>
         )}
-        <CostCard
-          title="Datadog · SaaS (illustrative)"
-          className="bg-gray-50 border border-gray-200"
-        >
-          <CostTotal amount={obsCost.datadog.total} variant="datadog" />
-          <CostBreakdown lines={[
-            `Logs + APM ${formatCompactUsd(obsCost.datadog.ingest)}`,
-            `Storage ${formatCompactUsd(obsCost.datadog.storage)}`,
-            ...(obsCost.datadog.archivePenalty > 0
-              ? [`Archive ${formatCompactUsd(obsCost.datadog.archivePenalty)}`]
-              : []),
-          ]} />
-        </CostCard>
       </div>
 
       <div className="mt-3 space-y-1.5 text-success font-medium">
-        {showSelfHosted && (
+        {showSelfHosted && obsCost.savings.selfHostedVsServerless.amount > 0 && (
           <SavingsLine
             label="Self-hosted"
-            amount={obsCost.savings.selfHostedVsDatadog.amount}
-            percent={obsCost.savings.selfHostedVsDatadog.percent}
+            amount={obsCost.savings.selfHostedVsServerless.amount}
+            percent={obsCost.savings.selfHostedVsServerless.percent}
+            baseline="Serverless-only"
           />
         )}
-        {(deployMode === 'all' || deployMode === 'hybrid') && (
-          <>
-            <SavingsLine
-              label="Serverless"
-              amount={obsCost.savings.serverlessVsDatadog.amount}
-              percent={obsCost.savings.serverlessVsDatadog.percent}
-            />
-            <SavingsLine
-              label="Split + A2A"
-              amount={obsCost.savings.hybridVsDatadog.amount}
-              percent={obsCost.savings.hybridVsDatadog.percent}
-            />
-          </>
+        {showHybrid && obsCost.savings.hybridVsServerless.amount > 0 && (
+          <SavingsLine
+            label="Split + A2A"
+            amount={obsCost.savings.hybridVsServerless.amount}
+            percent={obsCost.savings.hybridVsServerless.percent}
+            baseline="Serverless-only"
+          />
+        )}
+        {showSelfHosted && showHybrid && obsCost.savings.hybridVsSelfHosted.amount > 0 && (
+          <SavingsLine
+            label="Split + A2A"
+            amount={obsCost.savings.hybridVsSelfHosted.amount}
+            percent={obsCost.savings.hybridVsSelfHosted.percent}
+            baseline="Self-hosted"
+          />
         )}
       </div>
       <p className="text-xs text-elastic-gray mt-2 italic">{obsCost.drNote}</p>
@@ -641,7 +624,7 @@ export function CostCalculator({ mode = 'observability' }) {
         >
           elastic.co/pricing/serverless-observability
         </a>
-        {' '}({ELASTIC_PRICING_EFFECTIVE}). On-prem split and Datadog are illustrative. CCS not included — use A2A federation today.
+        {' '}({ELASTIC_PRICING_EFFECTIVE}). On-prem split costs are illustrative. CCS not included — use A2A federation today.
       </p>
 
       {(deployMode === 'all' || deployMode === 'hybrid') && (
@@ -656,7 +639,7 @@ export function CostCalculator({ mode = 'observability' }) {
               {cap.title}
             </p>
             <p className="text-elastic-gray mt-0.5">{cap.detail}</p>
-            <p className="text-elastic-gray/80 mt-1 italic">{cap.datadogLimit}</p>
+            <p className="text-elastic-gray/80 mt-1 italic">{cap.consideration}</p>
           </div>
         ))}
       </div>

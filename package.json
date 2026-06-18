@@ -10,7 +10,10 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "bootstrap:workflow": "node scripts/bootstrap-kibana-workflow.mjs"
+    "bootstrap:workflow": "node scripts/bootstrap-kibana-workflow.mjs",
+    "deploy:dashboard:observability": "node scripts/deploy-telco-dashboards.mjs observability",
+    "deploy:dashboard:search": "node scripts/deploy-telco-dashboards.mjs search",
+    "deploy:dashboard:security": "node scripts/deploy-telco-dashboards.mjs security"
   },
   "dependencies": {
     "cors": "^2.8.6",

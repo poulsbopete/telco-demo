@@ -16,6 +16,11 @@ import elasticSearchA2a from '../api/demo/elastic-search-a2a.js';
 import a2aFederation from '../api/demo/a2a-federation.js';
 import workflow from '../api/demo/workflow.js';
 import esql from '../api/esql.js';
+import anConfig from '../api/adaptive-networks/config.js';
+import anChannels from '../api/adaptive-networks/channels.js';
+import anInject from '../api/adaptive-networks/inject.js';
+import anExecutions from '../api/adaptive-networks/executions.js';
+import anResume from '../api/adaptive-networks/resume.js';
 
 config({ path: '.env.local' });
 config({ path: '.env' });
@@ -41,6 +46,11 @@ mount('/api/demo/a2a-federation', a2aFederation);
 mount('/api/demo/logs', logs);
 mount('/api/demo/workflow', workflow);
 mount('/api/esql', esql);
+mount('/api/adaptive-networks/config', anConfig);
+mount('/api/adaptive-networks/channels', anChannels);
+mount('/api/adaptive-networks/inject', anInject);
+mount('/api/adaptive-networks/executions', anExecutions);
+mount('/api/adaptive-networks/resume', anResume);
 
 app.listen(PORT, () => {
   console.log(`[dev-api] http://localhost:${PORT}/api/health`);

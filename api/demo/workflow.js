@@ -62,8 +62,8 @@ export default async function handler(req, res) {
     }
 
     const kibanaStarted = Boolean(kibana?.kibanaExecutionId);
-    let message = 'Elastic Workflow resolution started — federated A2A to Datadog, Security, and Search complete';
-    let aiSummary = 'Cross-project A2A: Datadog confirms DB pool exhaustion; Security cleared compromise; Search loaded runbooks for regionID ' + regionId + '. Executing remediation.';
+    let message = 'Elastic Workflow resolution started — federated A2A to metrics, Security, and Search complete';
+    let aiSummary = 'Cross-project A2A: external metrics confirm DB pool exhaustion; Security cleared compromise; Search loaded runbooks for regionID ' + regionId + '. Executing remediation.';
 
     if (isSecurityWorkflow) {
       message = kibanaStarted

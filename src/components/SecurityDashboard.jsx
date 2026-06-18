@@ -13,10 +13,12 @@ import {
   generateSecurityIngestionStats,
   generateMetricsSeries,
 } from '../utils/data-generator';
-import { formatNumber, SPLUNK_REPLACEMENT_MAP } from '../utils/cost-calculator';
+import { formatNumber, LEGACY_SECURITY_MAP } from '../utils/cost-calculator';
 import {
   kibanaDiscoverUrl,
   kibanaSecurityUrl,
+  getSecurityKibanaUrl,
+  kibanaSecurityDashboardUrl,
   openSecurityCase,
   runSecurityIncidentWorkflow,
 } from '../lib/elastic-api';
@@ -49,7 +51,8 @@ const RULE_TYPE_LABELS = {
 };
 
 export function SecurityDashboard() {
-  const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
+  const securityKibanaUrl = getSecurityKibanaUrl();
+  const securityDashboardUrl = kibanaSecurityDashboardUrl(securityKibanaUrl);
   const [alerts, setAlerts] = useState(() => generateSecurityFeed(10));
   const [stats, setStats] = useState(() => generateSecurityIngestionStats());
   const [selectedAlert, setSelectedAlert] = useState(null);
@@ -66,13 +69,13 @@ export function SecurityDashboard() {
   const [isolateResult, setIsolateResult] = useState(null);
 
   const securityLinks = useMemo(() => ({
-    alerts: kibanaSecurityUrl(kibanaUrl, 'alerts'),
-    cases: kibanaSecurityUrl(kibanaUrl, 'cases'),
-    rules: kibanaSecurityUrl(kibanaUrl, 'rules'),
-    entityAnalytics: kibanaSecurityUrl(kibanaUrl, 'entityAnalytics'),
-    attackDiscovery: kibanaSecurityUrl(kibanaUrl, 'attackDiscovery'),
-    overview: kibanaSecurityUrl(kibanaUrl, 'overview'),
-  }), [kibanaUrl]);
+    alerts: kibanaSecurityUrl(securityKibanaUrl, 'alerts'),
+    cases: kibanaSecurityUrl(securityKibanaUrl, 'cases'),
+    rules: kibanaSecurityUrl(securityKibanaUrl, 'rules'),
+    entityAnalytics: kibanaSecurityUrl(securityKibanaUrl, 'entityAnalytics'),
+    attackDiscovery: kibanaSecurityUrl(securityKibanaUrl, 'attackDiscovery'),
+    overview: kibanaSecurityUrl(securityKibanaUrl, 'overview'),
+  }), [securityKibanaUrl]);
 
   const refresh = useCallback(() => {
     setStats(generateSecurityIngestionStats());
@@ -97,6 +100,7 @@ export function SecurityDashboard() {
         hits: 12847 + Math.floor(Math.random() * 5000),
         timeMs: Math.round(performance.now() - start + 1800),
         splunkTimeMs: 42000 + Math.floor(Math.random() * 8000),
+        legacyTimeMs: 42000 + Math.floor(Math.random() * 8000),
         timeRange: '2 years',
         index: 'logs-* , .alerts-security.*',
       });
@@ -104,7 +108,7 @@ export function SecurityDashboard() {
   }
 
   const activeAlert = selectedAlert || alerts[0];
-  const discoverInvestigationUrl = kibanaDiscoverUrl(kibanaUrl, {
+  const discoverInvestigationUrl = kibanaDiscoverUrl(securityKibanaUrl, {
     query: investigationQuery
       ? `FROM logs-* | WHERE @timestamp >= NOW() - 2 years | WHERE ${investigationQuery.replace(/\s+AND\s+/gi, ' AND ')} | LIMIT 100`
       : undefined,
@@ -175,21 +179,62 @@ export function SecurityDashboard() {
     <div>
       <ModuleHeader
         title="Elastic Security"
-        subtitle="Replacing Splunk Enterprise Security + UBA — 300 TB/day PCI-scoped SIEM on Search AI Lake"
-        badge="Splunk Replacement"
-      />
+        subtitle="Unified SIEM, Entity Analytics, and Search AI Lake — 300 TB/day PCI-scoped security telemetry"
+        badge="Security Platform"
+      >
+        {securityDashboardUrl && (
+          <a
+            href={securityDashboardUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            Dashboard <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+        {securityLinks.alerts && (
+          <a
+            href={securityLinks.alerts}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            Alerts <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+        {securityLinks.cases && (
+          <a
+            href={securityLinks.cases}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            Cases <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+        {securityLinks.overview && (
+          <a
+            href={securityLinks.overview}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            Security <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+      </ModuleHeader>
 
       <DemoBanner />
 
       <div className="mt-3 p-3 rounded-xl border border-telco-magenta/20 bg-telco-magenta/5 flex flex-col sm:flex-row sm:items-center gap-3">
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-telco-magenta">Telco migration: Splunk → Elastic Security</p>
+          <p className="text-sm font-semibold text-telco-magenta">Telco security platform consolidation</p>
           <p className="text-xs text-elastic-gray mt-0.5">
-            Same detection coverage and long-term search — unified SIEM, Entity Analytics, Cases, and Workflows on Elastic Serverless.
+            Unified SIEM, Entity Analytics, Cases, and Workflows on Elastic Serverless — searchable multi-year retention on Search AI Lake.
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0 text-xs">
-          <span className="px-2 py-1 rounded bg-gray-100 text-elastic-gray font-medium">Splunk ES + UBA</span>
+          <span className="px-2 py-1 rounded bg-gray-100 text-elastic-gray font-medium">Legacy SIEM</span>
           <ArrowRight className="w-4 h-4 text-elastic-teal" />
           <span className="px-2 py-1 rounded bg-elastic-teal/10 text-elastic-teal font-medium">Elastic Security</span>
         </div>
@@ -212,22 +257,30 @@ export function SecurityDashboard() {
           value={formatNumber(stats.eventsPerSecond)}
           trend="Elastic Agent + Beats"
           highlight
+          kibanaUrl={securityKibanaUrl}
+          kibanaSection="alerts"
         />
         <StatCard
           label="Security Data"
           value={`${stats.tbPerDay.toFixed(0)} TB/day`}
           trend="Search AI Lake ingest"
+          kibanaUrl={securityKibanaUrl}
+          kibanaSection="security-overview"
         />
         <StatCard
           label="MTTD"
           value={`${stats.mttdMinutes.toFixed(1)} min`}
           trend={`MTTR: ${stats.mttrMinutes.toFixed(0)} min · Kibana Cases`}
           highlight
+          kibanaUrl={securityKibanaUrl}
+          kibanaSection="cases"
         />
         <StatCard
           label="Detection Queries"
           value={formatNumber(stats.queriesToday)}
           trend="ES|QL · EQL · ML rules"
+          kibanaUrl={securityKibanaUrl}
+          kibanaSection="rules"
         />
       </div>
 
@@ -427,7 +480,7 @@ export function SecurityDashboard() {
                           )}
                           {(workflowRun.kibanaExecutionId || workflowRun.kibanaWorkflowId) && (
                             <ElasticWorkflowLink
-                              kibanaUrl={kibanaUrl}
+                              kibanaUrl={securityKibanaUrl}
                               workflowId={workflowRun.kibanaWorkflowId}
                               executionId={workflowRun.kibanaExecutionId}
                               href={workflowRun.kibanaExecutionUrl || workflowRun.kibanaWorkflowUrl}
@@ -498,7 +551,7 @@ export function SecurityDashboard() {
               Search AI Lake · Long-Term Investigation
             </h3>
             <p className="text-xs text-elastic-gray mb-3">
-              Query years of security data in Search AI Lake with ES|QL — replacing Splunk indexed/frozen tier searches.
+              Query years of security data in Search AI Lake with ES|QL — no cold-tier rehydration required.
             </p>
             <form onSubmit={handleInvestigate} className="flex gap-2">
               <input
@@ -522,8 +575,8 @@ export function SecurityDashboard() {
                   {searchResult.timeRange} · {searchResult.index}
                 </p>
                 <p className="text-xs text-elastic-gray mt-1">
-                  Same query on Splunk cold storage: ~{(searchResult.splunkTimeMs / 1000).toFixed(0)}s
-                  <span className="text-elastic-teal font-medium"> · {(searchResult.splunkTimeMs / searchResult.timeMs).toFixed(0)}× faster with Elastic</span>
+                  Illustrative legacy cold-tier query: ~{((searchResult.legacyTimeMs || searchResult.splunkTimeMs) / 1000).toFixed(0)}s
+                  <span className="text-elastic-teal font-medium"> · {((searchResult.legacyTimeMs || searchResult.splunkTimeMs) / searchResult.timeMs).toFixed(0)}× faster with Elastic</span>
                 </p>
                 {discoverInvestigationUrl && (
                   <a
@@ -632,16 +685,16 @@ export function SecurityDashboard() {
           <div className="bg-telco-magenta/5 rounded-xl border border-telco-magenta/20 p-4">
             <p className="text-sm font-semibold text-telco-magenta flex items-center gap-1.5">
               <ArrowRight className="w-4 h-4" />
-              Splunk → Elastic Security
+              Platform capability map
             </p>
             <p className="text-xs text-elastic-gray mt-1 mb-3">
-              One platform replaces Splunk ES, UBA, and SOAR — with Search AI Lake for multi-year investigations.
+              One platform for SIEM, UBA, SOAR, and long-term search — with Search AI Lake for multi-year investigations.
             </p>
             <div className="space-y-2">
-              {SPLUNK_REPLACEMENT_MAP.map(row => (
-                <div key={row.splunk} className="p-2 bg-white/70 rounded-lg border border-gray-100">
+              {LEGACY_SECURITY_MAP.map(row => (
+                <div key={row.legacy} className="p-2 bg-white/70 rounded-lg border border-gray-100">
                   <div className="flex items-center gap-1.5 text-[10px] font-semibold">
-                    <span className="text-elastic-gray truncate">{row.splunk}</span>
+                    <span className="text-elastic-gray truncate">{row.legacy}</span>
                     <ArrowRight className="w-3 h-3 text-elastic-teal shrink-0" />
                     <span className="text-elastic-teal truncate">{row.elastic}</span>
                   </div>

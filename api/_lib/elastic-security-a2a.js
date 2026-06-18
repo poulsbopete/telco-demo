@@ -12,10 +12,20 @@ import {
 } from './a2a-common.js';
 import { CHECKOUT_INCIDENT, checkoutPrompt } from './demo-incident.js';
 
+const SECURITY_KIBANA_URL = (
+  process.env.SECURITY_KIBANA_URL
+  || process.env.VITE_SECURITY_KIBANA_URL
+  || 'https://my-security-project-b0679b.kb.us-central1.gcp.elastic.cloud'
+).replace(/\/$/, '');
+
+function securityKibanaPath(path) {
+  return `${SECURITY_KIBANA_URL}${path}`;
+}
+
 export const SECURITY_AGENT_CARD = {
   name: 'elastic-security-soc-agent',
   description: 'Elastic Security AI agent — SIEM detection, endpoint telemetry, cases, and threat intel',
-  url: 'https://paypal-security.kb.us-east-1.aws.elastic.cloud/.well-known/agent.json',
+  url: `${SECURITY_KIBANA_URL}/.well-known/agent.json`,
   version: '1.2.0',
   project: 'elastic_security',
   provider: 'Elastic N.V.',
@@ -24,7 +34,7 @@ export const SECURITY_AGENT_CARD = {
     { id: 'search_alerts', name: 'Alert Search', description: 'Query .alerts-security.* for open detections' },
     { id: 'enrich_threat_intel', name: 'Threat Intel', description: 'OTX + Mandiant enrichment on IOCs' },
     { id: 'manage_cases', name: 'Case Management', description: 'Open/update SOC cases via Kibana Cases API' },
-    { id: 'endpoint_response', name: 'Endpoint Response', description: 'Fleet actions on checkout-api hosts' },
+    { id: 'endpoint_response', name: 'Endpoint Response', description: 'Fleet actions on signaling-api hosts' },
   ],
   authentication: { schemes: ['apiKey', 'oauth2'] },
 };
@@ -33,26 +43,29 @@ function buildSecurityAlerts(regionId) {
   return {
     source: 'kibana.alerting',
     index: '.alerts-security.alerts-default',
+    kibanaUrl: securityKibanaPath('/app/security/alerts'),
     openCount: 3,
     alerts: [
       {
         id: 'sec-alert-8847291-a',
-        rule: 'Unusual API Key Usage — Checkout Service',
+        rule: 'Unusual API Key Usage — Signaling Service',
         severity: 'medium',
         risk_score: 47,
         regions_id: regionId,
         status: 'open',
-        reason: 'Spike in failed auth attempts correlated with checkout latency window',
-        entities: ['checkout-api-pod-7', 'svc-checkout-oauth'],
+        reason: 'Spike in failed auth attempts correlated with signaling latency window',
+        entities: ['signaling-api-pod-7', 'svc-signaling-oauth'],
+        url: securityKibanaPath('/app/security/alerts'),
       },
       {
         id: 'sec-alert-8847291-b',
-        rule: 'Impossible Travel — Merchant Admin Login',
+        rule: 'Impossible Travel — Region Admin Login',
         severity: 'low',
         risk_score: 21,
         regions_id: regionId,
         status: 'acknowledged',
         reason: 'Admin session from new geo during incident — likely ops team, not attack',
+        url: securityKibanaPath('/app/security/alerts'),
       },
     ],
     relatedSignals: [
@@ -68,9 +81,9 @@ function buildThreatIntel(regionId) {
     iocsChecked: 12,
     matches: 0,
     enrichment: {
-      checkout_api_ips: ['10.42.18.7', '10.42.18.9'],
+      signaling_api_ips: ['10.42.18.7', '10.42.18.9'],
       verdict: 'clean',
-      note: 'No known C2 or credential-stuffing lists match regions checkout traffic',
+      note: 'No known C2 or credential-stuffing lists match region signaling traffic',
     },
     recommendation: 'Treat as performance incident, not compromise — continue O11y remediation path',
   };
@@ -86,8 +99,9 @@ function buildSecurityCase(regionId, regionName, alertContext = {}) {
     caseId: `CASE-2026-${slug}`,
     title: `${threat} — ${host}${alertContext.userName ? ` (${alertContext.userName})` : ''}`,
     status: 'open',
-    assignee: 'soc-tier2@paypal.com',
+    assignee: 'soc-tier2@telco.demo',
     tags: ['siem-alert', threat.toLowerCase().replace(/\s+/g, '-'), host, 'elastic-security'],
+    kibanaUrl: securityKibanaPath('/app/security/cases'),
     timeline: [
       { at: new Date(Date.now() - 2 * 60000).toISOString(), event: `Alert ${alertId} linked from .alerts-security.alerts-default` },
       { at: new Date(Date.now() - 30 * 1000).toISOString(), event: 'Entity Analytics blast radius attached' },
@@ -143,7 +157,11 @@ export function simulateSecurityA2ACall({
     contextId,
     agentCard: SECURITY_AGENT_CARD,
     latencyMs: taskType === 'open_case' ? 64 : 98,
-    extraMeta: { kibanaSpace: 'security', serverlessProject: 'paypal-security-prod' },
+    extraMeta: {
+      kibanaSpace: 'security',
+      serverlessProject: 'my-security-project-b0679b',
+      securityKibanaUrl: SECURITY_KIBANA_URL,
+    },
     artifacts: [
       { artifactId: 'alerts-bundle', name: 'SIEM Alerts', parts: [{ type: 'data', data: alerts }] },
       { artifactId: 'threat-intel', name: 'Threat Intel', parts: [{ type: 'data', data: threatIntel }] },
@@ -161,6 +179,8 @@ export function simulateSecurityA2ACall({
     action: taskType === 'open_case' ? 'open_kibana_case' : 'merge_security_context',
     summary: synthesisSummary,
     nextStep,
+    securityKibanaUrl: SECURITY_KIBANA_URL,
+    casesUrl: securityCase.kibanaUrl,
   };
 
   return wrapA2AResult({
@@ -174,5 +194,6 @@ export function simulateSecurityA2ACall({
     elasticSynthesis,
     timingExtra: { siemQueryMs: 72, caseApiMs: 34 },
     narrative: 'Elastic Security project — federated SOC context via A2A.',
+    securityKibanaUrl: SECURITY_KIBANA_URL,
   });
 }

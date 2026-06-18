@@ -5,6 +5,7 @@ import { simulateSecurityA2ACall, SECURITY_AGENT_CARD } from '../_lib/elastic-se
 import { simulateSearchA2ACall, SEARCH_AGENT_CARD } from '../_lib/elastic-search-a2a.js';
 
 const TARGETS = {
+  metrics: { simulate: simulateA2ACall, card: DATADOG_AGENT_CARD, defaultTask: 'investigate_latency' },
   datadog: { simulate: simulateA2ACall, card: DATADOG_AGENT_CARD, defaultTask: 'investigate_latency' },
   security: { simulate: simulateSecurityA2ACall, card: SECURITY_AGENT_CARD, defaultTask: 'correlate_incident' },
   search: { simulate: simulateSearchA2ACall, card: SEARCH_AGENT_CARD, defaultTask: 'fetch_runbooks' },
@@ -25,7 +26,7 @@ export default async function handler(req, res) {
       ok: true,
       orchestrator: ELASTIC_ORCHESTRATOR_AGENT,
       federatedAgents: {
-        datadog: DATADOG_AGENT_CARD,
+        metrics: DATADOG_AGENT_CARD,
         security: SECURITY_AGENT_CARD,
         search: SEARCH_AGENT_CARD,
       },
@@ -45,7 +46,7 @@ export default async function handler(req, res) {
   const regionName = body.regionName || 'Acme Global Retail';
   const targets = Array.isArray(body.targets) && body.targets.length
     ? body.targets.filter(t => TARGETS[t])
-    : ['datadog', 'security', 'search'];
+    : ['metrics', 'security', 'search'];
 
   await new Promise(r => setTimeout(r, 280 + Math.random() * 120));
 
@@ -70,10 +71,10 @@ export default async function handler(req, res) {
     calls,
     orchestratorSynthesis: {
       agent: ELASTIC_ORCHESTRATOR_AGENT.name,
-      summary: `${CHECKOUT_INCIDENT.traceId}: Datadog p99 + pool · Security fraud.check cleared · Search runbook loaded.`,
+      summary: `${CHECKOUT_INCIDENT.traceId}: external metrics p99 + pool · Security fraud.check cleared · Search runbook loaded.`,
       nextStep: 'Execute remediation workflow',
     },
     timing: { parallelRoundTripMs: totalMs, agentCount: targets.length },
-    narrative: 'A2A v0.2 federation across Datadog, Security, and Search — one incident thread.',
+    narrative: 'A2A v0.2 federation across metrics, Security, and Search — one incident thread.',
   });
 }

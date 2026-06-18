@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
-  Bot, CheckCircle2, Loader2, Network, Radio, Search, Shield, Server,
+  Bot, CheckCircle2, ExternalLink, Loader2, Network, Radio, Search, Shield, Server,
 } from 'lucide-react';
 import { CHECKOUT_INCIDENT } from '../lib/demo-incident';
 import { FEDERATION_ARCHITECTURE } from '../utils/cost-calculator';
@@ -9,13 +9,27 @@ import {
   simulateDatadogA2A,
   simulateElasticSearchA2A,
   simulateElasticSecurityA2A,
+  getSearchKibanaUrl,
+  kibanaSearchHomeUrl,
+  getSecurityKibanaUrl,
+  kibanaSecurityUrl,
 } from '../lib/elastic-api';
 
 const AGENTS = {
-  datadog: { label: 'Datadog', icon: Server, color: '#632CA6', invoke: simulateDatadogA2A, taskType: 'investigate_latency' },
+  metrics: { label: 'Metrics', icon: Server, color: '#6b2c91', invoke: simulateDatadogA2A, taskType: 'investigate_latency' },
   security: { label: 'Security', icon: Shield, color: '#E04E39', invoke: simulateElasticSecurityA2A, taskType: 'correlate_incident' },
   search: { label: 'Search', icon: Search, color: '#0077CC', invoke: simulateElasticSearchA2A, taskType: 'fetch_runbooks' },
 };
+
+function securityCasesUrl(data) {
+  const caseBundle = data?.response?.result?.artifacts?.find(a => a.artifactId === 'case-bundle')?.parts?.[0]?.data;
+  return caseBundle?.kibanaUrl || data?.elasticSynthesis?.casesUrl || kibanaSecurityUrl(getSecurityKibanaUrl(), 'cases');
+}
+
+function runbookUrl(data) {
+  const runbooks = data?.response?.result?.artifacts?.find(a => a.artifactId === 'runbooks')?.parts?.[0]?.data;
+  return runbooks?.documents?.[0]?.url || data?.elasticSynthesis?.topRunbookUrl || null;
+}
 
 function headline(target, data) {
   const text = data?.response?.result?.artifacts?.find(a => a.artifactId === 'ai-summary')?.parts?.[0]?.text;
@@ -98,6 +112,11 @@ export function A2AFederationPanel({ regionId, regionName, compact = false, auto
   }, [autoRun]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const hasResults = Object.keys(results).length > 0;
+  const searchKibanaUrl = getSearchKibanaUrl();
+  const searchHomeLink = kibanaSearchHomeUrl(searchKibanaUrl);
+  const securityAlertsLink = kibanaSecurityUrl(getSecurityKibanaUrl(), 'alerts');
+  const topRunbookLink = runbookUrl(results.search);
+  const securityCaseLink = securityCasesUrl(results.security);
 
   return (
     <div className={`border border-elastic-teal/25 rounded-xl overflow-hidden ${compact ? '' : 'bg-white'}`}>
@@ -110,10 +129,32 @@ export function A2AFederationPanel({ regionId, regionName, compact = false, auto
           </p>
         </div>
         {phase !== 'running' && (
-          <button type="button" onClick={invokeAll}
-            className="shrink-0 text-[10px] px-2 py-1 bg-elastic-teal text-white rounded flex items-center gap-1">
-            <Radio className="w-3 h-3" /> {hasResults ? 'Re-run' : 'Invoke all'}
-          </button>
+          <div className="flex items-center gap-2 shrink-0">
+            {securityAlertsLink && (
+              <a
+                href={securityAlertsLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] px-2 py-1 rounded border border-danger/30 text-danger hover:bg-danger/10 flex items-center gap-1"
+              >
+                Security <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            {searchHomeLink && (
+              <a
+                href={searchHomeLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[10px] px-2 py-1 rounded border border-elastic-teal/30 text-elastic-teal hover:bg-elastic-teal/10 flex items-center gap-1"
+              >
+                Search <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            <button type="button" onClick={invokeAll}
+              className="text-[10px] px-2 py-1 bg-elastic-teal text-white rounded flex items-center gap-1">
+              <Radio className="w-3 h-3" /> {hasResults ? 'Re-run' : 'Invoke all'}
+            </button>
+          </div>
         )}
         {phase === 'running' && !activeTarget && (
           <Loader2 className="w-4 h-4 animate-spin text-elastic-teal shrink-0" />
@@ -143,6 +184,28 @@ export function A2AFederationPanel({ regionId, regionName, compact = false, auto
             </p>
             <p className="text-elastic-dark">{synthesis.summary}</p>
           </div>
+        )}
+
+        {topRunbookLink && (
+          <a
+            href={topRunbookLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] text-elastic-teal hover:underline flex items-center gap-1"
+          >
+            Open top runbook in Search <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
+
+        {securityCaseLink && (
+          <a
+            href={securityCaseLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] text-danger hover:underline flex items-center gap-1"
+          >
+            Open SOC case in Security <ExternalLink className="w-3 h-3" />
+          </a>
         )}
 
         <p className="text-[10px] text-elastic-gray leading-relaxed pt-1 border-t border-gray-100">

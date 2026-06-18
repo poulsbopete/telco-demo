@@ -219,7 +219,7 @@ const DEMO_WORKFLOW_SLUGS = {
 };
 
 export function resolveElasticWorkflowId(workflowId) {
-  if (!workflowId) return ELASTIC_CORE_WORKFLOW_SLUG;
+  if (!workflowId) return null;
   return DEMO_WORKFLOW_SLUGS[workflowId] || workflowId;
 }
 
@@ -229,7 +229,7 @@ export function elasticWorkflowUrl(elasticBase, { workflowId, executionId, url }
   const base = (elasticBase || import.meta.env.VITE_KIBANA_URL || '').replace(/\/$/, '');
   if (!base) return null;
   const resolvedWorkflowId = resolveElasticWorkflowId(workflowId);
-  if (executionId) {
+  if (resolvedWorkflowId && executionId) {
     const params = new URLSearchParams({
       executionId,
       stepExecutionId: '__overview',
@@ -237,7 +237,7 @@ export function elasticWorkflowUrl(elasticBase, { workflowId, executionId, url }
     });
     return `${base}/app/workflows/${encodeURIComponent(resolvedWorkflowId)}?${params.toString()}`;
   }
-  if (workflowId || resolvedWorkflowId) {
+  if (resolvedWorkflowId) {
     return `${base}/app/workflows/${encodeURIComponent(resolvedWorkflowId)}`;
   }
   return `${base}/app/workflows`;
@@ -247,8 +247,15 @@ export function elasticWorkflowUrl(elasticBase, { workflowId, executionId, url }
 export const kibanaWorkflowUrl = elasticWorkflowUrl;
 
 /** Deep links into Kibana Security (SIEM, cases, rules, entity analytics). */
+export const SECURITY_KIBANA_DEFAULT = 'https://my-security-project-b0679b.kb.us-central1.gcp.elastic.cloud';
+
+export function getSecurityKibanaUrl(override) {
+  const base = (override || import.meta.env.VITE_SECURITY_KIBANA_URL || SECURITY_KIBANA_DEFAULT).replace(/\/$/, '');
+  return base || null;
+}
+
 export function kibanaSecurityUrl(kibanaBase, section = 'alerts') {
-  const base = kibanaBase || import.meta.env.VITE_KIBANA_URL || '';
+  const base = getSecurityKibanaUrl(kibanaBase);
   if (!base) return null;
 
   const paths = {
@@ -261,7 +268,7 @@ export function kibanaSecurityUrl(kibanaBase, section = 'alerts') {
     timelines: '/app/security/timelines',
   };
 
-  return `${base.replace(/\/$/, '')}${paths[section] || paths.alerts}`;
+  return `${base}${paths[section] || paths.alerts}`;
 }
 
 export function kibanaDiscoverUrl(kibanaBase, { query, timeFrom = TELCO_DISCOVER_TIME.from, timeTo = TELCO_DISCOVER_TIME.to } = {}) {
@@ -298,4 +305,140 @@ export function formatUsd(n) {
   if (n >= 1e6) return `$${(n / 1e6).toFixed(1)}M`;
   if (n >= 1e3) return `$${(n / 1e3).toFixed(0)}K`;
   return `$${n}`;
+}
+
+/** Adaptive Networks — fault injection + workflow polling */
+/** Adaptive Networks — fault breakdown (body.text mnemonics; attributes.* not ES|QL columns) */
+export const ADAPTIVE_DISCOVER_ESQL = [
+  'FROM logs.otel.adaptive-networks*',
+  '| WHERE severity_text == "ERROR"',
+  '| EVAL fault = CASE(',
+  '    body.text LIKE "*SW_MATM*", "MAC Flap",',
+  '    body.text LIKE "*SPANTREE*", "STP",',
+  '    body.text LIKE "*BGP-3*", "BGP",',
+  '    body.text LIKE "*INTF-4*", "Interface",',
+  '    "Other")',
+  '| STATS errors = COUNT(*) BY fault',
+  '| SORT errors DESC',
+  '| LIMIT 10',
+].join(' ');
+
+export function fetchAdaptiveNetworksConfig() {
+  return fetchJson('/api/adaptive-networks/config');
+}
+
+export function injectNetworkFault(channel) {
+  return fetchJson('/api/adaptive-networks/inject', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ channel }),
+  });
+}
+
+export function pollAdaptiveExecutions(since) {
+  return fetchJson(`/api/adaptive-networks/executions?since=${encodeURIComponent(since)}`);
+}
+
+export function resumeAdaptiveExecution(executionId, { approved, notes } = {}) {
+  return fetchJson('/api/adaptive-networks/resume', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ executionId, approved, notes }),
+  });
+}
+
+export function kibanaAdaptiveCasesUrl(kibanaBase) {
+  const base = kibanaBase || import.meta.env.VITE_KIBANA_URL || '';
+  if (!base) return null;
+  return `${base.replace(/\/$/, '')}/app/observability/cases?tags=adaptive-networks`;
+}
+
+/** Elastic Serverless Search project (separate from otel-demo observability cluster) */
+export const SEARCH_KIBANA_DEFAULT = 'https://ai-assistants-ffcafb.kb.us-east-1.aws.elastic.cloud';
+export const SEARCH_ENGINE_DEFAULT = 'telco-tmobile-kb';
+
+export function getSearchKibanaUrl(override) {
+  const base = (override || import.meta.env.VITE_SEARCH_KIBANA_URL || SEARCH_KIBANA_DEFAULT).replace(/\/$/, '');
+  return base || null;
+}
+
+export function getSearchEngine(override) {
+  return override || import.meta.env.VITE_SEARCH_ENGINE || SEARCH_ENGINE_DEFAULT;
+}
+
+/** Default ES|QL for telco-tmobile-kb (Serverless ES index — not a legacy App Search engine) */
+export function buildSearchKbDiscoverEsql(engine, { titleLike } = {}) {
+  const index = getSearchEngine(engine);
+  const lines = [`FROM ${index}`];
+  if (titleLike) {
+    const term = String(titleLike).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    lines.push(`| WHERE title LIKE "*${term}*" OR content LIKE "*${term}*"`);
+  }
+  lines.push('| KEEP title, section, carrier, persona_tags, content');
+  lines.push('| SORT fetched_at DESC');
+  lines.push(`| LIMIT ${titleLike ? 25 : 50}`);
+  return lines.join(' ');
+}
+
+/** Discover deep link on the Search Serverless project */
+export function kibanaSearchDiscoverUrl(kibanaBase, { query, engine, timeFrom = 'now-365d', timeTo = 'now' } = {}) {
+  const base = getSearchKibanaUrl(kibanaBase);
+  if (!base) return null;
+  const esql = query || buildSearchKbDiscoverEsql(engine);
+  return kibanaDiscoverUrl(base, { query: esql, timeFrom, timeTo });
+}
+
+/** Search Serverless — KB index in Discover (replaces legacy /app/search routes) */
+export function kibanaSearchHomeUrl(kibanaBase) {
+  return kibanaSearchDiscoverUrl(kibanaBase);
+}
+
+/** Agent Builder on the Search Serverless project */
+export function kibanaAgentBuilderUrl(kibanaBase) {
+  const base = getSearchKibanaUrl(kibanaBase);
+  if (!base) return null;
+  return `${base}/app/agent_builder`;
+}
+
+/** telco-tmobile-kb index in Discover */
+export function kibanaSearchAppUrl(kibanaBase, engine) {
+  return kibanaSearchDiscoverUrl(kibanaBase, { engine });
+}
+
+/** Document/context drill-down in Discover */
+export function kibanaSearchDocumentUrl(kibanaBase, { engine, documentId, query, title } = {}) {
+  const searchTerm = title || query || documentId;
+  if (searchTerm) {
+    return kibanaSearchDiscoverUrl(kibanaBase, {
+      engine,
+      query: buildSearchKbDiscoverEsql(engine, { titleLike: searchTerm }),
+    });
+  }
+  return kibanaSearchAppUrl(kibanaBase, engine);
+}
+
+/** Telco demo dashboard IDs (created via scripts/deploy-telco-dashboards.mjs) */
+export const TELCO_O11Y_DASHBOARD_ID = 'telco-demo-network-telemetry';
+export const TELCO_SEARCH_DASHBOARD_ID = 'telco-demo-enterprise-search';
+export const TELCO_SECURITY_DASHBOARD_ID = 'telco-demo-elastic-security';
+
+export function kibanaDashboardUrl(kibanaBase, dashboardId) {
+  const base = (kibanaBase || '').replace(/\/$/, '');
+  if (!base || !dashboardId) return null;
+  return `${base}/app/dashboards#/view/${encodeURIComponent(dashboardId)}`;
+}
+
+export function kibanaO11yDashboardUrl(kibanaBase) {
+  return kibanaDashboardUrl(
+    kibanaBase || import.meta.env.VITE_KIBANA_URL || '',
+    TELCO_O11Y_DASHBOARD_ID,
+  );
+}
+
+export function kibanaSearchDashboardUrl(kibanaBase) {
+  return kibanaDashboardUrl(getSearchKibanaUrl(kibanaBase), TELCO_SEARCH_DASHBOARD_ID);
+}
+
+export function kibanaSecurityDashboardUrl(kibanaBase) {
+  return kibanaDashboardUrl(getSecurityKibanaUrl(kibanaBase), TELCO_SECURITY_DASHBOARD_ID);
 }

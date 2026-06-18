@@ -1,6 +1,6 @@
 version: "1"
 name: Telco 5G Core Latency Auto-Remediation
-description: Telco network region 5G core signaling latency remediation — ML anomaly, A2A federation (Datadog, Security, Search), and auto-remediation.
+description: Telco network region 5G core signaling latency remediation — ML anomaly, A2A federation (metrics, Security, Search), and auto-remediation.
 enabled: true
 tags:
   - Telco
@@ -30,7 +30,7 @@ steps:
   - name: a2a_federation_complete
     type: console
     with:
-      message: "A2A federation complete — Datadog metrics/traces, Security cleared, Search NOC runbooks loaded"
+      message: "A2A federation complete — external metrics/traces, Security cleared, Search NOC runbooks loaded"
 
   - name: execute_remediation
     type: console

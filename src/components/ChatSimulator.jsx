@@ -1,11 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   MessageSquare, Send, Bot, User, ChevronRight, Sparkles,
-  DollarSign, GitBranch, Zap,
+  DollarSign, GitBranch, Zap, ExternalLink,
 } from 'lucide-react';
 import { semanticSearch } from '../utils/semantic-search';
 import { evaluateRules, getCustomers } from '../utils/rules-engine';
 import { ModuleHeader, DemoBanner, StatCard } from './shared/ModuleHeader';
+import {
+  getSearchKibanaUrl,
+  kibanaSearchHomeUrl,
+  kibanaSearchAppUrl,
+  kibanaAgentBuilderUrl,
+  kibanaSearchDocumentUrl,
+  kibanaSearchDashboardUrl,
+} from '../lib/elastic-api';
 
 const QUICK_PROMPTS = [
   "I just signed up but haven't confirmed my email",
@@ -29,6 +37,11 @@ export function ChatSimulator() {
   const [lastResult, setLastResult] = useState(null);
   const messagesEnd = useRef(null);
   const customers = getCustomers();
+  const searchKibanaUrl = getSearchKibanaUrl();
+  const searchHomeUrl = kibanaSearchHomeUrl(searchKibanaUrl);
+  const searchAppUrl = kibanaSearchAppUrl(searchKibanaUrl);
+  const searchDashboardUrl = kibanaSearchDashboardUrl(searchKibanaUrl);
+  const agentBuilderUrl = kibanaAgentBuilderUrl(searchKibanaUrl);
 
   useEffect(() => {
     messagesEnd.current?.scrollIntoView({ behavior: 'smooth' });
@@ -71,6 +84,46 @@ export function ChatSimulator() {
         subtitle="ELSER semantic intent matching + hierarchical navigation + rule-based context engine"
         badge="ELSER v2"
       >
+        {searchDashboardUrl && (
+          <a
+            href={searchDashboardUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            Dashboard <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+        {searchHomeUrl && (
+          <a
+            href={searchHomeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            Search <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+        {searchAppUrl && (
+          <a
+            href={searchAppUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            telco-tmobile-kb <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
+        {agentBuilderUrl && (
+          <a
+            href={agentBuilderUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
+          >
+            Agent Builder <ExternalLink className="w-3.5 h-3.5" />
+          </a>
+        )}
         <select
           value={customerId}
           onChange={e => setCustomerId(e.target.value)}
@@ -175,15 +228,44 @@ export function ChatSimulator() {
               </div>
 
               <div className="bg-white rounded-xl border border-gray-200 p-4">
-                <h3 className="flex items-center gap-2 text-sm font-semibold text-elastic-dark mb-3">
-                  <Sparkles className="w-4 h-4 text-elastic-teal" />
-                  ELSER Match
-                </h3>
-                {lastResult.searchResult.results.slice(0, 3).map(doc => (
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold text-elastic-dark">
+                    <Sparkles className="w-4 h-4 text-elastic-teal" />
+                    ELSER Match
+                  </h3>
+                  {searchAppUrl && (
+                    <a
+                      href={searchAppUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10px] text-elastic-teal hover:underline flex items-center gap-1"
+                    >
+                      Open KB <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </div>
+                {lastResult.searchResult.results.slice(0, 3).map(doc => {
+                  const docUrl = kibanaSearchDocumentUrl(searchKibanaUrl, {
+                    documentId: doc.doc_id,
+                    query: doc.title,
+                  });
+                  return (
                   <div key={doc.doc_id} className="mb-2 last:mb-0">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs font-medium text-elastic-dark">{doc.title}</span>
-                      <span className={`text-xs font-bold ${
+                    <div className="flex justify-between items-center gap-2">
+                      {docUrl ? (
+                        <a
+                          href={docUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-medium text-elastic-teal hover:underline truncate"
+                          title="Open in Elastic Search"
+                        >
+                          {doc.title}
+                        </a>
+                      ) : (
+                        <span className="text-xs font-medium text-elastic-dark">{doc.title}</span>
+                      )}
+                      <span className={`text-xs font-bold shrink-0 ${
                         doc.confidence > 0.7 ? 'text-success' : doc.confidence > 0.4 ? 'text-warning' : 'text-elastic-gray'
                       }`}>
                         {(doc.confidence * 100).toFixed(0)}%
@@ -196,7 +278,8 @@ export function ChatSimulator() {
                       />
                     </div>
                   </div>
-                ))}
+                  );
+                })}
                 <p className="text-[10px] text-elastic-gray mt-2">
                   Search time: {lastResult.searchResult.searchTimeMs}ms · {lastResult.searchResult.model}
                 </p>
@@ -207,10 +290,14 @@ export function ChatSimulator() {
                   label="Auto Cost"
                   value={`$${lastResult.ruleResult.costSavings.automated.toFixed(2)}`}
                   highlight
+                  kibanaUrl={searchKibanaUrl}
+                  kibanaSection="search-app"
                 />
                 <StatCard
                   label="Human Cost"
                   value={`$${lastResult.ruleResult.costSavings.human.toFixed(2)}`}
+                  kibanaUrl={searchKibanaUrl}
+                  kibanaSection="agent-builder"
                 />
               </div>
             </>

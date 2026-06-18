@@ -129,7 +129,7 @@ export const WORKFLOW_TEMPLATES = {
     steps: [
       { id: 1, name: 'Ingest ML anomaly signal', tool: 'kibana.alerting', status: 'completed', detail: 'Anomaly ML job core-signaling-latency-v2 score 0.94' },
       { id: 2, name: 'Correlate traces + logs', tool: 'esql_query', status: 'completed', detail: 'FROM traces-* | JOIN logs-* ON trace.id — 847 spans, 2,341 logs' },
-      { id: 3, name: 'A2A call to Datadog agent', tool: 'a2a_datadog', status: 'completed', detail: 'tasks/send → datadog-observability-agent: fetch p99, error traces, monitors for regionID' },
+      { id: 3, name: 'A2A call to external metrics agent', tool: 'a2a_metrics', status: 'completed', detail: 'tasks/send → external-metrics-agent: fetch p99, error traces, monitors for regionID' },
       { id: 4, name: 'A2A call to Elastic Security', tool: 'a2a_security', status: 'completed', detail: 'tasks/send → elastic-security-soc-agent: SIEM alerts, threat intel, SOC case linkage' },
       { id: 5, name: 'A2A call to Enterprise Search', tool: 'a2a_search', status: 'completed', detail: 'tasks/send → elastic-enterprise-search-agent: NOC runbooks, region playbook, change policy' },
       { id: 6, name: 'AI root cause analysis', tool: 'elastic_agent', status: 'completed', detail: 'Cross-project synthesis — infra root cause, security cleared, runbook steps loaded' },

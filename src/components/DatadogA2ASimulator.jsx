@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import { formatCount, simulateDatadogA2A } from '../lib/elastic-api';
 
-const DD_PURPLE = '#632CA6';
+const METRICS_COLOR = '#6b2c91';
 
 export function DatadogA2ASimulator({ regionId, regionName, onComplete, compact = false }) {
   const [phase, setPhase] = useState('idle'); // idle | running | done
@@ -45,32 +45,32 @@ export function DatadogA2ASimulator({ regionId, regionName, onComplete, compact 
     return (
       <button type="button" onClick={runA2A}
         className="w-full py-2 border-2 border-dashed rounded-lg text-sm flex items-center justify-center gap-2 hover:bg-purple-50 transition-colors"
-        style={{ borderColor: DD_PURPLE, color: DD_PURPLE }}>
+        style={{ borderColor: METRICS_COLOR, color: METRICS_COLOR }}>
         <Radio className="w-4 h-4" />
-        Query Datadog via A2A
+        Query external metrics via A2A
       </button>
     );
   }
 
   return (
-    <div className="border rounded-xl overflow-hidden" style={{ borderColor: `${DD_PURPLE}40` }}>
-      <div className="px-4 py-3 flex items-center justify-between" style={{ backgroundColor: `${DD_PURPLE}10` }}>
+    <div className="border rounded-xl overflow-hidden" style={{ borderColor: `${METRICS_COLOR}40` }}>
+      <div className="px-4 py-3 flex items-center justify-between" style={{ backgroundColor: `${METRICS_COLOR}10` }}>
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded flex items-center justify-center text-white text-[10px] font-bold" style={{ backgroundColor: DD_PURPLE }}>DD</div>
+          <div className="w-6 h-6 rounded flex items-center justify-center text-white text-[10px] font-bold" style={{ backgroundColor: METRICS_COLOR }}>M</div>
           <div>
-            <p className="text-sm font-semibold text-elastic-dark">Datadog A2A Agent Call</p>
-            <p className="text-[10px] text-elastic-gray">Google Agent2Agent Protocol v0.2 · Telco primary metrics/traces</p>
+            <p className="text-sm font-semibold text-elastic-dark">External Metrics A2A Call</p>
+            <p className="text-[10px] text-elastic-gray">Google Agent2Agent Protocol v0.2 · existing metrics stack</p>
           </div>
         </div>
         {phase === 'idle' && (
           <button type="button" onClick={runA2A}
             className="text-xs px-3 py-1.5 text-white rounded-lg flex items-center gap-1"
-            style={{ backgroundColor: DD_PURPLE }}>
+            style={{ backgroundColor: METRICS_COLOR }}>
             <Radio className="w-3 h-3" /> Invoke A2A
           </button>
         )}
         {phase === 'running' && (
-          <span className="text-xs flex items-center gap-1" style={{ color: DD_PURPLE }}>
+          <span className="text-xs flex items-center gap-1" style={{ color: METRICS_COLOR }}>
             <Loader2 className="w-3 h-3 animate-spin" /> Delegating…
           </span>
         )}
@@ -92,14 +92,14 @@ export function DatadogA2ASimulator({ regionId, regionName, onComplete, compact 
           <ArrowRight className="w-3 h-3 text-elastic-gray" />
           <span className="text-[10px] text-elastic-gray font-mono">A2A message/send</span>
           <ArrowRight className="w-3 h-3 text-elastic-gray" />
-          <div className="flex items-center gap-1 px-2 py-1 rounded text-white" style={{ backgroundColor: DD_PURPLE }}>
-            <Server className="w-3 h-3" /> Datadog Agent
+          <div className="flex items-center gap-1 px-2 py-1 rounded text-white" style={{ backgroundColor: METRICS_COLOR }}>
+            <Server className="w-3 h-3" /> Metrics Agent
           </div>
         </div>
 
         {phase === 'running' && (
           <div className="space-y-1 text-[10px] text-elastic-gray font-mono">
-            {['Discovering Agent Card…', 'Sending tasks/send…', 'Datadog querying metrics + traces…', 'Receiving artifacts…'].map((s, i) => (
+            {['Discovering Agent Card…', 'Sending tasks/send…', 'Querying metrics + traces…', 'Receiving artifacts…'].map((s, i) => (
               <p key={s} className={visibleStep >= i ? 'text-elastic-dark' : 'opacity-40'}>
                 {visibleStep > i ? '✓' : visibleStep === i ? '→' : '·'} {s}
               </p>
@@ -116,10 +116,10 @@ export function DatadogA2ASimulator({ regionId, regionName, onComplete, compact 
               <p className="text-gray-300 mt-1 truncate">{a2aData.request.params.message.parts[0].text}</p>
             </div>
 
-            {/* Metrics from Datadog */}
+            {/* Metrics from external agent */}
             {metrics && (
               <div>
-                <p className="text-xs font-semibold text-elastic-dark mb-2">Datadog Metrics (15m)</p>
+                <p className="text-xs font-semibold text-elastic-dark mb-2">External Metrics (15m)</p>
                 <div className="grid grid-cols-2 gap-2">
                   {metrics.series.slice(0, 4).map(m => (
                     <div key={m.metric} className="p-2 bg-gray-50 rounded text-[10px]">
@@ -131,11 +131,11 @@ export function DatadogA2ASimulator({ regionId, regionName, onComplete, compact 
               </div>
             )}
 
-            {/* Traces from Datadog */}
+            {/* Traces from external agent */}
             {traces && (
               <div>
                 <p className="text-xs font-semibold text-elastic-dark mb-2">
-                  Datadog APM — {formatCount(traces.count)} traces
+                  External APM — {formatCount(traces.count)} traces
                 </p>
                 {traces.traces.slice(0, 2).map(t => (
                   <div key={t.trace_id} className="flex items-center gap-2 p-2 bg-gray-50 rounded text-[10px] mb-1">
@@ -152,10 +152,10 @@ export function DatadogA2ASimulator({ regionId, regionName, onComplete, compact 
               </div>
             )}
 
-            {/* Datadog AI summary */}
+            {/* External agent summary */}
             {summary && (
-              <div className="p-3 rounded-lg border" style={{ backgroundColor: `${DD_PURPLE}08`, borderColor: `${DD_PURPLE}30` }}>
-                <p className="text-[10px] font-semibold mb-1" style={{ color: DD_PURPLE }}>Datadog Agent Response</p>
+              <div className="p-3 rounded-lg border" style={{ backgroundColor: `${METRICS_COLOR}08`, borderColor: `${METRICS_COLOR}30` }}>
+                <p className="text-[10px] font-semibold mb-1" style={{ color: METRICS_COLOR }}>Metrics Agent Response</p>
                 <p className="text-xs text-elastic-dark">{summary}</p>
               </div>
             )}

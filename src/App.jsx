@@ -1,14 +1,18 @@
 import { useState } from 'react';
 import {
-  Search, Activity, Shield, Menu, X, Radio,
+  Search, Activity, Shield, Menu, X, Radio, Network, GitBranch,
 } from 'lucide-react';
 import { LiveElasticDemo } from './components/LiveElasticDemo';
+import { AdaptiveNetworksDemo } from './components/AdaptiveNetworksDemo';
 import { ChatSimulator } from './components/ChatSimulator';
 import { ObservabilityDashboard } from './components/ObservabilityDashboard';
 import { SecurityDashboard } from './components/SecurityDashboard';
+import { IncidentResponseDemo } from './components/IncidentResponseDemo';
 
 const MODULES = [
   { id: 'live', label: 'Network Telemetry', icon: Radio, focus: 'Business-relevant OTel by regionID · network SLAs · ML & workflows', live: true },
+  { id: 'adaptive-networks', label: 'Adaptive Networks', icon: Network, focus: 'Router/switch fault injection · Agent Builder RCA · HITL remediation', live: true },
+  { id: 'incident-response', label: 'Incident Response', icon: GitBranch, focus: 'Reactive · proactive · knowledge loops — anonymized reference architecture' },
   { id: 'search', label: 'Enterprise Search', icon: Search, focus: 'Enterprise Search & AI assistant · customer care deflection' },
   { id: 'observability', label: 'Observability', icon: Activity, focus: 'Unified metrics, traces & logs at telco scale' },
   { id: 'security', label: 'Elastic Security', icon: Shield, focus: 'SIEM · Entity Analytics · NOC workflows · threat intel' },
@@ -16,6 +20,8 @@ const MODULES = [
 
 const MODULE_COMPONENTS = {
   live: LiveElasticDemo,
+  'adaptive-networks': AdaptiveNetworksDemo,
+  'incident-response': IncidentResponseDemo,
   search: ChatSimulator,
   observability: ObservabilityDashboard,
   security: SecurityDashboard,
@@ -27,7 +33,7 @@ export default function App() {
 
   const ActiveComponent = MODULE_COMPONENTS[activeModule];
   const activeMeta = MODULES.find(m => m.id === activeModule);
-  const isLive = activeModule === 'live';
+  const isLive = Boolean(activeMeta?.live);
 
   return (
     <div className="min-h-screen bg-elastic-light">
@@ -47,7 +53,7 @@ export default function App() {
               <div className="hidden md:block h-6 w-px bg-gray-200" />
               <div className="hidden md:flex items-center gap-1 text-[10px] text-elastic-gray">
                 <span className={`w-1.5 h-1.5 rounded-full animate-pulse-dot ${isLive ? 'bg-success' : 'bg-elastic-teal'}`} />
-                {isLive ? 'Live · 5G core & network telemetry' : '2PB logs · 800M spans/min · 150TB security/day'}
+                {isLive ? 'Live · connected to Elastic Serverless' : '2PB logs · 800M spans/min · 150TB security/day'}
               </div>
             </div>
 
@@ -55,16 +61,17 @@ export default function App() {
               {MODULES.map(mod => {
                 const Icon = mod.icon;
                 const isActive = activeModule === mod.id;
+                const activeClass = isActive
+                  ? mod.live
+                    ? 'bg-success text-white'
+                    : 'bg-elastic-teal text-white'
+                  : 'text-elastic-gray hover:bg-gray-100 hover:text-elastic-dark';
                 return (
                   <button
                     key={mod.id}
                     type="button"
                     onClick={() => setActiveModule(mod.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                      isActive
-                        ? mod.live ? 'bg-success text-white' : 'bg-elastic-teal text-white'
-                        : 'text-elastic-gray hover:bg-gray-100 hover:text-elastic-dark'
-                    }`}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeClass}`}
                   >
                     <Icon className="w-4 h-4" />
                     {mod.label}
@@ -97,7 +104,9 @@ export default function App() {
                   onClick={() => { setActiveModule(mod.id); setMobileMenuOpen(false); }}
                   className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium ${
                     activeModule === mod.id
-                      ? mod.live ? 'bg-success text-white' : 'bg-elastic-teal text-white'
+                      ? mod.live
+                        ? 'bg-success text-white'
+                        : 'bg-elastic-teal text-white'
                       : 'text-elastic-gray'
                   }`}
                 >

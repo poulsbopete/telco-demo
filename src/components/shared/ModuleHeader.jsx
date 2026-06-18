@@ -1,14 +1,20 @@
 import { ExternalLink } from 'lucide-react';
-import { kibanaDiscoverUrl, kibanaSecurityUrl, elasticWorkflowUrl } from '../../lib/elastic-api';
+import {
+  kibanaDiscoverUrl, kibanaSecurityUrl, elasticWorkflowUrl,
+  kibanaSearchHomeUrl, kibanaSearchAppUrl, kibanaAgentBuilderUrl,
+} from '../../lib/elastic-api';
 
-export function ModuleHeader({ title, subtitle, badge, children }) {
+export function ModuleHeader({ title, subtitle, badge, children, accent = 'teal' }) {
+  const badgeTone = accent === 'magenta'
+    ? 'bg-telco-magenta/10 text-telco-magenta'
+    : 'bg-elastic-teal/10 text-elastic-teal';
   return (
     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
       <div>
         <div className="flex items-center gap-2">
           <h2 className="text-xl sm:text-2xl font-semibold text-elastic-dark">{title}</h2>
           {badge && (
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-elastic-teal/10 text-elastic-teal px-2 py-0.5 rounded-full">
+            <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${badgeTone}`}>
               {badge}
             </span>
           )}
@@ -25,7 +31,13 @@ function resolveKibanaLink(kibanaUrl, section) {
   if (section === 'security' || section === 'alerts') return kibanaSecurityUrl(kibanaUrl, 'alerts');
   if (section === 'cases') return kibanaSecurityUrl(kibanaUrl, 'cases');
   if (section === 'rules') return kibanaSecurityUrl(kibanaUrl, 'rules');
+  if (section === 'entity-analytics') return kibanaSecurityUrl(kibanaUrl, 'entityAnalytics');
+  if (section === 'attack-discovery') return kibanaSecurityUrl(kibanaUrl, 'attackDiscovery');
+  if (section === 'security-overview') return kibanaSecurityUrl(kibanaUrl, 'overview');
   if (section === 'workflows') return elasticWorkflowUrl(kibanaUrl);
+  if (section === 'search') return kibanaSearchHomeUrl(kibanaUrl);
+  if (section === 'search-app') return kibanaSearchAppUrl(kibanaUrl);
+  if (section === 'agent-builder') return kibanaAgentBuilderUrl(kibanaUrl);
   return kibanaDiscoverUrl(kibanaUrl);
 }
 

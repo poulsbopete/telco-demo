@@ -1,6 +1,6 @@
 /**
- * Simulates Google A2A (Agent-to-Agent) calls to Datadog's observability agent.
- * Telco uses Datadog as primary for metrics/traces; Elastic orchestrates via A2A during incidents.
+ * Simulates Google A2A (Agent-to-Agent) calls to an external metrics/observability agent.
+ * Telco may retain existing metrics tooling; Elastic orchestrates via A2A during incidents.
  */
 
 import {
@@ -17,20 +17,20 @@ import { CHECKOUT_INCIDENT, checkoutPrompt } from './demo-incident.js';
 export { ELASTIC_AGENT_CARD, ELASTIC_ORCHESTRATOR_AGENT };
 
 export const DATADOG_AGENT_CARD = {
-  name: 'datadog-observability-agent',
-  description: 'Datadog Bits AI agent — metrics, traces, monitors, and APM (Telco primary O11y)',
-  url: 'https://agent.datadoghq.com/.well-known/agent.json',
+  name: 'external-metrics-agent',
+  description: 'External metrics & APM agent — query existing observability stack during incidents',
+  url: 'https://metrics.example.com/.well-known/agent.json',
   version: '2.1.0',
-  provider: 'Datadog, Inc.',
+  provider: 'External Observability',
   capabilities: {
     streaming: true,
     pushNotifications: true,
   },
   skills: [
-    { id: 'get_metrics', name: 'Query Metrics', description: 'Datadog metrics API — 500M+ datapoints/min' },
+    { id: 'get_metrics', name: 'Query Metrics', description: 'Metrics API — 500M+ datapoints/min' },
     { id: 'get_traces', name: 'APM Traces', description: 'Distributed traces — 1.2B spans/min peak' },
     { id: 'get_monitors', name: 'Monitors & SLOs', description: 'Active monitors and alert status' },
-    { id: 'query_logs', name: 'Log Analytics', description: 'Datadog Log Management (legacy eBay pipeline)' },
+    { id: 'query_logs', name: 'Log Analytics', description: 'Legacy log pipeline integration' },
   ],
   authentication: { schemes: ['oauth2', 'apiKey'] },
 };

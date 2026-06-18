@@ -10,6 +10,7 @@ import {
   searchLogs,
   runWorkflow,
   kibanaDiscoverUrl,
+  kibanaO11yDashboardUrl,
   TELCO_DISCOVER_ESQL,
   formatCount,
 } from '../lib/elastic-api';
@@ -134,6 +135,7 @@ export function LiveElasticDemo() {
 
   const kibanaUrl = health?.kibanaUrl || import.meta.env.VITE_KIBANA_URL;
   const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
   const trace = data?.traceDrilldown;
   const anomaly = selectedAnomaly || data?.primaryAnomaly;
 
@@ -148,6 +150,12 @@ export function LiveElasticDemo() {
           className="text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-1">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
         </button>
+        {o11yDashboardUrl && (
+          <a href={o11yDashboardUrl} target="_blank" rel="noopener noreferrer"
+            className="text-sm px-3 py-2 border border-telco-magenta/40 text-telco-magenta rounded-lg flex items-center gap-1 hover:bg-telco-magenta/5">
+            <ExternalLink className="w-4 h-4" /> Dashboard
+          </a>
+        )}
         {discoverUrl && (
           <a href={discoverUrl} target="_blank" rel="noopener noreferrer"
             className="text-sm px-3 py-2 bg-elastic-teal text-white rounded-lg flex items-center gap-1">
