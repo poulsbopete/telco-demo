@@ -312,15 +312,18 @@ export function ChatSimulator() {
           <div className="bg-telco-magenta/5 rounded-xl border border-telco-magenta/20 p-4">
             <div className="flex items-center gap-2 text-sm font-semibold text-telco-magenta mb-2">
               <DollarSign className="w-4 h-4" />
-              Cost Impact
+              Cost &amp; churn impact
             </div>
             <p className="text-xs text-elastic-gray">
               Elastic + ELSER resolves ~60% of IVR calls automatically at $0.02–$0.25 per interaction vs $6–$45 for human agents.
             </p>
             <div className="flex items-center gap-1 mt-2 text-xs text-success font-medium">
               <Zap className="w-3 h-3" />
-              20-second transfer eliminated
+              20-second transfer eliminated · faster resolution lowers care-driven churn
             </div>
+            <p className="text-[10px] text-elastic-gray mt-2">
+              Illustrative: each avoided outage escalation protects high-value subscriber segments — pair with Network Telemetry churn-risk tiles.
+            </p>
           </div>
         </div>
       </div>

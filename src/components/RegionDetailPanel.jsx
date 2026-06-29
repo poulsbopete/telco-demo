@@ -8,6 +8,8 @@ import {
   GitBranch, Shield, Workflow, Zap,
 } from 'lucide-react';
 import { formatCount, kibanaDiscoverUrl, TELCO_DISCOVER_ESQL } from '../lib/elastic-api';
+import { ChurnRiskTile } from './shared/ChurnRiskTile';
+import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 
 export function RegionDetailPanel({
   detail,
@@ -97,6 +99,17 @@ export function RegionDetailPanel({
             </div>
           ))}
         </div>
+
+        <ChurnRiskTile
+          sessions24h={m.sessions24h}
+          successRate={m.successRate}
+          sloStatus={detail.slo?.status}
+          sloCurrent={detail.slo?.current}
+          sloTarget={detail.slo?.target}
+          tier={m.tier}
+          regionName={m.name}
+          regionId={m.regionId}
+        />
 
         <div className="grid lg:grid-cols-2 gap-4">
           {/* Hourly trend */}
@@ -265,12 +278,14 @@ export function RegionDetailPanel({
                     {workflowLoading ? 'Starting…' : 'Run AI Resolution Workflow'}
                   </button>
                 ) : (
-                  <div className="space-y-2">
-                    <p className="text-xs text-success flex items-center gap-1"><Zap className="w-3 h-3" /> {workflowRun.message}</p>
-                    {workflowRun.aiSummary && (
-                      <p className="text-[10px] text-elastic-dark bg-white p-2 rounded">{workflowRun.aiSummary}</p>
-                    )}
-                  </div>
+                  <WorkflowResolutionPanel
+                    workflowRun={workflowRun}
+                    loading={workflowLoading}
+                    compact
+                    kibanaUrl={kibanaUrl}
+                    workflowId={anomaly?.workflowId}
+                    title="Elastic Workflow — AI Resolution"
+                  />
                 )}
               </div>
               </div>

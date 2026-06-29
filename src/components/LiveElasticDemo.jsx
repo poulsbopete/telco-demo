@@ -19,6 +19,9 @@ import { RegionDetailPanel } from './RegionDetailPanel';
 import { A2AFederationPanel } from './A2AFederationPanel';
 import { ElasticWorkflowLink } from './ElasticWorkflowLink';
 import { LogDetailPanel, LogRowButton } from './LogDetailPanel';
+import { ChurnRiskTile } from './shared/ChurnRiskTile';
+import { P1IncidentCounter } from './shared/P1IncidentCounter';
+import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 
 export function LiveElasticDemo() {
   const [health, setHealth] = useState(null);
@@ -138,6 +141,10 @@ export function LiveElasticDemo() {
   const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
   const trace = data?.traceDrilldown;
   const anomaly = selectedAnomaly || data?.primaryAnomaly;
+  const anomalyRegion = anomaly
+    ? data?.regions?.find(r => r.regionId === anomaly.regionId)
+    : null;
+  const workflowResolved = workflowRun?.steps?.every(s => s.status === 'completed');
 
   return (
     <div>
@@ -192,6 +199,19 @@ export function LiveElasticDemo() {
             <StatCard label="Network Success" value={`${data.stats.networkSuccessRate}%`} trend="Across region tiers" highlight kibanaUrl={kibanaUrl} kibanaSection="discover" />
             <StatCard label="ML Anomalies" value={data.stats.mlAnomaliesOpen} trend="Elastic ML + AIOps" kibanaUrl={kibanaUrl} kibanaSection="discover" />
           </div>
+
+          {anomaly && !selectedRegionId && anomalyRegion && (
+            <ChurnRiskTile
+              className="mt-4"
+              compact
+              sessions24h={anomalyRegion.sessions24h}
+              successRate={anomalyRegion.successRate}
+              sloStatus={anomalyRegion.successRate < 99.7 ? 'breached' : 'at_risk'}
+              tier={anomalyRegion.tier}
+              regionName={anomalyRegion.name || anomaly.regionName}
+              regionId={anomaly.regionId}
+            />
+          )}
 
           <div className="grid lg:grid-cols-3 gap-4 mt-4">
             {/* Network regions */}
@@ -465,6 +485,13 @@ export function LiveElasticDemo() {
                   <p className="text-[10px] text-elastic-gray mt-3">
                     Est. resolution: {workflowRun.estimatedResolutionMin} min · No human escalation required
                   </p>
+                  {workflowResolved && (
+                    <P1IncidentCounter
+                      compact
+                      context={workflowRun.message || 'Elastic Workflow auto-remediation completed'}
+                      className="mt-3"
+                    />
+                  )}
                 </div>
               )}
 

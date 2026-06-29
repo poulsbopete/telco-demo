@@ -8,6 +8,7 @@ import { ChatSimulator } from './components/ChatSimulator';
 import { ObservabilityDashboard } from './components/ObservabilityDashboard';
 import { SecurityDashboard } from './components/SecurityDashboard';
 import { IncidentResponseDemo } from './components/IncidentResponseDemo';
+import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
 
 const MODULES = [
   { id: 'live', label: 'Network Telemetry', icon: Radio, focus: 'Business-relevant OTel by regionID · network SLAs · ML & workflows', live: true },
@@ -120,6 +121,7 @@ export default function App() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+        <ExecutiveOutcomesBanner compact className="mb-4" />
         {activeMeta && (
           <p className="text-xs text-elastic-gray mb-4">
             Focus: <strong>{activeMeta.focus}</strong>

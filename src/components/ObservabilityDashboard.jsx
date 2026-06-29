@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { TimeSeriesChart } from './shared/TimeSeriesChart';
 import { DataRetentionPolicy } from './shared/DataRetentionPolicy';
+import { StreamsRetentionCallout } from './shared/StreamsRetentionCallout';
 import { CostCalculator } from './CostCalculator';
 import { ModuleHeader, DemoBanner, StatCard } from './shared/ModuleHeader';
 import {
@@ -17,6 +18,7 @@ import { formatNumber, formatDailyVolume, traceVolumeFromSpansPerMinute } from '
 import traces from '../data/sample-traces.json';
 import { A2AFederationPanel } from './A2AFederationPanel';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
+import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import { CHECKOUT_INCIDENT } from '../lib/demo-incident';
 import {
   runWorkflow,
@@ -187,11 +189,20 @@ export function ObservabilityDashboard() {
       )}
 
       {incidentPhase === 'resolved' && (
-        <div className="mt-4 p-3 bg-success/10 border border-success/30 rounded-lg text-xs text-success flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 shrink-0" />
-          Resolved by Elastic Workflow — p99 &lt; 250ms, regions REG-8847291 notified
-        </div>
+        <>
+          <div className="mt-4 p-3 bg-success/10 border border-success/30 rounded-lg text-xs text-success flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            Resolved by Elastic Workflow — p99 &lt; 250ms, regions REG-8847291 notified
+          </div>
+          <P1IncidentCounter
+            compact
+            context="Demo incident auto-remediated — modeled P1 reduction for NOC operating model"
+            className="mt-3"
+          />
+        </>
       )}
+
+      <StreamsRetentionCallout className="mt-4" fullRetentionCostMonthly={1_240_000} />
 
       {drMode === 'failover' && (
         <div className="mt-4 p-3 bg-success/10 border border-success/30 rounded-lg text-sm text-success flex items-center gap-2">

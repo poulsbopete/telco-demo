@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ExternalLink, GitBranch, Loader2, Radio, Workflow } from 'lucide-react';
 import { IncidentFlowChart } from './IncidentFlowChart';
 import { ModuleHeader } from './shared/ModuleHeader';
+import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import { FAULT_CHANNELS, INCIDENT_STEPS } from '../lib/adaptive-networks/channels';
 import { TELEMETRY_INGEST_SUMMARY, TELEMETRY_SOURCES } from '../lib/adaptive-networks/telemetry';
 import {
@@ -397,6 +398,18 @@ export function AdaptiveNetworksDemo() {
                 ))}
               </ul>
             </div>
+          )}
+
+          {phase === 'done' && (
+            <P1IncidentCounter
+              compact
+              context={
+                selectedFault?.severity === 'high'
+                  ? 'HITL-approved network remediation completed — P1 volume modeled down'
+                  : 'Auto-remediation completed — transport fault cleared without NOC escalation'
+              }
+              className="mt-4"
+            />
           )}
 
           {!execution && phase === 'waiting' && (

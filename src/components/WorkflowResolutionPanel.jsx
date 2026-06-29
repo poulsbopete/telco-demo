@@ -1,5 +1,6 @@
 import { Bot, CheckCircle2, Loader2, Workflow, Zap } from 'lucide-react';
 import { ElasticWorkflowLink } from './ElasticWorkflowLink';
+import { P1IncidentCounter } from './shared/P1IncidentCounter';
 
 const STATUS_STYLE = {
   completed: 'bg-success text-white',
@@ -89,6 +90,13 @@ export function WorkflowResolutionPanel({
           <p className="text-[10px] text-elastic-gray flex items-center gap-1">
             <Bot className="w-3 h-3" /> Est. {workflowRun.estimatedResolutionMin} min · no human escalation
           </p>
+        )}
+        {resolved && (
+          <P1IncidentCounter
+            compact={compact}
+            context={workflowRun.message || 'Elastic Workflow auto-remediation completed'}
+            className="mt-2"
+          />
         )}
       </div>
     </div>

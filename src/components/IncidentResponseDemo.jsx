@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { IncidentResponseDiagram } from './IncidentResponseDiagram';
 import { ModuleHeader, DemoBanner } from './shared/ModuleHeader';
+import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import {
   LOOPS,
   SCENARIOS,
@@ -220,9 +221,23 @@ export function IncidentResponseDemo() {
             </ul>
           )}
           {phase === 'done' && (
-            <div className="mt-3 p-3 rounded-lg bg-success/5 border border-success/20 text-sm text-elastic-dark">
-              <strong>Outcome:</strong> {scenario.outcome}
-            </div>
+            <>
+              <div className="mt-3 p-3 rounded-lg bg-success/5 border border-success/20 text-sm text-elastic-dark">
+                <strong>Outcome:</strong> {scenario.outcome}
+              </div>
+              <P1IncidentCounter
+                compact
+                context={
+                  activeLoop === 'reactive'
+                    ? 'Reactive loop — subscriber status in <90s, outage churn risk contained'
+                    : activeLoop === 'proactive'
+                      ? 'Proactive loop — degradation resolved before customer-facing P1'
+                      : 'Knowledge loop — faster resolution on repeat incidents'
+                }
+                showMttr={activeLoop !== 'knowledge'}
+                className="mt-3"
+              />
+            </>
           )}
         </section>
 
