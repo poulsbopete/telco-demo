@@ -8,18 +8,22 @@ import { TimeSeriesChart } from './shared/TimeSeriesChart';
 import { DataRetentionPolicy } from './shared/DataRetentionPolicy';
 import { StreamsRetentionCallout } from './shared/StreamsRetentionCallout';
 import { CostCalculator } from './CostCalculator';
-import { ModuleHeader, DemoBanner, StatCard } from './shared/ModuleHeader';
+import { ModuleHeader, StatCard } from './shared/ModuleHeader';
 import {
   generateMetricsSeries,
   generateIngestionStats,
   generateTraceSummary,
 } from '../utils/data-generator';
+import { IPHONE_LAUNCH } from '../lib/iphone-launch-event';
 import { formatNumber, formatDailyVolume, traceVolumeFromSpansPerMinute } from '../utils/cost-calculator';
 import traces from '../data/sample-traces.json';
 import { A2AFederationPanel } from './A2AFederationPanel';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
+import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
+import { LaunchEventStrip } from './shared/LaunchEventStrip';
 import { CHECKOUT_INCIDENT } from '../lib/demo-incident';
+import { buildDemoMlSignalIntelligence, DEMO_ML_ANOMALIES } from '../lib/ml-signal-intelligence';
 import {
   runWorkflow,
   simulateElasticSearchA2A,
@@ -145,45 +149,42 @@ export function ObservabilityDashboard() {
 
   const activeTrace = selectedTrace || traces[0];
   const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
+  const demoMlIntelligence = buildDemoMlSignalIntelligence(DEMO_ML_ANOMALIES);
 
   return (
     <div>
       <ModuleHeader
-        title="Observability at Massive Scale"
-        subtitle="OpenTelemetry-native unified metrics, traces, and logs — petabyte-scale with cost efficiency"
-        badge="OTel Native"
+        title="Observability at scale"
+        subtitle={`${IPHONE_LAUNCH.eventName} — ${(IPHONE_LAUNCH.metrics.activationsFirst6h / 1_000_000).toFixed(2)}M activations in 6h · ${IPHONE_LAUNCH.metrics.provisioningSpikePct}% provisioning spike.`}
       >
         <button
           type="button"
           onClick={triggerIncident}
           disabled={incidentPhase === 'running'}
-          className="text-sm px-3 py-2 bg-danger text-white rounded-lg hover:bg-danger/90 flex items-center gap-1 disabled:opacity-60"
+          className="btn-primary disabled:opacity-60 flex items-center gap-1.5"
         >
-          <AlertCircle className="w-4 h-4" />
-          {incidentPhase === 'running' ? 'Incident in progress…' : incidentPhase === 'resolved' ? 'Replay Incident' : 'Trigger Demo Incident'}
-        </button>
-        <button
-          type="button"
-          onClick={() => setDrMode(d => d === 'primary' ? 'failover' : 'primary')}
-          className={`text-sm px-3 py-2 rounded-lg flex items-center gap-1 border ${
-            drMode === 'failover'
-              ? 'bg-success text-white border-success'
-              : 'bg-white border-gray-200 text-elastic-dark hover:bg-gray-50'
-          }`}
-        >
-          <RefreshCw className="w-4 h-4" />
-          DR: {drMode === 'primary' ? 'Primary cluster' : 'Elastic failover'}
+          {incidentPhase === 'running' ? 'Running…' : incidentPhase === 'resolved' ? 'Replay' : 'Run incident demo'}
         </button>
       </ModuleHeader>
 
-      <DemoBanner />
+      <LaunchEventStrip className="mb-8" />
+
+      <div className="surface-card p-5 mb-8">
+        <MlSignalIntelligence
+          intelligence={demoMlIntelligence}
+          anomalies={DEMO_ML_ANOMALIES.slice(0, 2)}
+          compact
+          showAnomalies={incidentPhase !== 'idle'}
+          showSuppressed={false}
+        />
+      </div>
 
       {incidentPhase === 'running' && (
         <div className="mt-4 p-3 bg-danger/5 border border-danger/20 rounded-lg text-xs text-elastic-dark flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin text-danger shrink-0" />
           <span>
             <strong className="text-danger">ML anomaly detected</strong>
-            {' · '}{CHECKOUT_INCIDENT.traceId} · correlating traces → A2A federation → Elastic Workflow
+            {' · '}{CHECKOUT_INCIDENT.traceId} · ML correlated RAN/core/transport → workflow
           </span>
         </div>
       )}
@@ -211,28 +212,29 @@ export function ObservabilityDashboard() {
         </div>
       )}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+      <LaunchEventStrip className="mb-8" />
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          label="Spans/min"
-          value={formatNumber(ingestion.spansPerMinute)}
-          trend={`1.2B/min · ${formatDailyVolume(traceVolumeFromSpansPerMinute(ingestion.spansPerMinute).tbPerDay)} traces`}
+          label="Launch activations/min"
+          value={formatNumber(ingestion.launchActivationsPerMin || IPHONE_LAUNCH.metrics.activationsPerMinutePeak)}
+          trend={IPHONE_LAUNCH.eventName}
           highlight
+        />
+        <StatCard
+          label="eSIM OTA/min"
+          value={formatNumber(ingestion.launchEsimOtaPerMin || IPHONE_LAUNCH.metrics.esimDownloadsPerMin)}
+          trend="SM-DP+ profile downloads"
         />
         <StatCard
           label="Logs/day"
           value={`${ingestion.logsPerDay.toFixed(1)} PB`}
-          trend="2.5–3 PB/day range"
+          trend="Launch weekend ingest"
         />
         <StatCard
-          label="Metrics/min"
-          value={formatNumber(ingestion.metricsPerMinute)}
-          trend="500M+ datapoints"
-        />
-        <StatCard
-          label="Query Latency"
+          label="Query latency"
           value={`${ingestion.queryLatencyMs}ms`}
           trend="< 1 sec at PB scale"
-          highlight
         />
       </div>
 

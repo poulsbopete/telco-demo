@@ -1,7 +1,5 @@
 import { useState } from 'react';
-import {
-  Search, Activity, Shield, Menu, X, Radio, Network, GitBranch,
-} from 'lucide-react';
+import { Menu, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { LiveElasticDemo } from './components/LiveElasticDemo';
 import { AdaptiveNetworksDemo } from './components/AdaptiveNetworksDemo';
 import { ChatSimulator } from './components/ChatSimulator';
@@ -11,12 +9,12 @@ import { IncidentResponseDemo } from './components/IncidentResponseDemo';
 import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
 
 const MODULES = [
-  { id: 'live', label: 'Network Telemetry', icon: Radio, focus: 'Business-relevant OTel by regionID · network SLAs · ML & workflows', live: true },
-  { id: 'adaptive-networks', label: 'Adaptive Networks', icon: Network, focus: 'Router/switch fault injection · Agent Builder RCA · HITL remediation', live: true },
-  { id: 'incident-response', label: 'Incident Response', icon: GitBranch, focus: 'Reactive · proactive · knowledge loops — anonymized reference architecture' },
-  { id: 'search', label: 'Enterprise Search', icon: Search, focus: 'Enterprise Search & AI assistant · customer care deflection' },
-  { id: 'observability', label: 'Observability', icon: Activity, focus: 'Unified metrics, traces & logs at telco scale' },
-  { id: 'security', label: 'Elastic Security', icon: Shield, focus: 'SIEM · Entity Analytics · NOC workflows · threat intel' },
+  { id: 'live', label: 'Telemetry', live: true },
+  { id: 'adaptive-networks', label: 'Networks', live: true },
+  { id: 'incident-response', label: 'Response' },
+  { id: 'search', label: 'Search' },
+  { id: 'observability', label: 'Scale' },
+  { id: 'security', label: 'Security' },
 ];
 
 const MODULE_COMPONENTS = {
@@ -31,63 +29,45 @@ const MODULE_COMPONENTS = {
 export default function App() {
   const [activeModule, setActiveModule] = useState('live');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [outcomesOpen, setOutcomesOpen] = useState(false);
 
   const ActiveComponent = MODULE_COMPONENTS[activeModule];
   const activeMeta = MODULES.find(m => m.id === activeModule);
-  const isLive = Boolean(activeMeta?.live);
 
   return (
-    <div className="min-h-screen bg-elastic-light">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-telco-magenta flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">T</span>
-                </div>
-                <div className="hidden sm:block">
-                  <h1 className="text-sm font-bold text-telco-magenta leading-tight">Telco NOC</h1>
-                  <p className="text-[10px] text-elastic-gray leading-tight">× Elastic Serverless Demo</p>
-                </div>
-              </div>
-              <div className="hidden md:block h-6 w-px bg-gray-200" />
-              <div className="hidden md:flex items-center gap-1 text-[10px] text-elastic-gray">
-                <span className={`w-1.5 h-1.5 rounded-full animate-pulse-dot ${isLive ? 'bg-success' : 'bg-elastic-teal'}`} />
-                {isLive ? 'Live · connected to Elastic Serverless' : '2PB logs · 800M spans/min · 150TB security/day'}
-              </div>
-            </div>
+    <div className="min-h-screen bg-[#fbfbfd]">
+      <header className="sticky top-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-[#d2d2d7]/60">
+        <div className="max-w-[980px] mx-auto px-6">
+          <div className="flex items-center justify-between h-11">
+            <button
+              type="button"
+              onClick={() => setActiveModule('live')}
+              className="text-[21px] font-semibold tracking-tight text-[#1d1d1f]"
+            >
+              Telco NOC
+            </button>
 
-            <nav className="hidden lg:flex items-center gap-1">
-              {MODULES.map(mod => {
-                const Icon = mod.icon;
-                const isActive = activeModule === mod.id;
-                const activeClass = isActive
-                  ? mod.live
-                    ? 'bg-success text-white'
-                    : 'bg-elastic-teal text-white'
-                  : 'text-elastic-gray hover:bg-gray-100 hover:text-elastic-dark';
-                return (
-                  <button
-                    key={mod.id}
-                    type="button"
-                    onClick={() => setActiveModule(mod.id)}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${activeClass}`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {mod.label}
-                    {mod.live && !isActive && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-success" />
-                    )}
-                  </button>
-                );
-              })}
+            <nav className="hidden md:flex items-center gap-1">
+              {MODULES.map(mod => (
+                <button
+                  key={mod.id}
+                  type="button"
+                  onClick={() => setActiveModule(mod.id)}
+                  className={`nav-link ${activeModule === mod.id ? 'nav-link-active' : ''}`}
+                >
+                  {mod.label}
+                  {mod.live && activeModule !== mod.id && (
+                    <span className="ml-1 text-[10px] text-[#008009]">●</span>
+                  )}
+                </button>
+              ))}
             </nav>
 
             <button
               type="button"
-              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="md:hidden p-2 -mr-2 text-[#1d1d1f]"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Menu"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -95,55 +75,48 @@ export default function App() {
         </div>
 
         {mobileMenuOpen && (
-          <nav className="lg:hidden border-t border-gray-100 px-4 py-2 space-y-1">
-            {MODULES.map(mod => {
-              const Icon = mod.icon;
-              return (
-                <button
-                  key={mod.id}
-                  type="button"
-                  onClick={() => { setActiveModule(mod.id); setMobileMenuOpen(false); }}
-                  className={`w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm font-medium ${
-                    activeModule === mod.id
-                      ? mod.live
-                        ? 'bg-success text-white'
-                        : 'bg-elastic-teal text-white'
-                      : 'text-elastic-gray'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {mod.label}
-                </button>
-              );
-            })}
+          <nav className="md:hidden border-t border-[#d2d2d7]/60 px-6 py-3 space-y-1 bg-[#fbfbfd]">
+            {MODULES.map(mod => (
+              <button
+                key={mod.id}
+                type="button"
+                onClick={() => { setActiveModule(mod.id); setMobileMenuOpen(false); }}
+                className={`block w-full text-left py-2 text-[17px] ${
+                  activeModule === mod.id ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
+                }`}
+              >
+                {mod.label}
+              </button>
+            ))}
           </nav>
         )}
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
-        <ExecutiveOutcomesBanner compact className="mb-4" />
-        {activeMeta && (
-          <p className="text-xs text-elastic-gray mb-4">
-            Focus: <strong>{activeMeta.focus}</strong>
-            {!isLive && ' · simulated demo data'}
-          </p>
-        )}
+      <main className="max-w-[980px] mx-auto px-6 py-10 md:py-14">
         <ActiveComponent />
       </main>
 
-      <footer className="border-t border-gray-200 bg-white mt-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-elastic-gray">
-          <p>
-            Telco NOC × Elastic Serverless Demo
-            {isLive ? ' · Live data from Elastic Cloud Serverless' : ' · Simulated sample data'}
+      <section className="max-w-[980px] mx-auto px-6 pb-8">
+        <button
+          type="button"
+          onClick={() => setOutcomesOpen(v => !v)}
+          className="disclosure w-full py-4 flex items-center justify-between text-left text-[14px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+        >
+          <span>Executive outcomes</span>
+          {outcomesOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+        {outcomesOpen && (
+          <ExecutiveOutcomesBanner compact className="mb-8 border-0 shadow-none" />
+        )}
+      </section>
+
+      <footer className="border-t border-[#d2d2d7]/60 mt-4">
+        <div className="max-w-[980px] mx-auto px-6 py-6 text-[12px] text-[#86868b] leading-relaxed">
+          <p>Telco NOC × Elastic Serverless</p>
+          <p className="mt-1">
+            {activeMeta?.live ? 'Live cluster data.' : 'Simulated sample data.'}
+            {' '}Synthetic demo content only.
           </p>
-          <div className="flex items-center gap-3">
-            <span className="flex items-center gap-1">
-              <span className="w-2 h-2 rounded-full bg-elastic-teal" />
-              Elastic Stack
-            </span>
-            <span>DR Backup · Cost Optimization · Unified Platform</span>
-          </div>
         </div>
       </footer>
     </div>

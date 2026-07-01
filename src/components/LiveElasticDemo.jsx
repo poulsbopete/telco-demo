@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  Activity, AlertCircle, ArrowRight, Bot, CheckCircle2, ExternalLink,
-  RefreshCw, Search, Store, Workflow, XCircle, Zap, Brain, GitBranch, ChevronRight,
+  AlertCircle, ArrowRight, Bot, ExternalLink,
+  RefreshCw, Workflow, Zap, GitBranch, ChevronRight,
 } from 'lucide-react';
 import {
   fetchHealth,
@@ -19,8 +19,9 @@ import { RegionDetailPanel } from './RegionDetailPanel';
 import { A2AFederationPanel } from './A2AFederationPanel';
 import { ElasticWorkflowLink } from './ElasticWorkflowLink';
 import { LogDetailPanel, LogRowButton } from './LogDetailPanel';
-import { ChurnRiskTile } from './shared/ChurnRiskTile';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
+import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
+import { LaunchEventStrip } from './shared/LaunchEventStrip';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 
 export function LiveElasticDemo() {
@@ -149,43 +150,32 @@ export function LiveElasticDemo() {
   return (
     <div>
       <ModuleHeader
-        title="Telco Business Telemetry"
-        subtitle="Business-relevant metrics, traces & logs — OpenTelemetry enriched with regionID to connect pipeline signals to revenue, SLAs, and Elastic Workflows remediation"
-        badge="Live · regionID context"
+        title="Network telemetry"
+        subtitle="OpenTelemetry with region context — see business impact, not just infrastructure signals."
+        badge={health?.connected ? 'Live · Elastic Serverless' : 'Offline'}
       >
-        <button type="button" onClick={load} disabled={loading}
-          className="text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-1">
-          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> Refresh
+        <button type="button" onClick={load} disabled={loading} className="btn-quiet flex items-center gap-1.5">
+          <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          Refresh
         </button>
-        {o11yDashboardUrl && (
-          <a href={o11yDashboardUrl} target="_blank" rel="noopener noreferrer"
-            className="text-sm px-3 py-2 border border-telco-magenta/40 text-telco-magenta rounded-lg flex items-center gap-1 hover:bg-telco-magenta/5">
-            <ExternalLink className="w-4 h-4" /> Dashboard
-          </a>
-        )}
         {discoverUrl && (
-          <a href={discoverUrl} target="_blank" rel="noopener noreferrer"
-            className="text-sm px-3 py-2 bg-elastic-teal text-white rounded-lg flex items-center gap-1">
-            <ExternalLink className="w-4 h-4" /> Kibana Discover
+          <a href={discoverUrl} target="_blank" rel="noopener noreferrer" className="btn-primary flex items-center gap-1.5">
+            <ExternalLink className="w-4 h-4" /> Discover
           </a>
         )}
       </ModuleHeader>
 
-      <div className={`mt-4 p-4 rounded-xl border flex items-start gap-3 ${
-        health?.connected ? 'bg-success/5 border-success/30' : 'bg-danger/5 border-danger/30'
-      }`}>
-        {health?.connected ? <CheckCircle2 className="w-5 h-5 text-success shrink-0 mt-0.5" /> : <XCircle className="w-5 h-5 text-danger shrink-0 mt-0.5" />}
-        <div>
-          <p className="font-semibold text-sm text-elastic-dark">
-            {health?.connected ? `Elastic Serverless · ${health.cluster?.name}` : 'Not connected'}
-          </p>
-          <p className="text-xs text-elastic-gray mt-1">
-            Raw OTel from checkout · cart · payment — enriched with regionID so ops sees business impact, not just infra
-            {lastRefresh && ` · ${lastRefresh.toLocaleTimeString()}`}
-            {data?.queryTimeMs && ` · ${data.queryTimeMs}ms`}
-          </p>
-        </div>
-      </div>
+      {health?.connected && (
+        <p className="text-[13px] text-[#86868b] -mt-6 mb-8">
+          {health.cluster?.name}
+          {lastRefresh && ` · Updated ${lastRefresh.toLocaleTimeString()}`}
+          {data?.queryTimeMs && ` · ${data.queryTimeMs}ms`}
+        </p>
+      )}
+
+      {!health?.connected && (
+        <p className="text-[13px] text-[#cc0000] -mt-6 mb-8">Not connected to Elastic Serverless.</p>
+      )}
 
       {error && !data && (
         <p className="mt-4 text-sm text-danger">{error}</p>
@@ -193,51 +183,50 @@ export function LiveElasticDemo() {
 
       {data && (
         <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
-            <StatCard label="Regions Monitored" value="12K+" trend="business context on OTel" highlight kibanaUrl={kibanaUrl} kibanaSection="discover" />
-            <StatCard label="Sessions (24h)" value={formatCount(data.stats.sessions24h)} trend="signaling · provisioning · billing" kibanaUrl={kibanaUrl} kibanaSection="discover" />
-            <StatCard label="Network Success" value={`${data.stats.networkSuccessRate}%`} trend="Across region tiers" highlight kibanaUrl={kibanaUrl} kibanaSection="discover" />
-            <StatCard label="ML Anomalies" value={data.stats.mlAnomaliesOpen} trend="Elastic ML + AIOps" kibanaUrl={kibanaUrl} kibanaSection="discover" />
+          {data.launchEvent && <LaunchEventStrip launchEvent={data.launchEvent} className="mb-8" />}
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <StatCard
+              label="Launch activations (6h)"
+              value={data.stats.iphoneActivations6h
+                ? `${(data.stats.iphoneActivations6h / 1_000_000).toFixed(2)}M`
+                : '847K'}
+              highlight
+              kibanaUrl={kibanaUrl}
+              kibanaSection="discover"
+            />
+            <StatCard
+              label="Pre-orders (24h)"
+              value={data.stats.iphonePreOrders24h
+                ? `${(data.stats.iphonePreOrders24h / 1_000_000).toFixed(1)}M`
+                : '2.4M'}
+              kibanaUrl={kibanaUrl}
+              kibanaSection="discover"
+            />
+            <StatCard label="Success rate" value={`${data.stats.networkSuccessRate}%`} kibanaUrl={kibanaUrl} kibanaSection="discover" />
+            <StatCard label="ML actionable" value={data.stats.mlAnomaliesOpen} trend={`${data.stats.mlWatching ?? 0} watching`} kibanaUrl={kibanaUrl} kibanaSection="discover" />
           </div>
 
-          {anomaly && !selectedRegionId && anomalyRegion && (
-            <ChurnRiskTile
-              className="mt-4"
-              compact
-              sessions24h={anomalyRegion.sessions24h}
-              successRate={anomalyRegion.successRate}
-              sloStatus={anomalyRegion.successRate < 99.7 ? 'breached' : 'at_risk'}
-              tier={anomalyRegion.tier}
-              regionName={anomalyRegion.name || anomaly.regionName}
-              regionId={anomaly.regionId}
-            />
-          )}
-
-          <div className="grid lg:grid-cols-3 gap-4 mt-4">
-            {/* Network regions */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
-                <Store className="w-4 h-4 text-telco-magenta" /> Top Regions by Volume
-              </h3>
+          <div className="grid lg:grid-cols-3 gap-5 mt-8">
+            <div className="surface-card p-5">
+              <h3 className="text-[17px] font-semibold text-[#1d1d1f] mb-4">Regions</h3>
               <div className="space-y-2 max-h-[320px] overflow-y-auto">
                 {data.regions?.map(m => (
                   <button key={m.regionId} type="button" onClick={() => handleRegionClick(m.regionId)}
-                    className={`w-full text-left p-2 rounded-lg border transition-all group ${
-                      selectedRegionId === m.regionId ? 'border-telco-magenta bg-telco-magenta/5 ring-1 ring-telco-magenta/30' : 'border-gray-100 hover:border-telco-magenta/40 hover:bg-gray-50'
+                    className={`w-full text-left p-3 rounded-2xl transition-colors group ${
+                      selectedRegionId === m.regionId ? 'bg-[#0071e3]/8 ring-1 ring-[#0071e3]/25' : 'bg-[#f5f5f7] hover:bg-[#ebebed]'
                     }`}>
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <p className="text-xs font-semibold text-elastic-dark">{m.name}</p>
-                        <p className="text-[10px] font-mono text-telco-magenta">{m.regionId}</p>
+                      <p className="text-[14px] font-medium text-[#1d1d1f]">{m.name}</p>
+                      <p className="text-[11px] font-mono text-[#86868b] mt-0.5">{m.regionId}</p>
+                      {m.launchHotspot && (
+                        <p className="text-[11px] text-[#0071e3] mt-1">{m.launchRole || 'Launch hotspot'}</p>
+                      )}
                       </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-[10px] text-elastic-gray">{m.tier}</span>
-                        <ChevronRight className={`w-3 h-3 text-elastic-gray group-hover:text-telco-magenta transition-colors ${
-                          selectedRegionId === m.regionId ? 'text-telco-magenta' : ''
-                        }`} />
-                      </div>
+                      <ChevronRight className={`w-4 h-4 text-[#86868b] ${selectedRegionId === m.regionId ? 'text-[#0071e3]' : ''}`} />
                     </div>
-                    <div className="flex gap-3 mt-1 text-[10px] text-elastic-gray">
+                    <div className="flex gap-3 mt-2 text-[11px] text-[#86868b]">
                       <span>{formatCount(m.sessions24h)} sessions</span>
                       <span className={m.successRate < 99.7 ? 'text-warning' : 'text-success'}>{m.successRate}%</span>
                       <span>{m.p99LatencyMs}ms p99</span>
@@ -249,10 +238,8 @@ export function LiveElasticDemo() {
             </div>
 
             {/* Network core pipeline */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
-                <Activity className="w-4 h-4 text-elastic-teal" /> Network Core Pipeline (live)
-              </h3>
+            <div className="surface-card p-5">
+              <h3 className="text-[17px] font-semibold text-[#1d1d1f] mb-4">Core pipeline</h3>
               <div className="space-y-3">
                 {data.networkPipeline?.map(p => (
                   <div key={p.service}>
@@ -280,28 +267,16 @@ export function LiveElasticDemo() {
               </div>
             </div>
 
-            {/* ML Anomalies */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
-                <Brain className="w-4 h-4 text-warning" /> ML-Detected Anomalies
-              </h3>
-              <div className="space-y-2">
-                {data.mlAnomalies?.map(a => (
-                  <button key={a.id} type="button" onClick={() => { setSelectedAnomaly(a); setWorkflowRun(null); }}
-                    className={`w-full text-left p-3 rounded-lg border ${
-                      selectedAnomaly?.id === a.id ? 'border-warning bg-warning/5 ring-1 ring-warning/30' : 'border-gray-100 hover:bg-gray-50'
-                    }`}>
-                    <div className="flex justify-between items-start">
-                      <span className="text-xs font-medium text-elastic-dark">{a.title}</span>
-                      <span className={`text-xs font-bold ${
-                        a.severity === 'critical' ? 'text-danger' : a.severity === 'high' ? 'text-warning' : 'text-elastic-gray'
-                      }`}>{(a.mlScore * 100).toFixed(0)}</span>
-                    </div>
-                    <p className="text-[10px] text-elastic-gray mt-1">{a.regionId} · {a.regionName}</p>
-                    <p className="text-[10px] text-elastic-dark mt-1 line-clamp-2">{a.signal}</p>
-                  </button>
-                ))}
-              </div>
+            {/* ML signal intelligence */}
+            <div className="surface-card p-5">
+              <MlSignalIntelligence
+                intelligence={data.mlSignalIntelligence}
+                anomalies={data.mlAnomalies}
+                selectedAnomalyId={selectedAnomaly?.id}
+                onSelectAnomaly={(a) => { setSelectedAnomaly(a); setWorkflowRun(null); }}
+                compact
+                showSuppressed={false}
+              />
             </div>
           </div>
 
@@ -333,8 +308,8 @@ export function LiveElasticDemo() {
           </div>
 
           {/* Drill-down + Workflow */}
-          <div className="grid lg:grid-cols-2 gap-4 mt-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="grid lg:grid-cols-2 gap-5 mt-8">
+            <div className="surface-card p-5">
               <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
                 <GitBranch className="w-4 h-4 text-elastic-teal" />
                 Unified Troubleshooting — {anomaly?.regionId}
@@ -408,11 +383,9 @@ export function LiveElasticDemo() {
             </div>
 
             {/* Elastic Workflows */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2">
-                  <Workflow className="w-4 h-4 text-telco-magenta" /> Elastic Workflows — AI Resolution
-                </h3>
+            <div className="surface-card p-5">
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Workflow</h3>
                 {(workflowRun || anomaly) && (
                   <ElasticWorkflowLink
                     kibanaUrl={kibanaUrl}
@@ -424,13 +397,10 @@ export function LiveElasticDemo() {
               </div>
 
               {anomaly && !workflowRun && (
-                <div className="mb-4 p-3 bg-telco-magenta/5 rounded-lg border border-telco-magenta/20">
-                  <p className="text-xs font-medium text-telco-magenta">{anomaly.title}</p>
-                  <p className="text-[10px] text-elastic-gray mt-1">
-                    Workflow: <code className="bg-white px-1 rounded">{anomaly.workflowId}</code>
-                  </p>
+                <div className="mb-4 p-4 rounded-2xl bg-[#f5f5f7]">
+                  <p className="text-[14px] font-medium text-[#1d1d1f]">{anomaly.title}</p>
                   <button type="button" onClick={handleRunWorkflow} disabled={workflowLoading}
-                    className="mt-3 w-full py-2 bg-telco-magenta text-white text-sm rounded-lg hover:bg-telco-magenta/90 disabled:opacity-50 flex items-center justify-center gap-2">
+                    className="mt-4 w-full py-3 btn-primary disabled:opacity-50 flex items-center justify-center gap-2">
                     <Bot className="w-4 h-4" />
                     {workflowLoading ? 'Starting workflow…' : 'Run Elastic Workflow + AI Agent'}
                   </button>
@@ -502,8 +472,8 @@ export function LiveElasticDemo() {
           </div>
 
           {/* Region logs + errors */}
-          <div className="grid lg:grid-cols-2 gap-4 mt-4">
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="grid lg:grid-cols-2 gap-5 mt-8">
+            <div className="surface-card p-5">
               <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
                 <AlertCircle className="w-4 h-4 text-danger" /> Payment Errors (live logs)
               </h3>

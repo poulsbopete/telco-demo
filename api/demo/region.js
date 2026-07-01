@@ -7,6 +7,7 @@ import {
   buildRegionDetail,
   REGIONS,
 } from '../_lib/telco-context.js';
+import { enrichMlAnomalies, buildMlSignalIntelligence } from '../_lib/ml-signal-intelligence.js';
 
 const NETWORK_PIPELINE_QUERY = `
 FROM logs-generic.otel-default
@@ -49,7 +50,8 @@ async function loadBaseData() {
 
   const networkPipeline = buildNetworkPipeline(pipelineStats);
   const regionsMetrics = buildRegionMetrics(pipelineStats);
-  const mlAnomalies = buildMlAnomalies({ pipelineStats, regionMetrics: regionsMetrics, recentErrors });
+  const mlAnomaliesRaw = buildMlAnomalies({ pipelineStats, regionMetrics: regionsMetrics, recentErrors });
+  const mlAnomalies = enrichMlAnomalies(mlAnomaliesRaw);
 
   return { cluster, pipelineStats, recentErrors, networkPipeline, regionsMetrics, mlAnomalies };
 }
@@ -86,6 +88,11 @@ export default async function handler(req, res) {
   try {
     const base = await loadBaseData();
     const detail = buildRegionDetail(regionId, base);
+    const regionAnomalies = base.mlAnomalies.filter(a => a.regionId === regionId);
+    const mlSignalIntelligence = buildMlSignalIntelligence({
+      mlAnomalies: regionAnomalies.length ? regionAnomalies : base.mlAnomalies,
+      pipelineStats: base.pipelineStats,
+    });
 
     return res.status(200).json({
       ok: true,
@@ -94,6 +101,7 @@ export default async function handler(req, res) {
         kibanaUrl: base.cluster.kibanaUrl,
       },
       ...detail,
+      mlSignalIntelligence,
       queryTimeMs: Date.now() - start,
     });
   } catch (err) {

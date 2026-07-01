@@ -6,7 +6,11 @@ import {
 import { AlertFeed } from './shared/AlertFeed';
 import { CostCalculator } from './CostCalculator';
 import { ElasticWorkflowLink } from './ElasticWorkflowLink';
-import { ModuleHeader, DemoBanner, StatCard } from './shared/ModuleHeader';
+import { ModuleHeader, StatCard } from './shared/ModuleHeader';
+import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
+import { buildDemoMlSignalIntelligence } from '../lib/ml-signal-intelligence';
+import { IPHONE_LAUNCH } from '../lib/iphone-launch-event';
+import { LaunchEventStrip } from './shared/LaunchEventStrip';
 import { TimeSeriesChart } from './shared/TimeSeriesChart';
 import {
   generateSecurityFeed,
@@ -29,15 +33,6 @@ function extractCaseFromA2A(result) {
   const caseArtifact = artifacts.find(a => a.artifactId === 'case-bundle');
   return caseArtifact?.parts?.[0]?.data || null;
 }
-
-const ELASTIC_SECURITY_PILLARS = [
-  'SIEM & Detection',
-  'Elastic Defend',
-  'Entity Analytics',
-  'Attack Discovery',
-  'Kibana Cases',
-  'Workflows',
-];
 
 const SECURITY_CONNECTORS = [
   'PagerDuty', 'ServiceNow', 'Jira', 'Slack', 'CrowdStrike', 'Okta', 'MS Sentinel', 'Webhook',
@@ -175,83 +170,71 @@ export function SecurityDashboard() {
     }, 500);
   }
 
+  const securityMlIntelligence = useMemo(() => ({
+    ...buildDemoMlSignalIntelligence([]),
+    funnel: {
+      rawThresholdAlerts: 12400,
+      mlScored: 890,
+      correlatedActionable: 23,
+      actionableNow: 8,
+      watching: 15,
+      proactiveWorkflowsReady: 8,
+      suppressedNoise: 12377,
+      noiseReductionPct: 99.8,
+    },
+    mlJobs: [
+      { id: 'entity-risk-v2', label: 'Entity risk scoring', domain: 'security', lastScore: 0.89, linkedAnomalyId: 'ML-SEC-001' },
+      { id: 'auth-anomaly-v1', label: 'Auth failure clustering', domain: 'security', lastScore: 0.76 },
+      { id: 'dns-tunnel-ml', label: 'DNS tunnel detection', domain: 'security', lastScore: 0.82 },
+    ],
+    correlationWindow: 'Entity Analytics + ML · SIEM rule correlation',
+    proactiveAvgLeadMin: 8,
+  }), []);
+
+  const securityMlAnomalies = useMemo(() => [
+    {
+      id: 'ML-SEC-001',
+      title: 'Entity risk spike — lateral movement pattern',
+      mlScore: 0.89,
+      severity: 'high',
+      domain: 'security',
+      mlJobId: 'entity-risk-v2',
+      regionId: 'NOC-SOC',
+      regionName: 'Security operations',
+      signal: 'User/host risk score 3.4σ above peer cohort · MITRE T1021',
+      priorityScore: 89,
+      proactiveLeadMin: 8,
+      suppressedDuplicates: 412,
+      status: 'actionable',
+      correlatedDomains: ['security'],
+    },
+  ], []);
+
   return (
     <div>
       <ModuleHeader
         title="Elastic Security"
-        subtitle="Unified SIEM, Entity Analytics, and Search AI Lake — 300 TB/day PCI-scoped security telemetry"
-        badge="Security Platform"
+        subtitle="SIEM, entity analytics, and automated response on one platform."
       >
-        {securityDashboardUrl && (
-          <a
-            href={securityDashboardUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
-            Dashboard <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
         {securityLinks.alerts && (
-          <a
-            href={securityLinks.alerts}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
+          <a href={securityLinks.alerts} target="_blank" rel="noopener noreferrer" className="btn-link flex items-center gap-1">
             Alerts <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
-        {securityLinks.cases && (
-          <a
-            href={securityLinks.cases}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
-            Cases <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
-        {securityLinks.overview && (
-          <a
-            href={securityLinks.overview}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
-            Security <ExternalLink className="w-3.5 h-3.5" />
           </a>
         )}
       </ModuleHeader>
 
-      <DemoBanner />
+      <LaunchEventStrip className="mb-8" />
 
-      <div className="mt-3 p-3 rounded-xl border border-telco-magenta/20 bg-telco-magenta/5 flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-telco-magenta">Telco security platform consolidation</p>
-          <p className="text-xs text-elastic-gray mt-0.5">
-            Unified SIEM, Entity Analytics, Cases, and Workflows on Elastic Serverless — searchable multi-year retention on Search AI Lake.
-          </p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0 text-xs">
-          <span className="px-2 py-1 rounded bg-gray-100 text-elastic-gray font-medium">Legacy SIEM</span>
-          <ArrowRight className="w-4 h-4 text-elastic-teal" />
-          <span className="px-2 py-1 rounded bg-elastic-teal/10 text-elastic-teal font-medium">Elastic Security</span>
-        </div>
+      <div className="surface-card p-5 mb-8">
+        <MlSignalIntelligence
+          intelligence={securityMlIntelligence}
+          anomalies={securityMlAnomalies}
+          compact
+          showAnomalies={false}
+        />
       </div>
 
-      <div className="flex flex-wrap gap-1.5 mt-3">
-        {ELASTIC_SECURITY_PILLARS.map(name => (
-          <span
-            key={name}
-            className="text-[10px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full bg-elastic-teal/10 text-elastic-teal border border-elastic-teal/20"
-          >
-            {name}
-          </span>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Events/sec"
           value={formatNumber(stats.eventsPerSecond)}

@@ -3,6 +3,12 @@
  * regional observability narrative (regionID, ML anomalies, workflows).
  */
 
+import {
+  applyLaunchRegionBoost,
+  buildLaunchEventSummary,
+  buildLaunchMlAnomalies,
+} from '../../lib/iphone-launch-event.js';
+
 export const TELCO_SERVICES = {
   cart: { label: 'Service Provisioning', domain: 'core-network' },
   checkout: { label: 'Core Signaling (5G AMF/SMF)', domain: 'core-network' },
@@ -40,7 +46,7 @@ export function buildRegionMetrics(pipelineStats, regionCount = 8) {
   const regions = REGIONS.slice(0, regionCount);
   const totalSessions = pipelineStats.reduce((s, p) => s + p.session_count, 0) || 1;
 
-  return regions.map((r, i) => {
+  const metrics = regions.map((r, i) => {
     const weight = 0.28 - i * 0.025 + (hashSeed(r.regionId) % 100) / 2000;
     const share = Math.max(weight, 0.04);
     const sessions = Math.round(totalSessions * share);
@@ -57,6 +63,8 @@ export function buildRegionMetrics(pipelineStats, regionCount = 8) {
       bandwidthGbps: Math.round(sessions * 0.012 * 10) / 10,
     };
   }).sort((a, b) => b.sessions24h - a.sessions24h);
+
+  return applyLaunchRegionBoost(metrics);
 }
 
 export function buildMlAnomalies({ pipelineStats, regionMetrics, recentErrors }) {
@@ -66,7 +74,10 @@ export function buildMlAnomalies({ pipelineStats, regionMetrics, recentErrors })
   const topRegion = regionMetrics[0];
   const affectedRegion = regionMetrics.find(r => r.successRate < 99.7) || regionMetrics[2];
 
+  const launchAnomalies = buildLaunchMlAnomalies(regionMetrics);
+
   const anomalies = [
+    ...launchAnomalies,
     {
       id: 'ML-ANOM-001',
       type: 'signaling_latency_spike',
@@ -121,6 +132,9 @@ export function buildMlAnomalies({ pipelineStats, regionMetrics, recentErrors })
 
   return anomalies;
 }
+
+export { enrichMlAnomalies, buildMlSignalIntelligence } from './ml-signal-intelligence.js';
+export { buildLaunchEventSummary } from '../../lib/iphone-launch-event.js';
 
 export const WORKFLOW_TEMPLATES = {
   'wf-core-latency-remediation': {
@@ -238,6 +252,10 @@ export function buildRegionDetail(regionId, { pipelineStats, mlAnomalies, recent
   const syntheticLogs = [
     { level: 'INFO', message: `Session established regionID=${regionId} bandwidth=${(142 + seed % 500).toFixed(1)}Mbps ses=SES-${seed.toString(16).slice(0, 8)}`, service: 'checkout' },
     { level: 'INFO', message: `Provisioning completed — ${metrics.sessions24h} daily sessions`, service: 'cart' },
+    ...(metrics.launchHotspot ? [
+      { level: 'WARN', message: `iPhone 17 Pro launch queue depth=842 regionID=${regionId} model=17-Pro-Max esim=true`, service: 'cart' },
+      { level: 'INFO', message: `eSIM SM-DP+ download initiated ICCID=8901…${regionId.slice(-4)} device=iPhone17Pro`, service: 'cart' },
+    ] : []),
     ...(metrics.errorCount > 0 ? [{ level: 'ERROR', message: `Signaling timeout regionID=${regionId} — upstream latency ${metrics.p99LatencyMs}ms`, service: 'checkout' }] : []),
     ...(metrics.successRate < 99.7 ? [{ level: 'WARN', message: `Billing failure rate elevated for ${regionId}: ${(100 - metrics.successRate).toFixed(2)}%`, service: 'payment' }] : []),
   ].map((log, i) => enrichLogForTelco({

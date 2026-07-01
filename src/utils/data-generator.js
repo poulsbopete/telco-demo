@@ -3,6 +3,8 @@
  * Simulates petabyte-scale ingestion rates without storing massive datasets.
  */
 
+import { IPHONE_LAUNCH, IPHONE_LAUNCH_SECURITY_ALERT } from '../lib/iphone-launch-event.js';
+
 const SERVICES = [
   'checkout-api', 'payment-gateway', 'fraud-service', 'user-service',
   'notification-service', 'inventory-api', 'shipping-service', 'auth-service',
@@ -73,6 +75,16 @@ const THREAT_TYPES = [
     ruleType: 'threshold',
     index: '.alerts-security.alerts-default',
   },
+  {
+    type: IPHONE_LAUNCH_SECURITY_ALERT.type,
+    severity: IPHONE_LAUNCH_SECURITY_ALERT.severity,
+    remediation: IPHONE_LAUNCH_SECURITY_ALERT.remediation,
+    ruleName: IPHONE_LAUNCH_SECURITY_ALERT.ruleName,
+    ruleId: IPHONE_LAUNCH_SECURITY_ALERT.ruleId,
+    mitreTactic: IPHONE_LAUNCH_SECURITY_ALERT.mitreTactic,
+    ruleType: IPHONE_LAUNCH_SECURITY_ALERT.ruleType,
+    index: '.alerts-security.alerts-default',
+  },
 ];
 
 const SYNTHETIC_USERS = [
@@ -89,16 +101,18 @@ function randomItem(arr) {
 }
 
 export function generateMetricPoint(baseTime, index) {
-  const spike = index > 18 && index < 24;
+  const launchSpike = index > 16 && index < 26;
+  const spike = launchSpike || (index > 18 && index < 24);
   return {
     time: new Date(baseTime + index * 5000).toISOString(),
     latency: spike ? 450 + Math.random() * 200 : 80 + Math.random() * 40,
     errorRate: spike ? 2.5 + Math.random() * 3 : 0.1 + Math.random() * 0.3,
-    throughput: 45000 + Math.random() * 10000,
+    throughput: launchSpike ? 78000 + Math.random() * 12000 : 45000 + Math.random() * 10000,
     cpu: 45 + Math.random() * 30 + (spike ? 25 : 0),
     memory: 60 + Math.random() * 20,
     paymentSuccess: spike ? 94 + Math.random() * 2 : 99.2 + Math.random() * 0.5,
     fraudDetection: 99.5 + Math.random() * 0.4,
+    label: launchSpike ? 'iphone-launch' : undefined,
   };
 }
 
@@ -108,13 +122,16 @@ export function generateMetricsSeries(count = 30) {
 }
 
 export function generateIngestionStats() {
+  const m = IPHONE_LAUNCH.metrics;
   return {
-    spansPerMinute: 1_200_000_000 + Math.floor(Math.random() * 50_000_000),
-    logsPerDay: 2.7 + Math.random() * 0.3,
-    metricsPerMinute: 520_000_000 + Math.floor(Math.random() * 20_000_000),
-    sourcesOnline: 648_000 + Math.floor(Math.random() * 5000),
+    spansPerMinute: 1_200_000_000 + Math.floor(Math.random() * 50_000_000) + m.activationsPerMinutePeak * 800,
+    logsPerDay: 2.7 + Math.random() * 0.3 + 0.15,
+    metricsPerMinute: 520_000_000 + Math.floor(Math.random() * 20_000_000) + m.esimDownloadsPerMin * 1200,
+    sourcesOnline: 648_000 + Math.floor(Math.random() * 5000) + m.retailStoresOnline,
     queryLatencyMs: 180 + Math.floor(Math.random() * 320),
     ingestionLagMs: 800 + Math.floor(Math.random() * 400),
+    launchActivationsPerMin: m.activationsPerMinutePeak,
+    launchEsimOtaPerMin: m.esimDownloadsPerMin,
   };
 }
 

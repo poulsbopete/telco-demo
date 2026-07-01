@@ -11,7 +11,12 @@ import {
   enrichLogForTelco,
   buildTraceDrilldown,
   REGIONS,
+  buildLaunchEventSummary,
 } from '../_lib/telco-context.js';
+import {
+  enrichMlAnomalies,
+  buildMlSignalIntelligence,
+} from '../_lib/ml-signal-intelligence.js';
 
 const NETWORK_PIPELINE_QUERY = `
 FROM logs-generic.otel-default
@@ -75,7 +80,9 @@ export default async function handler(req, res) {
 
     const networkPipeline = buildNetworkPipeline(pipelineStats);
     const regionsMetrics = buildRegionMetrics(pipelineStats);
-    const mlAnomalies = buildMlAnomalies({ pipelineStats, regionMetrics: regionsMetrics, recentErrors });
+    const mlAnomaliesRaw = buildMlAnomalies({ pipelineStats, regionMetrics: regionsMetrics, recentErrors });
+    const mlAnomalies = enrichMlAnomalies(mlAnomaliesRaw);
+    const mlSignalIntelligence = buildMlSignalIntelligence({ mlAnomalies, pipelineStats });
 
     const totalTxns = pipelineStats.reduce((s, p) => s + p.session_count, 0);
     const totalErrors = pipelineStats.reduce((s, p) => s + p.errors, 0);
@@ -83,8 +90,11 @@ export default async function handler(req, res) {
       ? regionsMetrics.reduce((s, m) => s + m.successRate, 0) / regionsMetrics.length
       : 99.9;
 
+    const launchEvent = buildLaunchEventSummary();
+
     return res.status(200).json({
       ok: true,
+      launchEvent,
       cluster: {
         name: cluster.clusterName,
         version: cluster.version,
@@ -95,12 +105,17 @@ export default async function handler(req, res) {
         regionIdsActive: `${REGIONS.length},000+`.replace('8,000+', '12,000+'),
         sessions24h: totalTxns,
         networkSuccessRate: Math.round(avgSuccess * 100) / 100,
-        mlAnomaliesOpen: mlAnomalies.filter(a => a.severity !== 'low').length,
+        mlAnomaliesOpen: mlAnomalies.filter(a => a.status === 'actionable').length,
+        mlWatching: mlAnomalies.filter(a => a.status === 'watching').length,
+        alertsSuppressed24h: mlSignalIntelligence.funnel.suppressedNoise,
         errorCount: totalErrors,
+        iphoneActivations6h: launchEvent.metrics.activationsFirst6h,
+        iphonePreOrders24h: launchEvent.metrics.preOrders24h,
       },
       networkPipeline,
       regions: regionsMetrics,
       mlAnomalies,
+      mlSignalIntelligence,
       recentErrors: recentErrors.map(enrichLogForTelco),
       primaryAnomaly: mlAnomalies[0],
       traceDrilldown: buildTraceDrilldown(mlAnomalies[0], recentErrors),

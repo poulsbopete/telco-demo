@@ -5,7 +5,8 @@ import {
 } from 'lucide-react';
 import { semanticSearch } from '../utils/semantic-search';
 import { evaluateRules, getCustomers } from '../utils/rules-engine';
-import { ModuleHeader, DemoBanner, StatCard } from './shared/ModuleHeader';
+import { ModuleHeader, StatCard } from './shared/ModuleHeader';
+import { LaunchEventStrip } from './shared/LaunchEventStrip';
 import {
   getSearchKibanaUrl,
   kibanaSearchHomeUrl,
@@ -16,12 +17,12 @@ import {
 } from '../lib/elastic-api';
 
 const QUICK_PROMPTS = [
+  'My iPhone 17 Pro is stuck on activation — it says it may take a few minutes',
+  'How do I transfer my eSIM to my new iPhone 17?',
+  'Where is my iPhone 17 pre-order pickup appointment?',
+  'What is my launch trade-in credit for iPhone 17 Pro?',
   "I just signed up but haven't confirmed my email",
-  'What are Telco credit limits?',
   'My account is locked after too many login attempts',
-  'What are the legal requirements for Telco Credit?',
-  'How do I activate my debit card?',
-  'What are the PCI compliance requirements?',
 ];
 
 export function ChatSimulator() {
@@ -32,7 +33,7 @@ export function ChatSimulator() {
     },
   ]);
   const [input, setInput] = useState('');
-  const [customerId, setCustomerId] = useState('CUST-1001');
+  const [customerId, setCustomerId] = useState('CUST-1006');
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState(null);
   const messagesEnd = useRef(null);
@@ -80,82 +81,46 @@ export function ChatSimulator() {
   return (
     <div>
       <ModuleHeader
-        title="Enterprise Search & Conversational AI"
-        subtitle="ELSER semantic intent matching + hierarchical navigation + rule-based context engine"
-        badge="ELSER v2"
+        title="Enterprise Search"
+        subtitle="Semantic search and AI-assisted care deflection."
       >
-        {searchDashboardUrl && (
-          <a
-            href={searchDashboardUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
-            Dashboard <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
         {searchHomeUrl && (
-          <a
-            href={searchHomeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
+          <a href={searchHomeUrl} target="_blank" rel="noopener noreferrer" className="btn-link flex items-center gap-1">
             Search <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
-        {searchAppUrl && (
-          <a
-            href={searchAppUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
-            telco-tmobile-kb <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
-        {agentBuilderUrl && (
-          <a
-            href={agentBuilderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 rounded-lg border border-gray-200 bg-white text-elastic-teal hover:bg-elastic-teal/5 flex items-center gap-1.5"
-          >
-            Agent Builder <ExternalLink className="w-3.5 h-3.5" />
           </a>
         )}
         <select
           value={customerId}
           onChange={e => setCustomerId(e.target.value)}
-          className="text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white"
+          className="btn-quiet text-[13px]"
         >
           {customers.map(c => (
             <option key={c.customer_id} value={c.customer_id}>
-              {c.name} ({c.lifecycle_stage}, {c.account_state})
+              {c.name}
             </option>
           ))}
         </select>
       </ModuleHeader>
 
-      <DemoBanner />
+      <LaunchEventStrip className="mb-8" />
 
-      <div className="grid lg:grid-cols-3 gap-4 mt-4">
-        <div className="lg:col-span-2 flex flex-col bg-white rounded-xl border border-gray-200 overflow-hidden min-h-[500px]">
+      <div className="grid lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2 flex flex-col surface-card overflow-hidden min-h-[500px]">
           <div className="flex-1 overflow-y-auto p-4 space-y-4 max-h-[400px]">
             {messages.map((msg, i) => (
               <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                  msg.role === 'user' ? 'bg-telco-magenta text-white' :
-                  msg.role === 'assistant' ? 'bg-elastic-teal text-white' : 'bg-gray-100'
+                  msg.role === 'user' ? 'bg-[#1d1d1f] text-white' :
+                  msg.role === 'assistant' ? 'bg-[#0071e3] text-white' : 'bg-[#f5f5f7]'
                 }`}>
                   {msg.role === 'user' ? <User className="w-4 h-4" /> :
                    msg.role === 'assistant' ? <Bot className="w-4 h-4" /> :
                    <Sparkles className="w-4 h-4 text-elastic-gray" />}
                 </div>
-                <div className={`max-w-[80%] p-3 rounded-xl text-sm whitespace-pre-wrap ${
-                  msg.role === 'user' ? 'bg-telco-magenta text-white rounded-br-sm' :
-                  msg.role === 'assistant' ? 'bg-elastic-light text-elastic-dark rounded-bl-sm' :
-                  'bg-gray-50 text-elastic-gray text-xs italic'
+                <div className={`max-w-[80%] p-3 rounded-2xl text-sm whitespace-pre-wrap ${
+                  msg.role === 'user' ? 'bg-[#1d1d1f] text-white' :
+                  msg.role === 'assistant' ? 'bg-[#f5f5f7] text-[#1d1d1f]' :
+                  'bg-[#f5f5f7] text-[#86868b] text-xs italic'
                 }`}>
                   {msg.content}
                 </div>
@@ -198,7 +163,7 @@ export function ChatSimulator() {
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2.5 bg-elastic-teal text-white rounded-lg hover:bg-elastic-teal/90 disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2.5 btn-primary disabled:opacity-50 flex items-center gap-2"
             >
               <Send className="w-4 h-4" />
               <span className="hidden sm:inline">Send</span>

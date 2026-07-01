@@ -3,8 +3,11 @@ import { ExternalLink, GitBranch, Loader2, Radio, Workflow } from 'lucide-react'
 import { IncidentFlowChart } from './IncidentFlowChart';
 import { ModuleHeader } from './shared/ModuleHeader';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
+import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
 import { FAULT_CHANNELS, INCIDENT_STEPS } from '../lib/adaptive-networks/channels';
-import { TELEMETRY_INGEST_SUMMARY, TELEMETRY_SOURCES } from '../lib/adaptive-networks/telemetry';
+import { buildDemoMlSignalIntelligence } from '../lib/ml-signal-intelligence';
+import { LaunchEventStrip } from './shared/LaunchEventStrip';
+import { IPHONE_LAUNCH } from '../lib/iphone-launch-event';
 import {
   fetchAdaptiveNetworksConfig,
   injectNetworkFault,
@@ -143,6 +146,29 @@ export function AdaptiveNetworksDemo() {
     [selected],
   );
 
+  const adaptiveMlIntelligence = useMemo(
+    () => buildDemoMlSignalIntelligence([
+      {
+        id: 'ML-ADAPTIVE-001',
+        type: 'transport_degradation',
+        title: selectedFault?.name || 'Network transport fault',
+        mlScore: selectedFault?.severity === 'high' ? 0.92 : 0.86,
+        severity: selectedFault?.severity === 'high' ? 'high' : 'medium',
+        domain: 'transport',
+        mlJobId: 'transport-link-loss-v1',
+        regionId: 'REG-4421098',
+        regionName: 'West Fiber Backbone',
+        signal: selectedFault?.description || 'ML job flagged pre-customer degradation pattern',
+        priorityScore: selectedFault?.severity === 'high' ? 92 : 78,
+        proactiveLeadMin: selectedFault?.severity === 'high' ? 14 : 28,
+        suppressedDuplicates: 34,
+        status: 'actionable',
+        correlatedDomains: ['transport', 'core'],
+      },
+    ]),
+    [selectedFault],
+  );
+
   const activeWorkflowStep = useMemo(() => {
     if (!execution) return undefined;
     const steps = execution.stepExecutions ?? [];
@@ -193,74 +219,34 @@ export function AdaptiveNetworksDemo() {
   return (
     <div>
       <ModuleHeader
-        title="Adaptive Networks"
-        subtitle="Router/switch fault injection · Agent Builder RCA · HITL remediation on otel-demo"
+        title="Adaptive networks"
+        subtitle="Inject a transport or routing fault and watch ML correlate telemetry before remediation runs."
         badge="Live"
       >
-        {o11yDashboardUrl && (
-          <a href={o11yDashboardUrl} target="_blank" rel="noopener noreferrer"
-            className="text-sm px-3 py-2 border border-telco-magenta/40 text-telco-magenta rounded-lg flex items-center gap-1 hover:bg-telco-magenta/5">
-            <ExternalLink className="w-4 h-4" /> Dashboard
-          </a>
-        )}
         {discoverUrl && (
-          <a href={discoverUrl} target="_blank" rel="noopener noreferrer"
-            className="text-sm px-3 py-2 bg-elastic-teal text-white rounded-lg flex items-center gap-1 hover:bg-elastic-teal/90">
-            <ExternalLink className="w-4 h-4" /> Discover
-          </a>
-        )}
-        {workflowsUrl && (
-          <a href={workflowsUrl} target="_blank" rel="noopener noreferrer"
-            className="text-sm px-3 py-2 border border-gray-200 rounded-lg flex items-center gap-1 hover:bg-gray-50 text-elastic-dark">
-            <Workflow className="w-4 h-4" /> Workflows
-          </a>
-        )}
-        {casesUrl && (
-          <a href={casesUrl} target="_blank" rel="noopener noreferrer"
-            className="text-sm px-3 py-2 border border-gray-200 rounded-lg flex items-center gap-1 hover:bg-gray-50 text-elastic-dark">
-            <GitBranch className="w-4 h-4" /> Cases
+          <a href={discoverUrl} target="_blank" rel="noopener noreferrer" className="btn-link flex items-center gap-1">
+            Discover <ExternalLink className="w-3.5 h-3.5" />
           </a>
         )}
       </ModuleHeader>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-4 sm:p-6 shadow-sm">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-elastic-teal mb-1">
-          Elastic Observability · Agent Builder · Workflows
-        </p>
-        <p className="text-sm text-elastic-gray max-w-3xl leading-relaxed mb-3">
-          Inject a simulated router or switch fault via <strong className="text-elastic-dark">OTLP logs and metrics</strong>,
-          then watch the real <strong className="text-elastic-dark">Network Incident Response</strong> workflow correlate
-          telemetry with otel-demo <strong className="text-elastic-dark">Prometheus</strong> service metrics.
+      <LaunchEventStrip className="mb-8" />
+
+      <div className="surface-card p-6 sm:p-8">
+        <p className="section-lead mb-6">
+          {IPHONE_LAUNCH.eventName} load on transport — inject a fault and watch ML correlate telemetry before remediation runs.
         </p>
         {config && (
-          <p className="text-xs text-elastic-gray mb-4">
-            Kibana:{' '}
-            <a href={config.kibanaUrl} target="_blank" rel="noopener noreferrer" className="text-elastic-teal hover:underline">
+          <p className="text-[13px] text-[#86868b] mb-8">
+            <a href={config.kibanaUrl} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">
               {config.kibanaUrl.replace('https://', '')}
             </a>
-            {' · '}Alert interval {config.alertIntervalHint}
-            {!config.otlpConfigured && (
-              <span className="text-amber-600"> · OTLP_ENDPOINT not configured — inject disabled</span>
-            )}
+            {!config.otlpConfigured && ' · OTLP not configured'}
           </p>
         )}
 
-        <div className="rounded-xl border border-gray-200 bg-elastic-light p-3 mb-5">
-          <p className="text-xs text-elastic-gray mb-3">{TELEMETRY_INGEST_SUMMARY}</p>
-          <div className="grid sm:grid-cols-3 gap-2">
-            {TELEMETRY_SOURCES.map(source => (
-              <div key={source.id} className="rounded-lg border border-gray-200 bg-white p-2.5">
-                <span className="text-[10px] font-bold uppercase tracking-wide text-elastic-teal">{source.label}</span>
-                <p className="text-[11px] text-elastic-gray mt-1 leading-snug">{source.detail}</p>
-                <code className="text-[10px] text-telco-magenta block mt-1">{source.destination}</code>
-                <span className="text-[10px] text-elastic-gray block mt-1">{source.examples}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <section className="rounded-xl border border-gray-200 bg-white p-4 mb-4">
-          <h2 className="text-sm font-semibold text-elastic-dark mb-3">1 · Choose a network fault</h2>
+        <section className="mb-8">
+          <h2 className="text-[21px] font-semibold text-[#1d1d1f] mb-4">Choose a fault</h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {FAULT_CHANNELS.map(fault => (
               <button
@@ -268,26 +254,15 @@ export function AdaptiveNetworksDemo() {
                 type="button"
                 onClick={() => inject(fault.channel)}
                 disabled={phase === 'injecting'}
-                className={`text-left rounded-xl border p-3 transition-all disabled:opacity-50 ${
+                className={`text-left rounded-2xl p-4 transition-colors disabled:opacity-50 ${
                   selected === fault.channel
-                    ? 'border-elastic-teal ring-1 ring-elastic-teal/40 bg-elastic-teal/5'
-                    : 'border-gray-200 hover:border-elastic-teal/40 bg-white hover:bg-gray-50'
+                    ? 'bg-[#0071e3]/8 ring-1 ring-[#0071e3]/25'
+                    : 'bg-[#f5f5f7] hover:bg-[#ebebed]'
                 }`}
               >
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <span className="text-xs font-bold text-telco-magenta">CH{String(fault.channel).padStart(2, '0')}</span>
-                  <span className={`text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full ${
-                    fault.severity === 'high' ? 'bg-danger/10 text-danger' : 'bg-success/10 text-success'
-                  }`}>{fault.severity}</span>
-                  {fault.severity === 'high' && (
-                    <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200 ml-auto">
-                      HITL approval
-                    </span>
-                  )}
-                </div>
-                <h3 className="text-sm font-semibold text-elastic-dark">{fault.name}</h3>
-                <p className="text-[11px] text-elastic-gray mt-1 leading-snug">{fault.description}</p>
-                <code className="text-[10px] text-telco-magenta mt-2 block">{fault.errorType}</code>
+                <p className="text-[12px] text-[#86868b] capitalize">{fault.severity}</p>
+                <h3 className="text-[15px] font-medium text-[#1d1d1f] mt-1">{fault.name}</h3>
+                <p className="text-[13px] text-[#86868b] mt-2 leading-snug">{fault.description}</p>
               </button>
             ))}
           </div>
@@ -295,10 +270,40 @@ export function AdaptiveNetworksDemo() {
           <div className="mt-4">
             <IncidentFlowChart fault={selectedFault ?? null} phase={phase} workflowStep={activeWorkflowStep} />
           </div>
+
+          {selectedFault && phase !== 'idle' && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <MlSignalIntelligence
+                intelligence={adaptiveMlIntelligence}
+                anomalies={adaptiveMlIntelligence ? [{
+                  id: 'ML-ADAPTIVE-001',
+                  type: 'transport_degradation',
+                  title: selectedFault.name,
+                  mlScore: selectedFault.severity === 'high' ? 0.92 : 0.86,
+                  severity: selectedFault.severity === 'high' ? 'high' : 'medium',
+                  domain: 'transport',
+                  mlJobId: 'transport-link-loss-v1',
+                  regionId: 'REG-4421098',
+                  regionName: 'West Fiber Backbone',
+                  signal: selectedFault.description,
+                  priorityScore: selectedFault.severity === 'high' ? 92 : 78,
+                  proactiveLeadMin: selectedFault.severity === 'high' ? 14 : 28,
+                  suppressedDuplicates: 34,
+                  status: 'actionable',
+                  correlatedDomains: ['transport', 'core'],
+                }] : []}
+                compact
+                showFunnel
+                showJobs={false}
+                showSuppressed={false}
+                showAnomalies
+              />
+            </div>
+          )}
         </section>
 
-        <section className="rounded-xl border border-gray-200 bg-white p-4">
-          <h2 className="text-sm font-semibold text-elastic-dark mb-3">2 · Workflow progress</h2>
+        <section className="pt-8 border-t border-[#d2d2d7]/60">
+          <h2 className="text-[21px] font-semibold text-[#1d1d1f] mb-4">Workflow</h2>
 
           <div className="flex flex-wrap gap-x-4 gap-y-2 mb-4">
             {TIMELINE.map(([key, label]) => (

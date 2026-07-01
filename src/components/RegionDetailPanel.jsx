@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { formatCount, kibanaDiscoverUrl, TELCO_DISCOVER_ESQL } from '../lib/elastic-api';
 import { ChurnRiskTile } from './shared/ChurnRiskTile';
+import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 
 export function RegionDetailPanel({
@@ -111,6 +112,17 @@ export function RegionDetailPanel({
           regionId={m.regionId}
         />
 
+        {detail.mlSignalIntelligence && (
+          <MlSignalIntelligence
+            intelligence={detail.mlSignalIntelligence}
+            anomalies={detail.anomalies}
+            selectedAnomalyId={anomaly?.id}
+            onSelectAnomaly={onSelectAnomaly}
+            compact
+            showSuppressed={false}
+          />
+        )}
+
         <div className="grid lg:grid-cols-2 gap-4">
           {/* Hourly trend */}
           <div className="border border-gray-100 rounded-lg p-4">
@@ -145,8 +157,8 @@ export function RegionDetailPanel({
           </div>
         </div>
 
-        {/* ML Anomalies for regions */}
-        {detail.anomalies?.length > 0 && (
+        {/* ML Anomalies for region — detail cards when not using full panel */}
+        {detail.anomalies?.length > 0 && !detail.mlSignalIntelligence && (
           <div className="border border-warning/30 bg-warning/5 rounded-lg p-4">
             <h4 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
               <Brain className="w-4 h-4 text-warning" /> ML Anomalies for this Region

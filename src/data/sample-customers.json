@@ -71,5 +71,26 @@
     "credit_eligible": false,
     "account_age_days": 450,
     "last_contact": "2025-12-01T11:00:00Z"
+  },
+  {
+    "customer_id": "CUST-1006",
+    "name": "Riley Parker",
+    "email": "riley.parker@demo.elastic.co",
+    "lifecycle_stage": "active",
+    "account_state": "verified",
+    "account_type": "personal",
+    "age": 31,
+    "country": "US",
+    "identity_verified": true,
+    "credit_eligible": true,
+    "credit_limit": 1200,
+    "account_age_days": 640,
+    "last_contact": "2026-09-19T14:22:00Z",
+    "launch_context": {
+      "pre_order": "iPhone 17 Pro Max · Natural Titanium · 256GB",
+      "pickup_store": "Manhattan flagship · REG-8847291",
+      "trade_in": "iPhone 15 Pro",
+      "issue": "activation_stuck"
+    }
   }
 ]

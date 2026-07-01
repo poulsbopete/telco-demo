@@ -3,7 +3,7 @@ import {
   BookOpen, Bot, ExternalLink, Loader2, Play, RefreshCw, Workflow,
 } from 'lucide-react';
 import { IncidentResponseDiagram } from './IncidentResponseDiagram';
-import { ModuleHeader, DemoBanner } from './shared/ModuleHeader';
+import { ModuleHeader } from './shared/ModuleHeader';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import {
   LOOPS,
@@ -89,50 +89,13 @@ export function IncidentResponseDemo() {
   return (
     <div>
       <ModuleHeader
-        title="Incident Response Platform"
-        subtitle="Three closed loops — reactive customer diagnostics, proactive NOC alerts, and knowledge enrichment on Elastic Serverless"
-        badge="Architecture demo"
+        title="Incident response"
+        subtitle="Reactive, proactive, and knowledge loops on Elastic Serverless."
       >
-        <button
-          type="button"
-          onClick={reset}
-          className="text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-1"
-        >
+        <button type="button" onClick={reset} className="btn-quiet flex items-center gap-1.5">
           <RefreshCw className="w-4 h-4" /> Reset
         </button>
-        {o11yDashboardUrl && (
-          <a
-            href={o11yDashboardUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-1 text-elastic-dark"
-          >
-            <ExternalLink className="w-4 h-4" /> Telemetry
-          </a>
-        )}
-        {workflowsUrl && (
-          <a
-            href={workflowsUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 bg-elastic-teal text-white rounded-lg flex items-center gap-1"
-          >
-            <Workflow className="w-4 h-4" /> Workflows
-          </a>
-        )}
-        {searchUrl && (
-          <a
-            href={searchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 flex items-center gap-1 text-elastic-dark"
-          >
-            <BookOpen className="w-4 h-4" /> Runbooks
-          </a>
-        )}
       </ModuleHeader>
-
-      <DemoBanner />
 
       <div className="grid lg:grid-cols-3 gap-2 mb-4">
         {LOOP_ORDER.map(loopId => {
