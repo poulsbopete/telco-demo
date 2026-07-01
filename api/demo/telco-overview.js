@@ -91,6 +91,7 @@ export default async function handler(req, res) {
       : 99.9;
 
     const launchEvent = buildLaunchEventSummary();
+    const { businessForecast } = launchEvent;
 
     return res.status(200).json({
       ok: true,
@@ -111,6 +112,11 @@ export default async function handler(req, res) {
         errorCount: totalErrors,
         iphoneActivations6h: launchEvent.metrics.activationsFirst6h,
         iphonePreOrders24h: launchEvent.metrics.preOrders24h,
+        launchGrossAddRevenue24h: businessForecast?.business?.grossAddRevenue24hUsd,
+        launchActivationsPerMinNow: businessForecast?.currentPhase?.activationsPerMin,
+        launchMlNextTrend: businessForecast?.mlOutlook?.nextTrend,
+        launchMlHoursToNextTrend: businessForecast?.mlOutlook?.hoursToNextTrend,
+        launchChurnRiskSubs: businessForecast?.business?.churnRiskSubs,
       },
       networkPipeline,
       regions: regionsMetrics,

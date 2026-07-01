@@ -21,7 +21,7 @@ import { A2AFederationPanel } from './A2AFederationPanel';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
-import { LaunchEventStrip } from './shared/LaunchEventStrip';
+import { LaunchBusinessMetrics } from './shared/LaunchEventStrip';
 import { CHECKOUT_INCIDENT } from '../lib/demo-incident';
 import { buildDemoMlSignalIntelligence, DEMO_ML_ANOMALIES } from '../lib/ml-signal-intelligence';
 import {
@@ -167,7 +167,7 @@ export function ObservabilityDashboard() {
         </button>
       </ModuleHeader>
 
-      <LaunchEventStrip className="mb-8" />
+      <LaunchBusinessMetrics className="mb-8" />
 
       <div className="surface-card p-5 mb-8">
         <MlSignalIntelligence
@@ -211,8 +211,6 @@ export function ObservabilityDashboard() {
           Elastic DR cluster active — queries routing to backup cluster with 1.2s sync latency. Primary cluster unavailable.
         </div>
       )}
-
-      <LaunchEventStrip className="mb-8" />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard

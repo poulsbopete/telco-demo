@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
   AlertCircle, ArrowRight, Bot, ExternalLink,
-  RefreshCw, Workflow, Zap, GitBranch, ChevronRight,
+  RefreshCw, Workflow, Zap, GitBranch, ChevronRight, Search,
 } from 'lucide-react';
 import {
   fetchHealth,
@@ -21,7 +21,7 @@ import { ElasticWorkflowLink } from './ElasticWorkflowLink';
 import { LogDetailPanel, LogRowButton } from './LogDetailPanel';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
-import { LaunchEventStrip } from './shared/LaunchEventStrip';
+import { LaunchBusinessMetrics } from './shared/LaunchEventStrip';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 
 export function LiveElasticDemo() {
@@ -183,7 +183,7 @@ export function LiveElasticDemo() {
 
       {data && (
         <>
-          {data.launchEvent && <LaunchEventStrip launchEvent={data.launchEvent} className="mb-8" />}
+          {data.launchEvent && <LaunchBusinessMetrics launchEvent={data.launchEvent} className="mb-8" />}
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
