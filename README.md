@@ -1,10 +1,92 @@
 # Telco NOC × Elastic Serverless Demo
 
+[![Public repo](https://img.shields.io/badge/GitHub-public-0071e3)](https://github.com/poulsbopete/telco-demo)
+
 Interactive telco network operations demo showcasing Elastic Stack across **Network Telemetry**, **Enterprise Search**, **Observability**, and **Security Analytics**.
 
-The **Network Telemetry** tab connects to **Elastic Cloud Serverless** (`otel-demo-a5630c`) and queries real OpenTelemetry data via ES|QL. Other tabs use simulated telco narrative data. Observability and Adaptive Networks deep links target **otel-demo** Kibana; **Enterprise Search** links target `ai-assistants-ffcafb`; **Elastic Security** links target `my-security-project-b0679b`.
+**Live demo:** https://telco-demo-sage.vercel.app  
+**Launch slides:** [docs/public-launch-slides.md](./docs/public-launch-slides.md) (Marp — export to PDF/PPTX for announcements)
 
-## Deploy to Vercel
+The **Network Telemetry** tab connects to **Elastic Cloud Serverless** and queries real OpenTelemetry data via ES|QL. Other tabs use simulated telco narrative data (iPhone launch, ML forecasts, executive KPIs). Observability and Adaptive Networks deep links target your **Observability** Kibana project; **Enterprise Search** and **Elastic Security** tabs link to separate Serverless projects when configured.
+
+---
+
+## Fork & run your own copy
+
+The repo is public so you can fork, deploy, and point the demo at **your** Elastic Cloud projects.
+
+### 1. Fork and clone
+
+```bash
+git clone https://github.com/YOUR_USER/telco-demo.git
+cd telco-demo
+npm install
+```
+
+### 2. Create Elastic credentials
+
+In [Elastic Cloud](https://cloud.elastic.co), create at least one **Observability Serverless** project (or use an existing OTel cluster).
+
+**Minimum for the Telemetry tab:**
+
+1. Project → **Management** → **API keys**
+2. Create a key scoped to **read** `logs-*`, `metrics-*`, `traces-*` (and `_query` / cluster info)
+3. Copy the base64 `id:secret` string
+
+**Recommended for full deep links:**
+
+| Serverless project | Env vars | Powers |
+|--------------------|----------|--------|
+| Observability | `ES_URL`, `ES_API_KEY`, `KIBANA_URL`, `VITE_KIBANA_URL` | Telemetry, Networks, workflow links |
+| Search | `VITE_SEARCH_KIBANA_URL` | Search tab, Agent Builder links |
+| Security | `VITE_SECURITY_KIBANA_URL` | Security tab, SIEM / cases links |
+
+Optional: `OTLP_ENDPOINT` + same API key for **Adaptive Networks** fault inject. See [adaptive-networks](https://github.com/poulsbopete/adaptive-networks) to bootstrap the incident workflow.
+
+### 3. Configure environment
+
+```bash
+cp .env.example .env.local
+# Edit .env.local — replace YOUR-* placeholders with your endpoints and API key
+```
+
+**Never commit `.env.local` or real keys.** The tracked `.env.example` uses placeholders only.
+
+### 4. Run locally
+
+```bash
+npm run dev        # Vite :5173 + API :3001
+```
+
+Open http://localhost:5173 → **Telemetry**. Confirm **Connected** (green) via `/api/health`.
+
+Tabs **Search**, **Scale**, **Security**, and **Response** work without live Elastic data—they use simulated telco narrative. Deep links open your Kibana URLs when `VITE_*_KIBANA_URL` is set.
+
+### 5. Deploy your fork (Vercel)
+
+```bash
+npm i -g vercel   # if needed
+vercel login
+vercel link       # link to your fork
+vercel --prod
+```
+
+In Vercel → **Settings → Environment Variables**, add the same variables as `.env.local` (especially `ES_URL`, `ES_API_KEY`, `VITE_KIBANA_URL`). Redeploy after saving.
+
+Or connect the GitHub repo in the Vercel dashboard for automatic deploys on push.
+
+### Quick troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| Blank page after deploy | Hard refresh (`Cmd+Shift+R`) — stale JS bundle after redeploy |
+| “Not connected to Elastic Serverless” | Check `ES_URL` + `ES_API_KEY` in Vercel env; hit `/api/health` |
+| Adaptive Networks idle | Set `OTLP_ENDPOINT`; run adaptive-networks `deploy.sh`; optional `INCIDENT_WORKFLOW_ID` |
+| Security dashboard deploy fails | Add `SECURITY_KIBANA_API_KEY` to `.env.local` (see below) |
+
+---
+
+## Deploy to Vercel (reference stack)
 
 ### 1. Create a read-only API key
 
@@ -27,7 +109,9 @@ In Vercel → Project → Settings → Environment Variables:
 | `VITE_SECURITY_KIBANA_URL` | `https://my-security-project-b0679b.kb.us-central1.gcp.elastic.cloud` (SIEM, Cases, Rules) |
 | `OTLP_ENDPOINT` | `https://otel-demo-a5630c.ingest.us-east-1.aws.elastic.cloud` (Adaptive Networks inject) |
 
-Copy from `.env.example` — **never commit real keys**.
+Copy from `.env.example` and substitute your values — **never commit real keys**.
+
+Reference deployment (maintainer demo) uses:
 
 ### Adaptive Networks bootstrap
 

@@ -26,4 +26,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env*
+
+# Local / secret env files only — keep .env.example tracked for forks
+.env.local
+.env.otel-elastic
+.env.vercel*
