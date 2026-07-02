@@ -85,11 +85,11 @@
     "credit_eligible": true,
     "credit_limit": 1200,
     "account_age_days": 640,
-    "last_contact": "2026-09-19T14:22:00Z",
+    "last_contact": "2026-09-18T14:22:00Z",
     "launch_context": {
-      "pre_order": "iPhone 17 Pro Max · Natural Titanium · 256GB",
-      "pickup_store": "Manhattan flagship · REG-8847291",
-      "trade_in": "iPhone 15 Pro",
+      "pre_order": "iPhone 18 Pro Max · Deep Blue · 256GB",
+      "pickup_store": "Reg-8847291 flagship · Manhattan",
+      "trade_in": "iPhone 16 Pro",
       "issue": "activation_stuck"
     }
   }

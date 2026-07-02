@@ -17,10 +17,10 @@ import {
 } from '../lib/elastic-api';
 
 const QUICK_PROMPTS = [
-  'My iPhone 17 Pro is stuck on activation — it says it may take a few minutes',
-  'How do I transfer my eSIM to my new iPhone 17?',
-  'Where is my iPhone 17 pre-order pickup appointment?',
-  'What is my launch trade-in credit for iPhone 17 Pro?',
+  'My iPhone 18 Pro is stuck on activation — it says it may take a few minutes',
+  'How do I transfer my eSIM to my new iPhone 18?',
+  'Where is my iPhone 18 pre-order pickup appointment?',
+  'What is my launch trade-in credit for iPhone 18 Pro?',
   "I just signed up but haven't confirmed my email",
   'My account is locked after too many login attempts',
 ];

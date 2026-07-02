@@ -42,10 +42,10 @@ const STATE_RULES = [
     id: 'iphone-launch-activation',
     condition: (c, doc) =>
       c.launch_context?.issue === 'activation_stuck'
-      && doc?.doc_id === 'iphone17_activation_stuck',
+      && doc?.doc_id === 'iphone18_activation_stuck',
     priority: 11,
     override: {
-      resolution: 'Queue-aware iPhone 17 activation guide — launch window ETA 15–30 min',
+      resolution: 'Queue-aware iPhone 18 activation guide — launch window ETA 15–30 min',
       rule: 'RULE-LCH-001: Launch activation stuck → provisioning queue status + eSIM retry',
     },
   },

@@ -27,14 +27,14 @@ const SEMANTIC_PHRASES = {
   'legal disclosure': ['paypal_credit_legal'],
   'checkout integration': ['checkout_integration'],
   'business account': ['business_multi_user'],
-  'iphone 17': ['iphone17_activation_stuck', 'iphone17_esim_transfer', 'iphone17_trade_in_launch', 'iphone17_preorder_pickup'],
-  'iphone activation': ['iphone17_activation_stuck'],
-  'activation stuck': ['iphone17_activation_stuck'],
-  'new iphone': ['iphone17_activation_stuck', 'iphone17_esim_transfer'],
-  'esim transfer': ['iphone17_esim_transfer'],
-  'trade in': ['iphone17_trade_in_launch'],
-  'pre-order pickup': ['iphone17_preorder_pickup'],
-  'launch day': ['iphone17_preorder_pickup', 'iphone17_activation_stuck'],
+  'iphone 18': ['iphone18_activation_stuck', 'iphone18_esim_transfer', 'iphone18_trade_in_launch', 'iphone18_preorder_pickup'],
+  'iphone activation': ['iphone18_activation_stuck'],
+  'activation stuck': ['iphone18_activation_stuck'],
+  'new iphone': ['iphone18_activation_stuck', 'iphone18_esim_transfer'],
+  'esim transfer': ['iphone18_esim_transfer'],
+  'trade in': ['iphone18_trade_in_launch'],
+  'pre-order pickup': ['iphone18_preorder_pickup'],
+  'launch day': ['iphone18_preorder_pickup', 'iphone18_activation_stuck'],
 };
 
 function tokenize(text) {

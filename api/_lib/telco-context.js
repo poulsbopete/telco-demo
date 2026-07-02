@@ -253,8 +253,8 @@ export function buildRegionDetail(regionId, { pipelineStats, mlAnomalies, recent
     { level: 'INFO', message: `Session established regionID=${regionId} bandwidth=${(142 + seed % 500).toFixed(1)}Mbps ses=SES-${seed.toString(16).slice(0, 8)}`, service: 'checkout' },
     { level: 'INFO', message: `Provisioning completed — ${metrics.sessions24h} daily sessions`, service: 'cart' },
     ...(metrics.launchHotspot ? [
-      { level: 'WARN', message: `iPhone 17 Pro launch queue depth=842 regionID=${regionId} model=17-Pro-Max esim=true`, service: 'cart' },
-      { level: 'INFO', message: `eSIM SM-DP+ download initiated ICCID=8901…${regionId.slice(-4)} device=iPhone17Pro`, service: 'cart' },
+      { level: 'WARN', message: `iPhone 18 Pro launch queue depth=842 regionID=${regionId} model=18-Pro-Max esim=true`, service: 'cart' },
+      { level: 'INFO', message: `eSIM SM-DP+ download initiated ICCID=8901…${regionId.slice(-4)} device=iPhone18Pro`, service: 'cart' },
     ] : []),
     ...(metrics.errorCount > 0 ? [{ level: 'ERROR', message: `Signaling timeout regionID=${regionId} — upstream latency ${metrics.p99LatencyMs}ms`, service: 'checkout' }] : []),
     ...(metrics.successRate < 99.7 ? [{ level: 'WARN', message: `Billing failure rate elevated for ${regionId}: ${(100 - metrics.successRate).toFixed(2)}%`, service: 'payment' }] : []),
