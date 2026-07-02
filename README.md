@@ -6,7 +6,7 @@ Interactive telco network operations demo showcasing Elastic Stack across **Netw
 
 **Live demo:** https://telco-demo-sage.vercel.app  
 **Launch slides (GitHub Pages):** https://poulsbopete.github.io/telco-demo/  
-**Slide source:** [docs/public-launch-slides.md](./docs/public-launch-slides.md)
+**Slide source:** [docs/public-launch-slides.md](./docs/public-launch-slides.md) · rebuild with `npm run build:slides`
 
 The **Network Telemetry** tab connects to **Elastic Cloud Serverless** and queries real OpenTelemetry data via ES|QL. Other tabs use simulated telco narrative data (iPhone launch, ML forecasts, executive KPIs). Observability and Adaptive Networks deep links target your **Observability** Kibana project; **Enterprise Search** and **Elastic Security** tabs link to separate Serverless projects when configured.
 

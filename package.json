@@ -8,6 +8,7 @@
     "dev:web": "vite",
     "dev:vercel": "vercel dev",
     "build": "vite build",
+    "build:slides": "marp docs/public-launch-slides.md -o docs/index.html --html --allow-local-files",
     "lint": "eslint .",
     "preview": "vite preview",
     "bootstrap:workflow": "node scripts/bootstrap-kibana-workflow.mjs",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@marp-team/marp-cli": "^4.1.0",
     "@tailwindcss/vite": "^4.3.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

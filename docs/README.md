@@ -5,20 +5,24 @@
 **Present online:** https://poulsbopete.github.io/telco-demo/  
 **Source:** [`public-launch-slides.md`](./public-launch-slides.md) (Marp markdown)
 
-Slides rebuild automatically on push to `main` via [`.github/workflows/deploy-slides.yml`](../.github/workflows/deploy-slides.yml).
+GitHub Pages serves the built deck from this folder (`docs/index.html`) on the `main` branch.
 
-### Edit & preview locally
-
-```bash
-npx @marp-team/marp-cli docs/public-launch-slides.md -o /tmp/slides.html --html
-open /tmp/slides.html
-```
-
-### Export PDF / PPTX (optional)
+### Update slides
 
 ```bash
-npx @marp-team/marp-cli docs/public-launch-slides.md -o docs/public-launch-slides.pdf
-npx @marp-team/marp-cli docs/public-launch-slides.pptx
+npm run build:slides    # regenerates docs/index.html
+git add docs/index.html docs/public-launch-slides.md
+git commit -m "Update launch slides"
+git push
 ```
 
-**VS Code:** [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) extension for live preview while editing.
+Pages redeploys automatically within ~1–2 minutes.
+
+### Preview locally
+
+```bash
+npm run build:slides
+open docs/index.html
+```
+
+**VS Code:** [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) for live preview while editing the markdown source.

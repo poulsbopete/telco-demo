@@ -159,12 +159,12 @@ export function IncidentFlowChart({ fault, phase, workflowStep }) {
   const nodeById = Object.fromEntries(nodes.map(n => [n.id, n]));
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-elastic-teal/5 p-3">
-      <div className="flex items-baseline gap-2 mb-1">
-        <h3 className="text-sm font-semibold text-elastic-teal m-0">Incident flow</h3>
-        <p className="text-[10px] text-elastic-gray m-0">Break → detect → remediate</p>
+    <div className="rounded-xl border border-gray-200 bg-elastic-teal/5 p-4 sm:p-5">
+      <div className="flex items-baseline gap-2 mb-2">
+        <h3 className="text-base font-semibold text-elastic-teal m-0">Incident flow</h3>
+        <p className="text-[11px] text-elastic-gray m-0">Break → detect → remediate</p>
       </div>
-      <svg viewBox="0 0 328 152" className="w-full max-h-[168px] h-auto block" role="img" aria-label="Incident flow from fault to resolution">
+      <svg viewBox="0 0 328 152" className="w-full min-h-[280px] max-h-[360px] h-[320px] block" role="img" aria-label="Incident flow from fault to resolution">
         {visibleLinks.map(link => {
           const from = nodeById[link.from];
           const to = nodeById[link.to];
@@ -189,7 +189,7 @@ export function IncidentFlowChart({ fault, phase, workflowStep }) {
             return (
               <g key={node.id} opacity={0.45}>
                 <rect x={box.x} y={box.y} width={box.w} height={box.h} rx="4" fill="#ffffff" stroke="rgba(203,213,225,0.9)" strokeDasharray="3 2" />
-                <text x={box.x + box.w / 2} y={box.y + 15} textAnchor="middle" fill="#94a3b8" fontSize="7" fontWeight="600">HITL skipped</text>
+                <text x={box.x + box.w / 2} y={box.y + 15} textAnchor="middle" fill="#94a3b8" fontSize="8" fontWeight="600">HITL skipped</text>
               </g>
             );
           }
@@ -207,11 +207,11 @@ export function IncidentFlowChart({ fault, phase, workflowStep }) {
                 stroke={nodeStroke(node.tone, active)}
                 strokeWidth={active ? 1.25 : 1}
               />
-              <text x={box.x + box.w / 2} y={box.y + (node.sub ? 11 : 14)} textAnchor="middle" fill="#343741" fontSize="7" fontWeight="600">
+              <text x={box.x + box.w / 2} y={box.y + (node.sub ? 11 : 14)} textAnchor="middle" fill="#343741" fontSize="8.5" fontWeight="600">
                 {truncate(node.label, 14)}
               </text>
               {node.sub && (
-                <text x={box.x + box.w / 2} y={box.y + 20} textAnchor="middle" fill="#69707d" fontSize="6">
+                <text x={box.x + box.w / 2} y={box.y + 20} textAnchor="middle" fill="#69707d" fontSize="7.5">
                   {truncate(node.sub, 16)}
                 </text>
               )}
@@ -219,9 +219,9 @@ export function IncidentFlowChart({ fault, phase, workflowStep }) {
           );
         })}
 
-        <text x={48} y={8} fill="#69707d" fontSize="6.5" fontWeight="600">Break</text>
-        <text x={164} y={8} fill="#69707d" fontSize="6.5" fontWeight="600">Detect</text>
-        <text x={280} y={8} fill="#69707d" fontSize="6.5" fontWeight="600">Remediate</text>
+        <text x={48} y={8} fill="#69707d" fontSize="8" fontWeight="600">Break</text>
+        <text x={164} y={8} fill="#69707d" fontSize="8" fontWeight="600">Detect</text>
+        <text x={280} y={8} fill="#69707d" fontSize="8" fontWeight="600">Remediate</text>
       </svg>
     </div>
   );
