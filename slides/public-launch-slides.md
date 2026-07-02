@@ -3,8 +3,8 @@ marp: true
 theme: default
 paginate: true
 size: 16:9
-title: Why Elastic for Telco
-description: Executive narrative — one platform for CSP observability, security, and search
+title: Elastic Observability for Telco
+description: Executive narrative — OTel, ML, and business-aware NOC at CSP scale
 style: |
   section {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -44,169 +44,146 @@ style: |
 
 <!-- _class: lead -->
 
-# Why Elastic for Telco
+# Elastic Observability for Telco
 
-## One platform for NOC, security, and customer care at CSP scale
-
-**Observability · Security · Search · ML · Workflows**
-
-telco-demo-sage.vercel.app
-
----
-
-# Telco operations run on events, not averages
-
-CSPs face **burst workloads** that standard monitoring was never designed for:
-
-- **Device launches** — millions of activations, eSIM OTA, and provisioning spikes in hours
-- **Regional SLA pressure** — RAN attach, core latency, and transport faults hit revenue immediately
-- **Care surges** — contact volume tracks launch curves, not CPU graphs
-- **Fraud windows** — SIM swap and account takeover spike on launch weekends
-
-*The NOC needs business context, not another dashboard.*
-
----
-
-# The cost of tool fragmentation
-
-| Today (typical) | Impact |
-|-----------------|--------|
-| Separate observability, SIEM, and KB tools | Slow correlation · longer MTTR |
-| Static thresholds | Alert storms on launch day |
-| Metrics without subscriber context | Can't prioritize by churn or revenue |
-| Manual runbook hunts | Care and NOC out of sync |
-
-**Result:** P1 noise, 4+ hour MTTR, and subscribers at risk when SLAs slip.
-
----
-
-# Elastic — built for telco-scale complexity
-
-**One searchable platform** across logs, metrics, traces, and security events:
-
-| Pillar | Telco use case |
-|--------|----------------|
-| **Observability** | OTel ingest · ES\|QL · region-aware telemetry |
-| **Security** | SIEM · UBA · fraud · multi-year Search AI Lake |
-| **Search** | Runbooks · care KB · Agent Builder |
-| **ML** | Anomaly scoring · launch forecasting · signal funnel |
-| **Workflows** | Automated remediation · HITL · A2A federation |
-
-Serverless on Elastic Cloud — no cluster ops at petabyte scale.
-
----
-
-# Observability that speaks NOC language
-
-- **OpenTelemetry-native** — signaling, provisioning, RAN, core, transport in one view
-- **Region context on every signal** — tie telemetry to markets, stores, and SLA tiers
-- **ES\|QL at scale** — ad-hoc investigation without rehydrating cold tiers
-- **Deep links to Kibana** — Discover, APM, dashboards, and workflow executions
-
-*See infrastructure **and** business impact on the same screen.*
-
----
-
-# ML that predicts surge and slowdown
-
-Elastic ML goes beyond “something broke”:
-
-**Signal funnel:** Threshold → ML scored → Correlated → Actionable
-
-- **Launch lifecycle forecast** — when activations peak, taper, and resurge (weekend suburban wave)
-- **Business KPIs** — gross-add revenue, care load, churn risk if SLA slips
-- **Domain tagging** — RAN · Core · Transport · Fraud on every anomaly
-- **Noise suppression** — fewer P1s, more actionable incidents
-
-*Staff up before the spike — scale down when ML says taper.*
-
----
-
-# Security without a separate SOC stack
-
-- **Unified SIEM** on the same data model as observability
-- **Launch fraud patterns** — SIM swap surge, credential abuse, entity analytics
-- **Search AI Lake** — investigate years of security data without cold-tier rehydration
-- **Cases, rules, and response** — from alert to remediation in one Kibana workspace
-
-*Correlate a provisioning anomaly with a fraud alert in minutes, not days.*
-
----
-
-# Enterprise Search for care and runbooks
-
-- **Semantic KB** — ELSER-powered retrieval for device launch, activation, trade-in
-- **Agent Builder** — AI agents that pull runbooks and policy in the care flow
-- **A2A federation** — orchestrator calls Search + Security in one incident thread
-- **Care deflection** — resolve launch-day contacts before they become churn
-
-*Every NOC playbook and care script searchable in milliseconds.*
-
----
-
-# Automated response — break, detect, remediate
-
-**Adaptive Networks** pattern (live in demo):
-
-1. Inject transport fault via OTLP
-2. Alert rule fires on correlated logs + metrics
-3. Elastic Workflow runs RCA, opens case, remediates
-4. Human-in-the-loop for high-severity · auto-fix for low
-
-**A2A federation** across metrics, Security, and Search — one incident narrative.
-
----
-
-# Business outcomes CSP leaders care about
-
-*Illustrative operating model — representative of Elastic telco deployments*
-
-| Metric | Before → After |
-|--------|----------------|
-| **P1 incidents** | Baseline → **~60% reduction** |
-| **MTTR** | 4.2 hours → **18 minutes** (workflow + ML) |
-| **Observability TCO** | Streams retention → **40–70% storage savings** |
-| **Customer impact** | Region SLA + churn-risk prioritization |
-
-Elastic connects telemetry to **revenue, churn, and care cost**.
-
----
-
-# Proof point — iPhone launch weekend
-
-Demo narrative layered on **live Elastic Serverless** data:
-
-- **2.4M** pre-orders · **847K** activations in 6h · **340%** provisioning spike
-- ML forecast: retail peak → afternoon tail → evening lull → Saturday suburban surge
-- Hotspot regions: flagship retail, eSIM CDN edge, midnight PT wave
-- Executive tiles: gross-add revenue, care load next 4h, churn risk if SLA slips
+## OpenTelemetry · ML · business-aware NOC at CSP scale
 
 **Live demo:** telco-demo-sage.vercel.app
 
+*Today's focus: Observability — the demo also includes Security & Search tabs for reference.*
+
 ---
 
-# See it live — six integrated modules
+# Why observability breaks on launch day
 
-| Tab | What it shows |
-|-----|---------------|
-| **Telemetry** | Live OTel + region drill-down + ML signal intelligence |
-| **Networks** | Fault inject · workflow · incident flow |
-| **Search** | Care KB + semantic retrieval |
-| **Scale** | Petabyte observability narrative |
-| **Security** | SIEM · fraud · Search AI Lake |
-| **Response** | Gen-AI incident loop |
+CSP NOCs don't fail on steady state — they fail on **events**:
 
-Open **Telemetry** and **Networks** for live cluster data.
+- **Device launches** — provisioning, eSIM OTA, and RAN attach spike in hours
+- **Regional hotspots** — flagship stores, CDN edges, midnight time zones
+- **Cross-domain signals** — RAN, core, transport, and provisioning in different tools
+- **Static thresholds** — alert storms when volume curves aren't normal
+
+*You need telemetry that carries **region, SLA, and business context** — not just CPU.*
+
+---
+
+# What NOC teams actually need to see
+
+| Question | Observability answer |
+|----------|-------------------|
+| Where is pain concentrated? | **Region-aware** logs, metrics, traces |
+| Is this launch or infrastructure? | **ML-scored** anomalies + launch lifecycle forecast |
+| What happens in the next 4 hours? | Surge / taper prediction · care & capacity planning |
+| What's the business exposure? | Churn risk, gross-add revenue, SLA breach impact |
+| How fast can we fix it? | ES\|QL drill-down · Workflows · correlated RCA |
+
+Elastic Observability connects **signals to decisions**.
+
+---
+
+# OpenTelemetry-native, telco-shaped
+
+- **One agent, three pillars** — metrics, traces, logs from signaling, core, RAN, transport
+- **Elastic Serverless** — petabyte ingest without running clusters
+- **ES\|QL** — investigate across `logs-*`, `metrics-*`, `traces-*` without rehydration
+- **Region enrichment** — every signal tagged with market, store tier, and SLA context
+- **Kibana deep links** — Discover, APM, dashboards, workflow executions
+
+*Same OTel pipeline the industry is standardizing on — with telco-scale retention and query.*
+
+---
+
+# ML signal intelligence — not another alert storm
+
+**Signal funnel:** Threshold → ML scored → Correlated → Actionable
+
+- **Domain tags** — RAN · Core · Transport · Provisioning on every anomaly
+- **Launch lifecycle forecast** — peak retail → afternoon tail → weekend suburban surge
+- **Noise suppression** — duplicate alerts collapsed; NOC sees what matters
+- **Business KPIs on the same screen** — activations/min, care load, churn risk if SLA slips
+
+*ML tells you **when to surge staffing** and **when to taper** — not just that error rate went up.*
+
+---
+
+# Launch weekend — the observability story
+
+**iPhone 17 Pro launch** (demo narrative on live Serverless data):
+
+| Signal | What observability shows |
+|--------|-------------------------|
+| **847K** activations / 6h | Live OTel volume by region |
+| **340%** provisioning spike | ML anomaly + correlated traces/logs |
+| Hotspot regions | NYC retail · eSIM CDN · midnight PT wave |
+| ML forecast | Taper in ~2h · second wave Sat 10 AM |
+
+**Gross-add revenue · care load next 4h · churn risk** — on the Telemetry tab.
+
+---
+
+# Adaptive Networks — observe, detect, remediate
+
+End-to-end **observability-driven** incident loop (live in demo):
+
+1. **Break** — transport fault injected via OTLP (logs + metrics)
+2. **Detect** — alert rule on correlated ingest · ML scores the pattern
+3. **Remediate** — Elastic Workflow · RCA · optional HITL · auto-fix
+
+Incident flow ties **OTel → alert → workflow → resolution** in one narrative.
+
+*This is observability that **closes the loop** — not tickets in a separate tool.*
+
+---
+
+# Observability at scale — TCO and retention
+
+Telco ingest is measured in **petabytes**, not gigabytes:
+
+- **Streams** — tiered retention without losing queryability
+- **40–70% storage savings** vs. full-fidelity hot retention (illustrative model)
+- **Unified telemetry** — no duplicate agents for metrics vs. logs vs. traces
+- **Serverless pricing** — scale with launch weekends, return to baseline after
+
+The **Scale** tab in the demo walks the volume, cost, and retention story.
+
+---
+
+# Outcomes NOC and engineering leaders track
+
+*Illustrative operating model — representative of Elastic telco observability deployments*
+
+| Metric | Before → After |
+|--------|----------------|
+| **P1 incidents** | Baseline → **~60% reduction** (ML + suppression) |
+| **MTTR** | 4.2 hours → **18 minutes** (correlated RCA + workflows) |
+| **Alert noise** | Launch-day storms → **actionable signal funnel** |
+| **Observability TCO** | Hot-only retention → **Streams tiering** |
+
+Telemetry tied to **SLA, churn, and revenue** — not just infrastructure health.
+
+---
+
+# Demo walkthrough — observability focus
+
+| Tab | Today's path |
+|-----|----------------|
+| **Telemetry** | Live OTel · regions · ML forecast · business KPIs |
+| **Networks** | OTLP fault inject · incident flow · workflow |
+| **Scale** | Petabyte ingest · Streams TCO · unified OTel |
+
+*Security, Search, and Response tabs are in the app for reference — covered separately.*
+
+**Start here:** telco-demo-sage.vercel.app → **Telemetry**
 
 ---
 
 <!-- _class: lead -->
 
-# Elastic for Telco
+# Elastic Observability for Telco
 
-## Observability · Security · Search — one platform, CSP scale
+## See the launch · predict the curve · fix before churn
 
-**Demo:** telco-demo-sage.vercel.app  
-**Repo:** github.com/poulsbopete/telco-demo
+**Demo:** telco-demo-sage.vercel.app/slides/  
+**App:** telco-demo-sage.vercel.app
 
-Let's walk the launch scenario together.
+Let's open **Telemetry** and walk the launch scenario.

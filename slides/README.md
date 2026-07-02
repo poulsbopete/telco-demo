@@ -1,4 +1,4 @@
-# Why Elastic for Telco — slides
+# Elastic Observability for Telco — slides
 
 **Live (Vercel):** https://telco-demo-sage.vercel.app/slides/  
 **GitHub Pages:** https://poulsbopete.github.io/telco-demo/ *(repo Pages build currently failing — use Vercel link)*

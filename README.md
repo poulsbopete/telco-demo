@@ -5,7 +5,7 @@
 Interactive telco network operations demo showcasing Elastic Stack across **Network Telemetry**, **Enterprise Search**, **Observability**, and **Security Analytics**.
 
 **Live demo:** https://telco-demo-sage.vercel.app  
-**Launch slides:** https://telco-demo-sage.vercel.app/slides/  
+**Launch slides (Observability):** https://telco-demo-sage.vercel.app/slides/  
 **GitHub Pages (when build succeeds):** https://poulsbopete.github.io/telco-demo/  
 **Slide source:** [slides/public-launch-slides.md](./slides/public-launch-slides.md) · rebuild with `npm run build:slides`
 
