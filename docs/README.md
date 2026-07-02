@@ -2,17 +2,23 @@
 
 ## Public launch slides
 
-[`public-launch-slides.md`](./public-launch-slides.md) — Marp deck for announcing the open-source telco demo.
+**Present online:** https://poulsbopete.github.io/telco-demo/  
+**Source:** [`public-launch-slides.md`](./public-launch-slides.md) (Marp markdown)
 
-### Present or export
+Slides rebuild automatically on push to `main` via [`.github/workflows/deploy-slides.yml`](../.github/workflows/deploy-slides.yml).
 
-**VS Code:** install the [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) extension, open the file, and use preview or export to PDF/PPTX/HTML.
+### Edit & preview locally
 
-**CLI:**
+```bash
+npx @marp-team/marp-cli docs/public-launch-slides.md -o /tmp/slides.html --html
+open /tmp/slides.html
+```
+
+### Export PDF / PPTX (optional)
 
 ```bash
 npx @marp-team/marp-cli docs/public-launch-slides.md -o docs/public-launch-slides.pdf
-npx @marp-team/marp-cli docs/public-launch-slides.md -o docs/public-launch-slides.pptx
+npx @marp-team/marp-cli docs/public-launch-slides.pptx
 ```
 
-**Google Slides / Keynote:** export PDF or PPTX from Marp and import, or copy slide sections manually.
+**VS Code:** [Marp for VS Code](https://marketplace.visualstudio.com/items?itemName=marp-team.marp-vscode) extension for live preview while editing.

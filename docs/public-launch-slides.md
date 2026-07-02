@@ -144,7 +144,7 @@ Plus [adaptive-networks](https://github.com/poulsbopete/adaptive-networks) boots
 
 **Live:** https://telco-demo-sage.vercel.app  
 **Code:** https://github.com/poulsbopete/telco-demo  
-**Slides:** `docs/public-launch-slides.md` (this deck)
+**Slides:** https://poulsbopete.github.io/telco-demo/
 
 Questions · fork · deploy · extend the launch ML story
 
