@@ -8,7 +8,7 @@
     "dev:web": "vite",
     "dev:vercel": "vercel dev",
     "build": "vite build",
-    "build:slides": "marp docs/public-launch-slides.md -o docs/index.html --html --allow-local-files",
+    "build:slides": "marp docs/public-launch-slides.md -o docs/index.html --html --allow-local-files --no-stdin",
     "lint": "eslint .",
     "preview": "vite preview",
     "bootstrap:workflow": "node scripts/bootstrap-kibana-workflow.mjs",
