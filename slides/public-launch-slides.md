@@ -122,16 +122,31 @@ style: |
   section.dark .bridge-box p { color: #9a9aa0; margin: 0; line-height: 1.45; }
   section.dark .bridge-box.risk { border-color: #bf4800; background: rgba(191,72,0,.08); }
   section.dark .bridge-box.win { border-color: #00bfb3; background: rgba(0,191,179,.06); }
+  .research-row { display: flex; gap: 10px; margin-top: 0.45em; }
+  .research-stat { flex: 1; text-align: center; padding: 10px 8px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; }
+  .research-stat b { display: block; font-size: 1.5em; color: #00bfb3; }
+  .research-stat span { font-size: 0.58em; color: #9a9aa0; line-height: 1.35; display: block; margin-top: 0.2em; }
+  .gap-compare { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 8px; align-items: center; margin-top: 0.5em; font-size: 0.72em; }
+  .gap-box { border-radius: 12px; padding: 14px 16px; text-align: center; }
+  .gap-box.before { background: rgba(191,72,0,.12); border: 1px solid #bf4800; }
+  .gap-box.after { background: rgba(0,191,179,.08); border: 1px solid #00bfb3; }
+  .gap-box b { display: block; font-size: 2em; margin: 0.15em 0; }
+  .gap-box.before b { color: #bf4800; }
+  .gap-box.after b { color: #00bfb3; }
+  .gap-box span { color: #9a9aa0; font-size: 0.9em; }
+  .questions { font-size: 0.74em; margin-top: 0.35em; }
+  .questions li { margin: 0.35em 0; color: #1d1d1f; }
+  .questions b { color: #0071e3; }
 ---
 
 <!-- _class: lead -->
 
-# Elastic Observability
-## iPhone 18 Launch Event · Sept 2026
+# When the network cannot see itself
+## iPhone 18 Launch · Observability for US telecom
 
-**Unlock launch-weekend value from the OTel data you already collect**
+**The monitoring architecture most carriers run was built for a network that no longer exists.**
 
-**Narrative:** Connectivity is commoditizing — iPhone 18 launch is when subscribers decide if you're still their carrier.
+**This session:** the gap · iPhone 18 launch proof · live demo
 
 telco-demo-sage.vercel.app
 
@@ -148,7 +163,21 @@ telco-demo-sage.vercel.app
   <div><b>4 · Outcomes</b><br/>Less NOC toil · higher CSAT · protected revenue</div>
 </div>
 
-<p class="muted">Modeled on Elastic Telecom webinar narrative · use case = iPhone 18 Pro Launch weekend</p>
+<p class="muted">Session 2 observability narrative · iPhone 18 Pro Launch weekend demo</p>
+
+---
+
+<!-- _class: dark -->
+
+<span class="kicker">THE STARTING POINT</span>
+
+# The gap between what breaks and when you see it
+
+<p class="subhead">When iPhone 18 activation degrades for a subscriber — how long until your team knows <em>where in the stack</em> it originated? Not until it's fixed. Until they know what they're looking at. For most NOCs, that's hours. That gap is architecture, not people.</p>
+
+<p class="subhead">From Session 1: security is a visibility problem — you can't correlate what lives in separate systems. <strong>Same insight here:</strong> launch weekend breaks across eSIM, core, RAN, and care. Separate tools → separate questions.</p>
+
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Session 2 · Observability</span></div>
 
 ---
 
@@ -180,19 +209,55 @@ telco-demo-sage.vercel.app
 
 ---
 
+<!-- _class: dark -->
+
+<span class="kicker">THE TELECOM CONTEXT</span>
+
+# Five dimensions. One customer experience.
+
+<p class="subhead">Patterns across carrier environments — stress-tested against iPhone 18 launch weekend.</p>
+
+<div class="shift-list">
+  <div class="shift-item">
+    <div class="shift-num n1">01</div>
+    <div><b>Legacy + cloud coexistence</b><span>LTE, 5G SA, circuit-switched OSS/BSS alongside cloud-native workloads. Your monitoring stack reflects decades of decisions — not one launch event.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n2">02</div>
+    <div><b>5G complexity · containerized core</b><span>User-plane on Kubernetes, disaggregated RAN, MEC. Richer telemetry than ever — tooling to correlate it at iPhone 18 scale still catching up.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n3">03</div>
+    <div><b>The customer impact window</b><span>"Activation stuck" · failed port · pickup queue — reasons to call, review, or leave. In telecom the window between failure and subscriber pain is shorter than almost any industry. <strong>iPhone 18 is that window at national scale.</strong></span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n3" style="background:#7030a0">04</div>
+    <div><b>Volume of signal · launch surge</b><span>Billions of events/day — ingestion is solved. Correlation is not. iPhone 18 adds 4,200 raw alerts in hours. ML must tell you which 12 threaten SLA.</span></div>
+  </div>
+</div>
+
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Five dimensions · iPhone 18</span></div>
+
+---
+
 # The iPhone 18 launch challenge
 
-**Failing to unify launch telemetry is competitive disadvantage — not just NOC noise.**
+**Investment isn't the gap. Structure is.** Elastic Observability Labs · 500+ decision-makers · 2025.
 
-<div class="cols">
+<div class="research-row">
+  <div class="research-stat"><b>96%</b><span>execs plan to keep investing in observability</span></div>
+  <div class="research-stat"><b>97%</b><span>report roadblocks to full value</span></div>
+  <div class="research-stat"><b>71%</b><span>experts achieve better MTTR vs 40% early-stage</span></div>
+  <div class="research-stat"><b>80%</b><span>see better customer response times</span></div>
+</div>
+
+<div class="cols" style="margin-top:0.5em">
 
 <div>
 
 ✖ **Siloed data** — RAN, core, provisioning, care in separate tools  
-✖ **Overwhelming alerts** — 4,200 raw events · static thresholds  
-✖ **Impaired decisions** — war rooms on false P1s during the surge  
-✖ **Poor customer experience** — "activation stuck" · 18.4K care contacts/hr  
-✖ **Decreased resilience** — 84K subs at churn risk if SLA slips
+✖ **4,200 raw alerts** — static thresholds on a 340% provisioning spike  
+✖ **84K subs** at churn risk · **18.4K care contacts/hr** if SLA slips
 
 </div>
 
@@ -209,6 +274,8 @@ telco-demo-sage.vercel.app
 </div>
 
 <p class="callout"><strong>Bottom line:</strong> You already sold the upgrades. Launch weekend decides whether you keep them.</p>
+
+<p class="muted">elastic.co/observability-labs · 2025 Observability Trends</p>
 
 ---
 
@@ -488,45 +555,41 @@ Each phase breaks a **different layer** — subscribers only see *"my iPhone 18 
 
 ---
 
-# Before &amp; after · iPhone 18 activation
+# Before &amp; after · fragmented vs connected
 
-**Comcast-style outcome story — applied to device launch weekend**
+**MTTR is the symptom. Fragmented telemetry is the cause.** Telefónica Germany: 80% RCA reduction · 80% fewer service-impacting incidents.
 
-<div class="cols">
+<div class="gap-compare">
+  <div class="gap-box before">
+    <span>FRAGMENTED · siloed tools</span>
+    <b>20 min</b>
+    <span>Manual correlation across RAN · core · care to build one triage checklist</span>
+  </div>
+  <div style="text-align:center;color:#0071e3;font-weight:700">→</div>
+  <div class="gap-box after">
+    <span>CONNECTED · Elastic O11Y</span>
+    <b>Sec</b>
+    <span>Root causes ranked · resolution steps from connected OTel · iPhone 18 launch context</span>
+  </div>
+</div>
+
+<div class="cols" style="margin-top:0.65em;font-size:0.74em">
 
 <div>
 
-**Before Elastic**
-- Siloed RAN · core · care dashboards
-- 4,200 raw alerts · war room fatigue
-- Activation SLA slips · 84K churn-risk subs
-- 18.4K care contacts/hr · social escalation
+**Fragmented:** customer calls before NOC has a clear picture · security handoffs · weeks to instrument new slices
 
 </div>
 
 <div>
 
-**After Elastic (demo model)**
-- One OTel pipeline · ML lifecycle forecast
-- 4,200 → **12** actionable incidents
-- Provisioning surge flagged **2h early**
-- NOC + care share the same launch picture
+**Connected:** proactive anomaly detection before subscriber feels it · NOC + Security same foundation · iPhone 18 demo: 4,200 → **12** actionable incidents
 
 </div>
 
 </div>
 
-<svg viewBox="0 0 620 72" width="100%" style="margin-top:6px">
-  <rect x="0" y="8" width="280" height="56" rx="10" fill="#bf4800" fill-opacity="0.08" stroke="#bf4800"/>
-  <text x="140" y="30" text-anchor="middle" fill="#bf4800" font-size="9" font-weight="700">BEFORE · siloed tools</text>
-  <text x="140" y="48" text-anchor="middle" fill="#1d1d1f" font-size="8">Slow MTTR · lost upgrades · high care cost</text>
-  <path d="M292 36 H328" stroke="#0071e3" stroke-width="2" marker-end="url(#ba)"/>
-  <text x="310" y="28" text-anchor="middle" fill="#0071e3" font-size="7" font-weight="700">Elastic</text>
-  <rect x="340" y="8" width="280" height="56" rx="10" fill="#008009" fill-opacity="0.08" stroke="#008009"/>
-  <text x="480" y="30" text-anchor="middle" fill="#008009" font-size="9" font-weight="700">AFTER · unified launch view</text>
-  <text x="480" y="48" text-anchor="middle" fill="#1d1d1f" font-size="8">Predict surge · act early · protect CSAT</text>
-  <defs><marker id="ba" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0071e3"/></marker></defs>
-</svg>
+<p class="muted">Elastic Observability Labs · NOC triage research · elastic.co/customers/telefonica-germany</p>
 
 ---
 
@@ -575,6 +638,20 @@ Each phase breaks a **different layer** — subscribers only see *"my iPhone 18 
     <marker id="f2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#008009"/></marker>
   </defs>
 </svg>
+
+---
+
+# Three questions for your team
+
+**From Session 2 · worth sitting with before the demo**
+
+<ol class="questions">
+  <li><b>Tool sprawl:</b> How many monitoring tools were bought for a point-in-time problem? How much launch telemetry is invisible to the team that needs it because it lives in another dashboard?</li>
+  <li><b>Cross-domain incidents:</b> When iPhone 18 activation spans provisioning and a security event (SIM swap), how long until NOC and Security look at the same data? What's the cost of that handoff?</li>
+  <li><b>Proactive vs reactive:</b> What changes if anomaly detection runs across <em>all</em> OTel — eSIM, core, RAN, care — instead of inside each tool's silo?</li>
+</ol>
+
+<p class="callout"><strong>Demo answers these</strong> on iPhone 18 launch weekend — live OTel → ML → business impact → fault inject.</p>
 
 ---
 

@@ -10,7 +10,22 @@
 
 ---
 
-## Before you start
+## What we borrowed from Session 2 · Observability
+
+| Session 2 component | Our adaptation |
+|---------------------|----------------|
+| Opening · "network cannot see itself" | Lead slide |
+| THE STARTING POINT · visibility gap | Dark slide after Agenda |
+| THE STRUCTURAL SHIFT | THE LAUNCH SHIFT (iPhone 18) |
+| Five telecom dimensions | Customer impact window → iPhone 18 |
+| Observability Labs research (96/97/71/80) | Launch challenge slide |
+| MTTR symptom · 20 min → seconds | Fragmented vs connected slide |
+| Three questions | Pre-demo slide |
+| Telefónica proof | Before/after + personas |
+
+**Skipped (avoid bloat):** full 3-session arc, Gartner/Forrester, Search AI Session 3 preview — unless you're presenting the full series.
+
+---
 
 - Confirm Telemetry tab loads and shows **iPhone 18 Pro Launch** strip.
 - Optional: Observability / Security Kibana deep links configured in `.env.local`.
