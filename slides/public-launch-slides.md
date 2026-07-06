@@ -8,44 +8,44 @@ description: Telco launch observability webinar — Why Elastic, data ecosystem,
 style: |
   section {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-    background: #fbfbfd;
-    color: #1d1d1f;
-    padding: 38px 50px;
-    font-size: 22px;
-  }
-  section.lead { text-align: center; justify-content: center; }
-  section.lead h1 { font-size: 2.1em; font-weight: 700; letter-spacing: -0.03em; margin: 0; }
-  section.lead p { color: #86868b; font-size: 0.95em; margin-top: 1em; }
-  h1 { font-size: 1.5em; font-weight: 700; margin: 0 0 0.35em; letter-spacing: -0.02em; }
-  h2 { color: #0071e3; font-size: 0.92em; font-weight: 600; margin: 0 0 0.45em; }
-  ul { margin: 0.25em 0; line-height: 1.42; font-size: 0.8em; }
-  li { margin: 0.12em 0; }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; margin-top: 0.35em; }
-  .stat-row { display: flex; gap: 12px; margin-top: 0.45em; }
-  .stat { flex: 1; background: #fff; border: 1px solid #d2d2d7; border-radius: 14px; padding: 12px 14px; text-align: center; }
-  .stat b { display: block; font-size: 1.45em; color: #0071e3; }
-  .stat span { font-size: 0.62em; color: #86868b; }
-  .callout { background: #0071e3; color: #fff; border-radius: 14px; padding: 12px 16px; font-size: 0.76em; margin-top: 0.45em; }
-  .callout-green { background: #008009; color: #fff; border-radius: 14px; padding: 12px 16px; font-size: 0.76em; margin-top: 0.45em; }
-  .muted { color: #86868b; font-size: 0.7em; }
-  .pillar { background: #fff; border: 1px solid #d2d2d7; border-radius: 12px; padding: 9px 11px; font-size: 0.7em; }
-  .pillar b { display: block; color: #0071e3; font-size: 1.05em; margin-bottom: 0.15em; }
-  .pillar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.4em; }
-  .agenda { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.5em; font-size: 0.78em; }
-  .agenda div { background: #fff; border-left: 4px solid #0071e3; border-radius: 8px; padding: 10px 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
-  .agenda b { color: #0071e3; }
-  .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.68em; margin-top: 0.35em; }
-  .persona { background: #fff; border: 1px solid #d2d2d7; border-radius: 10px; padding: 8px 10px; }
-  .persona b { color: #0071e3; display: block; margin-bottom: 0.15em; }
-  svg text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-  section.dark {
     background: #050816;
     color: #f5f5f7;
     padding: 36px 48px 28px;
+    font-size: 22px;
   }
-  section.dark h1 { color: #fff; font-size: 1.35em; line-height: 1.25; margin-top: 0.15em; margin-bottom: 0; }
-  section.dark h2 { color: #fff; font-size: 1.35em; line-height: 1.25; font-weight: 700; margin: 0 0 0.35em; letter-spacing: -0.02em; }
-  section.dark .kicker {
+  section.lead { text-align: center; justify-content: center; }
+  section.lead h1 { font-size: 2.1em; font-weight: 700; letter-spacing: -0.03em; margin: 0; color: #fff; }
+  section.lead h2 { color: #00bfb3; font-size: 0.92em; font-weight: 600; margin: 0.5em 0 0; }
+  section.lead p { color: #9a9aa0; font-size: 0.95em; margin-top: 1em; }
+  h1 { font-size: 1.35em; font-weight: 700; margin: 0 0 0.35em; letter-spacing: -0.02em; color: #fff; line-height: 1.25; }
+  h2 { color: #fff; font-size: 1.35em; line-height: 1.25; font-weight: 700; margin: 0 0 0.35em; letter-spacing: -0.02em; }
+  p { color: #9a9aa0; }
+  strong { color: #fff; }
+  ul { margin: 0.25em 0; line-height: 1.42; font-size: 0.8em; color: #9a9aa0; }
+  li { margin: 0.12em 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.68em; margin-top: 0.4em; }
+  th { text-align: left; padding: 8px 10px; background: rgba(255,255,255,.06); color: #fff; border-bottom: 1px solid #2a2a2e; }
+  td { padding: 8px 10px; border-bottom: 1px solid #2a2a2e; color: #9a9aa0; vertical-align: top; }
+  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; margin-top: 0.35em; }
+  .stat-row { display: flex; gap: 12px; margin-top: 0.45em; }
+  .stat { flex: 1; background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 14px; padding: 12px 14px; text-align: center; }
+  .stat b { display: block; font-size: 1.45em; color: #00bfb3; }
+  .stat span { font-size: 0.62em; color: #9a9aa0; }
+  .callout { background: #0071e3; color: #fff; border-radius: 14px; padding: 12px 16px; font-size: 0.76em; margin-top: 0.45em; }
+  .callout strong { color: #fff; }
+  .callout-green { background: #008009; color: #fff; border-radius: 14px; padding: 12px 16px; font-size: 0.76em; margin-top: 0.45em; }
+  .muted { color: #6e6e73; font-size: 0.7em; }
+  .pillar { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 12px; padding: 9px 11px; font-size: 0.7em; color: #9a9aa0; }
+  .pillar b { display: block; color: #00bfb3; font-size: 1.05em; margin-bottom: 0.15em; }
+  .pillar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.4em; }
+  .agenda { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.5em; font-size: 0.78em; }
+  .agenda div { background: rgba(255,255,255,.04); border-left: 4px solid #00bfb3; border-radius: 8px; padding: 10px 12px; color: #9a9aa0; }
+  .agenda b { color: #00bfb3; }
+  .persona-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.68em; margin-top: 0.35em; }
+  .persona { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 10px; padding: 8px 10px; color: #9a9aa0; }
+  .persona b { color: #00bfb3; display: block; margin-bottom: 0.15em; }
+  svg text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .kicker {
     display: inline-block;
     background: #00bfb3;
     color: #050816;
@@ -55,9 +55,10 @@ style: |
     padding: 4px 10px;
     margin-bottom: 0.5em;
   }
-  section.dark .subhead { color: #9a9aa0; font-size: 0.72em; line-height: 1.45; margin: 0.4em 0 0.8em; max-width: 92%; }
-  section.dark .shift-list { margin-top: 0.35em; }
-  section.dark .shift-item {
+  .subhead { color: #9a9aa0; font-size: 0.72em; line-height: 1.45; margin: 0.4em 0 0.8em; max-width: 92%; }
+  .subhead strong { color: #fff; }
+  .shift-list { margin-top: 0.35em; }
+  .shift-item {
     display: grid;
     grid-template-columns: 52px 1fr;
     gap: 14px;
@@ -66,17 +67,17 @@ style: |
     font-size: 0.68em;
     line-height: 1.4;
   }
-  section.dark .shift-num {
+  .shift-num {
     width: 52px; height: 52px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.35em; font-weight: 700; color: #fff;
   }
-  section.dark .shift-num.n1 { background: #e8478b; }
-  section.dark .shift-num.n2 { background: #fec514; color: #1d1d1f; }
-  section.dark .shift-num.n3 { background: #0071e3; }
-  section.dark .shift-item b { display: block; color: #fff; font-size: 1.05em; margin-bottom: 0.2em; }
-  section.dark .shift-item span { color: #9a9aa0; }
-  section.dark .slide-foot {
+  .shift-num.n1 { background: #e8478b; }
+  .shift-num.n2 { background: #fec514; color: #1d1d1f; }
+  .shift-num.n3 { background: #0071e3; }
+  .shift-item b { display: block; color: #fff; font-size: 1.05em; margin-bottom: 0.2em; }
+  .shift-item span { color: #9a9aa0; }
+  .slide-foot {
     position: absolute; bottom: 22px; left: 48px; right: 48px;
     border-top: 2px solid #00bfb3;
     padding-top: 8px;
@@ -84,17 +85,17 @@ style: |
     color: #9a9aa0;
     display: flex; justify-content: space-between;
   }
-  section.dark .cite { font-size: 0.58em; color: #6e6e73; margin-top: 0.2em; }
-  section.dark .ecosystem-panel { font-size: 0.72em; line-height: 1.45; }
-  section.dark .ecosystem-panel b { color: #fff; }
-  section.dark .ecosystem-panel li { color: #9a9aa0; }
-  section.dark .ecosystem-img {
+  .cite { font-size: 0.58em; color: #6e6e73; margin-top: 0.2em; }
+  .ecosystem-panel { font-size: 0.72em; line-height: 1.45; }
+  .ecosystem-panel b { color: #fff; }
+  .ecosystem-panel li { color: #9a9aa0; }
+  .ecosystem-img {
     background: #fff;
     border-radius: 10px;
     padding: 10px;
     line-height: 0;
   }
-  section.dark .ecosystem-img img { width: 100%; height: auto; display: block; }
+  .ecosystem-img img { width: 100%; height: auto; display: block; }
   .walk-steps { margin-top: 0.35em; font-size: 0.72em; }
   .walk-step {
     display: grid;
@@ -102,7 +103,7 @@ style: |
     gap: 10px;
     align-items: start;
     padding: 8px 0;
-    border-bottom: 1px solid #d2d2d7;
+    border-bottom: 1px solid #2a2a2e;
   }
   .walk-step:last-child { border-bottom: none; }
   .walk-step .num {
@@ -111,17 +112,18 @@ style: |
     display: flex; align-items: center; justify-content: center;
     font-size: 0.85em; font-weight: 700;
   }
-  .walk-step b { color: #1d1d1f; }
-  .walk-step span { color: #86868b; display: block; margin-top: 0.15em; }
-  section.dark .walk-step { border-bottom-color: #2a2a2e; }
-  section.dark .walk-step b { color: #fff; }
-  section.dark .walk-step span { color: #9a9aa0; }
-  section.dark .bridge-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.72em; margin-top: 0.5em; }
-  section.dark .bridge-box { border: 1px solid #2a2a2e; border-radius: 10px; padding: 12px 14px; }
-  section.dark .bridge-box h3 { color: #fff; font-size: 1em; margin: 0 0 0.35em; }
-  section.dark .bridge-box p { color: #9a9aa0; margin: 0; line-height: 1.45; }
-  section.dark .bridge-box.risk { border-color: #bf4800; background: rgba(191,72,0,.08); }
-  section.dark .bridge-box.win { border-color: #00bfb3; background: rgba(0,191,179,.06); }
+  .walk-step b { color: #fff; }
+  .walk-step span { color: #9a9aa0; display: block; margin-top: 0.15em; }
+  .bridge-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.72em; margin-top: 0.5em; }
+  .bridge-box { border: 1px solid #2a2a2e; border-radius: 10px; padding: 12px 14px; }
+  .bridge-box h3 { color: #fff; font-size: 1em; margin: 0 0 0.35em; }
+  .bridge-box p { color: #9a9aa0; margin: 0; line-height: 1.45; }
+  .bridge-box.risk { border-color: #bf4800; background: rgba(191,72,0,.08); }
+  .bridge-box.win { border-color: #00bfb3; background: rgba(0,191,179,.06); }
+  .playbook { width: 100%; border-collapse: collapse; font-size: 0.68em; margin-top: 0.4em; }
+  .playbook th { text-align: left; padding: 8px 10px; background: rgba(255,255,255,.06); color: #fff; border-bottom: 1px solid #2a2a2e; }
+  .playbook td { padding: 8px 10px; border-bottom: 1px solid #2a2a2e; vertical-align: top; color: #9a9aa0; }
+  .playbook td:first-child { font-weight: 600; color: #00bfb3; width: 38%; }
   .research-row { display: flex; gap: 10px; margin-top: 0.45em; }
   .research-stat { flex: 1; text-align: center; padding: 10px 8px; border-radius: 10px; background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; }
   .research-stat b { display: block; font-size: 1.5em; color: #00bfb3; }
@@ -135,8 +137,9 @@ style: |
   .gap-box.after b { color: #00bfb3; }
   .gap-box span { color: #9a9aa0; font-size: 0.9em; }
   .questions { font-size: 0.74em; margin-top: 0.35em; }
-  .questions li { margin: 0.35em 0; color: #1d1d1f; }
-  .questions b { color: #0071e3; }
+  .questions li { margin: 0.35em 0; color: #9a9aa0; }
+  .questions b { color: #00bfb3; }
+  code { background: rgba(255,255,255,.08); color: #00bfb3; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
 ---
 
 <!-- _class: lead -->
@@ -157,17 +160,15 @@ telco-demo-sage.vercel.app
 **Today: get more value from telco data you're already collecting — through the iPhone 18 launch lens.**
 
 <div class="agenda">
-  <div><b>1 · Why Elastic</b><br/>Search AI Platform · meet you where you are</div>
-  <div><b>2 · Data ecosystem</b><br/>Primary &amp; enabling roles across your stack</div>
-  <div><b>3 · iPhone 18 launch event</b><br/>Bridge · 72-hour surge · live demo walk</div>
-  <div><b>4 · Outcomes</b><br/>Less NOC toil · higher CSAT · protected revenue</div>
+  <div><b>1 · 2026 telco context</b><br/>Boardroom realities · D2D vs Starlink · iPhone 18 bridge</div>
+  <div><b>2 · Why Elastic</b><br/>Partner playbook · Search AI · meet you where you are</div>
+  <div><b>3 · Data ecosystem</b><br/>Primary &amp; enabling roles across your stack</div>
+  <div><b>4 · iPhone 18 launch demo</b><br/>Live OTel → ML → business impact · ~12 min</div>
 </div>
 
 <p class="muted">Session 2 observability narrative · iPhone 18 Pro Launch weekend demo</p>
 
 ---
-
-<!-- _class: dark -->
 
 <span class="kicker">THE STARTING POINT</span>
 
@@ -180,8 +181,6 @@ telco-demo-sage.vercel.app
 <div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Session 2 · Observability</span></div>
 
 ---
-
-<!-- _class: dark -->
 
 <span class="kicker">THE LAUNCH SHIFT</span>
 
@@ -208,8 +207,6 @@ telco-demo-sage.vercel.app
 <div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>iPhone 18 Launch · Sept 2026</span></div>
 
 ---
-
-<!-- _class: dark -->
 
 <span class="kicker">THE TELECOM CONTEXT</span>
 
@@ -279,28 +276,56 @@ telco-demo-sage.vercel.app
 
 ---
 
-<!-- _class: dark -->
-
 <span class="kicker">THE STRATEGIC CONTEXT</span>
 
-# Connectivity is commoditizing.<br/>Launch weekend is when carriers prove they're still essential.
+# Connectivity is commoditizing.
+## Launch weekend is when carriers prove they're still essential.
 
-<p class="subhead">Starlink, satellite-to-phone, Apple, and eSIM portability change the long game. They don't remove the moment when a subscriber chooses you — or leaves — during iPhone 18 activation.</p>
+<p class="subhead"><strong>2026 reality:</strong> AT&amp;T, Verizon, and T-Mobile formed a tri-carrier Direct-to-Device joint venture — a defensive response to Starlink Mobile (9M+ subs) and orbital broadband on standard phones. Apple and eSIM make switching easier. The long game is multi-transport; the near-term battle is still <strong>subscriber execution</strong>.</p>
 
 <div class="bridge-cols">
   <div class="bridge-box risk">
-    <h3>What keeps execs up at night</h3>
-    <p>Disintermediation · dumb-pipe fears · OS and AI owning the relationship · easier switching · ARPU erosion when the experience breaks at go-live.</p>
+    <h3>Boardroom pressure · 2026</h3>
+    <p>Flat ARPU · ~35% EBITDA targets · OpEx reset · $20B Frontier · $5.75B Lumen fiber · tool sprawl across 4G, 5G SA, retail, IT. Projects that don't cut cost or prevent SLA penalties get delayed.</p>
   </div>
   <div class="bridge-box win">
-    <h3>Where carriers still win</h3>
-    <p>Flawless activation · port · trade-in · pickup in the first 48 hours. Operational excellence = relationship defense while the platform war plays out.</p>
+    <h3>Where carriers still win · iPhone 18</h3>
+    <p>Activation · port · trade-in · pickup in 48 hours. Same pattern as 8M plan migrations — if portals or provisioning slip, churn follows. Launch weekend is ARPU defense at national scale.</p>
   </div>
 </div>
 
-<p class="subhead" style="margin-top:0.6em"><strong>Today's demo:</strong> iPhone 18 launch observability ties live OTel → ML forecast → business impact (revenue, churn risk, care load) — the chain execs and NOC need in one view.</p>
+<p class="subhead" style="margin-top:0.5em"><strong>Demo:</strong> live OTel → ML forecast → <strong>84K churn-risk subs</strong> · <strong>$142M</strong> gross-add · care load — the exec chain NOC needs in one view.</p>
 
-<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Bridge · iPhone 18 Launch</span></div>
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>2026 Telco Landscape · iPhone 18</span></div>
+
+---
+
+<span class="kicker">2026 BOARDROOM</span>
+
+# Four realities shaping every telco budget
+
+<p class="subhead">U.S. carriers aren't buying features — they're buying <strong>margin defense</strong> or <strong>revenue enablement</strong>. iPhone 18 launch observability hits both.</p>
+
+<div class="shift-list">
+  <div class="shift-item">
+    <div class="shift-num n1">01</div>
+    <div><b>EBITDA &amp; OpEx reset</b><span>5G CapEx peaked · debt load · price wars (Verizon Simplicity, AT&amp;T Build-A-Plan). Wall Street judges ~35% EBITDA. Vendor consolidation = CFO language.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n2">02</div>
+    <div><b>M&amp;A &amp; federated visibility</b><span>Frontier · Lumen mass markets · Mint/Ultra — Frankenstein stacks. Need cross-cluster search without rip-and-replace. Same OTel layer meets you where acquired networks sit.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n3">03</div>
+    <div><b>Techco pivot · not dumb pipe</b><span>Private 5G · edge · AI transport corridors. Elastic as co-innovation engine — anomaly detection and unified visibility for <em>their</em> enterprise clients.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n3" style="background:#7030a0">04</div>
+    <div><b>Regulatory clock · SLA risk</b><span>CISA 72-hour · SEC 4-day disclosure · FCC KYC $2,500/call · 4-year retention. Launch SLA slips = churn + care cost + reputational hit — iPhone 18 amplifies all three.</span></div>
+  </div>
+</div>
+
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>2026 Telco Realities</span></div>
 
 ---
 
@@ -316,25 +341,41 @@ telco-demo-sage.vercel.app
 </div>
 
 <svg viewBox="0 0 620 88" width="100%" style="margin-top:8px">
-  <rect x="0" y="6" width="120" height="72" rx="10" fill="#f5f5f7" stroke="#d2d2d7"/>
-  <text x="60" y="28" text-anchor="middle" fill="#86868b" font-size="8" font-weight="600">Tool sprawl</text>
-  <text x="60" y="44" text-anchor="middle" fill="#1d1d1f" font-size="7.5">Siloed RAN · Core · Care</text>
+  <rect x="0" y="6" width="120" height="72" rx="10" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="60" y="28" text-anchor="middle" fill="#9a9aa0" font-size="8" font-weight="600">Tool sprawl</text>
+  <text x="60" y="44" text-anchor="middle" fill="#f5f5f7" font-size="7.5">Siloed RAN · Core · Care</text>
   <text x="60" y="58" text-anchor="middle" fill="#bf4800" font-size="7.5">Can't see one launch event</text>
   <path d="M128 42 H152" stroke="#0071e3" stroke-width="2" marker-end="url(#w1)"/>
   <rect x="158" y="6" width="250" height="72" rx="10" fill="#0071e3" fill-opacity="0.08" stroke="#0071e3"/>
-  <text x="283" y="26" text-anchor="middle" fill="#1d1d1f" font-size="9" font-weight="700">Elastic Search AI Platform</text>
-  <text x="283" y="42" text-anchor="middle" fill="#86868b" font-size="7.5">Observability · Security · Elasticsearch</text>
-  <text x="283" y="58" text-anchor="middle" fill="#1d1d1f" font-size="7.5">Milliseconds · not minutes</text>
+  <text x="283" y="26" text-anchor="middle" fill="#f5f5f7" font-size="9" font-weight="700">Elastic Search AI Platform</text>
+  <text x="283" y="42" text-anchor="middle" fill="#9a9aa0" font-size="7.5">Observability · Security · Elasticsearch</text>
+  <text x="283" y="58" text-anchor="middle" fill="#f5f5f7" font-size="7.5">Milliseconds · not minutes</text>
   <path d="M414 42 H438" stroke="#008009" stroke-width="2" marker-end="url(#w2)"/>
   <rect x="444" y="6" width="176" height="72" rx="10" fill="#008009" fill-opacity="0.08" stroke="#008009"/>
   <text x="532" y="28" text-anchor="middle" fill="#008009" font-size="8" font-weight="600">iPhone 18 outcomes</text>
-  <text x="532" y="44" text-anchor="middle" fill="#1d1d1f" font-size="7.5">Less toil · higher CSAT</text>
-  <text x="532" y="58" text-anchor="middle" fill="#1d1d1f" font-size="7.5">Revenue &amp; upgrades protected</text>
+  <text x="532" y="44" text-anchor="middle" fill="#f5f5f7" font-size="7.5">Less toil · higher CSAT</text>
+  <text x="532" y="58" text-anchor="middle" fill="#f5f5f7" font-size="7.5">Revenue &amp; upgrades protected</text>
   <defs>
     <marker id="w1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0071e3"/></marker>
     <marker id="w2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#008009"/></marker>
   </defs>
 </svg>
+
+---
+
+# Partner playbook · boardroom translation
+
+**How Elastic capabilities map to 2026 telco CFO and CISO priorities** *(2026 Telco Landscape)*
+
+| Elastic capability | Boardroom translation |
+|---|---|
+| **ES\|QL · sub-second query** | CISA 72-hour &amp; SEC 4-day breach disclosure — protect the C-suite from personal liability |
+| **Searchable Snapshots · tiered storage** | FCC 4-year KYC/SMS retention without crushing EBITDA |
+| **Native OpenTelemetry** | Future-proof pipeline — terrestrial + D2D satellite without proprietary tax |
+| **ML · behavioral anomalies** | SLA protection before penalties · iPhone 18 launch surge scored in context |
+| **One platform · Security + O11Y + Search** | Vendor consolidation — Verizon $500M synergy target · "pay once, query three times" |
+
+<p class="callout"><strong>iPhone 18 proof:</strong> same indexed OTel drives NOC triage, exec churn-risk tiles, and Security SIM-swap correlation — one launch event, one data foundation.</p>
 
 ---
 
@@ -360,17 +401,17 @@ Pure **OpenTelemetry** — no proprietary layers compromising portability.
 <div>
 
 <svg viewBox="0 0 280 175" width="100%">
-  <text x="0" y="14" fill="#86868b" font-size="9" font-weight="600">Query response · launch weekend</text>
-  <rect x="0" y="28" width="55" height="120" rx="6" fill="#f5f5f7" stroke="#d2d2d7"/>
-  <text x="27" y="50" text-anchor="middle" fill="#86868b" font-size="7" transform="rotate(-90 27 50)">Warehouse</text>
-  <rect x="62" y="48" width="55" height="100" rx="6" fill="#f5f5f7" stroke="#d2d2d7"/>
-  <text x="89" y="50" text-anchor="middle" fill="#86868b" font-size="7" transform="rotate(-90 89 50)">Lakehouse</text>
-  <rect x="124" y="68" width="55" height="80" rx="6" fill="#f5f5f7" stroke="#d2d2d7"/>
-  <text x="151" y="50" text-anchor="middle" fill="#86868b" font-size="7" transform="rotate(-90 151 50)">Data lake</text>
+  <text x="0" y="14" fill="#9a9aa0" font-size="9" font-weight="600">Query response · launch weekend</text>
+  <rect x="0" y="28" width="55" height="120" rx="6" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="27" y="50" text-anchor="middle" fill="#9a9aa0" font-size="7" transform="rotate(-90 27 50)">Warehouse</text>
+  <rect x="62" y="48" width="55" height="100" rx="6" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="89" y="50" text-anchor="middle" fill="#9a9aa0" font-size="7" transform="rotate(-90 89 50)">Lakehouse</text>
+  <rect x="124" y="68" width="55" height="80" rx="6" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="151" y="50" text-anchor="middle" fill="#9a9aa0" font-size="7" transform="rotate(-90 151 50)">Data lake</text>
   <rect x="186" y="108" width="55" height="40" rx="6" fill="#0071e3"/>
   <text x="213" y="50" text-anchor="middle" fill="#0071e3" font-size="7" font-weight="700" transform="rotate(-90 213 50)">Search AI</text>
-  <line x1="0" y1="158" x2="250" y2="158" stroke="#d2d2d7"/>
-  <text x="0" y="172" fill="#86868b" font-size="7">Slow →</text>
+  <line x1="0" y1="158" x2="250" y2="158" stroke="#2a2a2e"/>
+  <text x="0" y="172" fill="#9a9aa0" font-size="7">Slow →</text>
   <text x="210" y="172" fill="#0071e3" font-size="7" font-weight="600">Fast</text>
 </svg>
 
@@ -401,16 +442,16 @@ Pure **OpenTelemetry** — no proprietary layers compromising portability.
 
 <svg viewBox="0 0 280 200" width="100%">
   <rect x="90" y="70" width="100" height="60" rx="10" fill="#0071e3" fill-opacity="0.12" stroke="#0071e3" stroke-width="2"/>
-  <text x="140" y="94" text-anchor="middle" fill="#1d1d1f" font-size="9" font-weight="700">Search AI</text>
-  <text x="140" y="108" text-anchor="middle" fill="#1d1d1f" font-size="9" font-weight="700">Platform</text>
-  <rect x="10" y="10" width="72" height="34" rx="8" fill="#fff" stroke="#d2d2d7"/>
-  <text x="46" y="30" text-anchor="middle" fill="#1d1d1f" font-size="8" font-weight="600">Ingestion</text>
-  <rect x="198" y="10" width="72" height="34" rx="8" fill="#fff" stroke="#d2d2d7"/>
-  <text x="234" y="30" text-anchor="middle" fill="#1d1d1f" font-size="8" font-weight="600">AI analysis</text>
-  <rect x="10" y="156" width="72" height="34" rx="8" fill="#fff" stroke="#d2d2d7"/>
-  <text x="46" y="176" text-anchor="middle" fill="#1d1d1f" font-size="8" font-weight="600">ES|QL search</text>
-  <rect x="198" y="156" width="72" height="34" rx="8" fill="#fff" stroke="#d2d2d7"/>
-  <text x="234" y="176" text-anchor="middle" fill="#1d1d1f" font-size="8" font-weight="600">Workflows</text>
+  <text x="140" y="94" text-anchor="middle" fill="#f5f5f7" font-size="9" font-weight="700">Search AI</text>
+  <text x="140" y="108" text-anchor="middle" fill="#f5f5f7" font-size="9" font-weight="700">Platform</text>
+  <rect x="10" y="10" width="72" height="34" rx="8" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="46" y="30" text-anchor="middle" fill="#f5f5f7" font-size="8" font-weight="600">Ingestion</text>
+  <rect x="198" y="10" width="72" height="34" rx="8" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="234" y="30" text-anchor="middle" fill="#f5f5f7" font-size="8" font-weight="600">AI analysis</text>
+  <rect x="10" y="156" width="72" height="34" rx="8" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="46" y="176" text-anchor="middle" fill="#f5f5f7" font-size="8" font-weight="600">ES|QL search</text>
+  <rect x="198" y="156" width="72" height="34" rx="8" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="234" y="176" text-anchor="middle" fill="#f5f5f7" font-size="8" font-weight="600">Workflows</text>
   <line x1="82" y1="27" x2="98" y2="80" stroke="#0071e3"/>
   <line x1="198" y1="27" x2="182" y2="80" stroke="#0071e3"/>
   <line x1="82" y1="173" x2="98" y2="120" stroke="#0071e3"/>
@@ -427,8 +468,6 @@ Pure **OpenTelemetry** — no proprietary layers compromising portability.
 <p class="muted">Start with Observability for iPhone 18 · Security enables launch fraud · Search powers care KB.</p>
 
 ---
-
-<!-- _class: dark -->
 
 <span class="kicker">DATA ECOSYSTEM</span>
 
@@ -486,21 +525,21 @@ Pure **OpenTelemetry** — no proprietary layers compromising portability.
 <div>
 
 <svg viewBox="0 0 300 165" width="100%">
-  <rect x="0" y="20" width="88" height="120" rx="10" fill="#fff" stroke="#d2d2d7"/>
-  <text x="44" y="42" text-anchor="middle" fill="#1d1d1f" font-size="9" font-weight="600">Where you are</text>
-  <text x="44" y="62" text-anchor="middle" fill="#86868b" font-size="8">Legacy NOC · Point APM</text>
-  <text x="44" y="78" text-anchor="middle" fill="#86868b" font-size="8">Siloed logs · OTel in flight</text>
+  <rect x="0" y="20" width="88" height="120" rx="10" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="44" y="42" text-anchor="middle" fill="#f5f5f7" font-size="9" font-weight="600">Where you are</text>
+  <text x="44" y="62" text-anchor="middle" fill="#9a9aa0" font-size="8">Legacy NOC · Point APM</text>
+  <text x="44" y="78" text-anchor="middle" fill="#9a9aa0" font-size="8">Siloed logs · OTel in flight</text>
   <path d="M98 80 H112" stroke="#0071e3" stroke-width="2" marker-end="url(#m1)"/>
   <rect x="118" y="45" width="64" height="70" rx="10" fill="#0071e3" fill-opacity="0.1" stroke="#0071e3"/>
   <text x="150" y="68" text-anchor="middle" fill="#0071e3" font-size="8" font-weight="700">Elastic</text>
   <text x="150" y="82" text-anchor="middle" fill="#0071e3" font-size="8" font-weight="700">meets you</text>
-  <text x="150" y="98" text-anchor="middle" fill="#86868b" font-size="7">Ingest · unify · ML</text>
+  <text x="150" y="98" text-anchor="middle" fill="#9a9aa0" font-size="7">Ingest · unify · ML</text>
   <path d="M192 80 H206" stroke="#008009" stroke-width="2" marker-end="url(#m2)"/>
   <rect x="212" y="20" width="88" height="120" rx="10" fill="#008009" fill-opacity="0.08" stroke="#008009"/>
-  <text x="256" y="42" text-anchor="middle" fill="#1d1d1f" font-size="9" font-weight="600">iPhone 18 ready</text>
-  <text x="256" y="62" text-anchor="middle" fill="#86868b" font-size="8">Launch forecast</text>
-  <text x="256" y="78" text-anchor="middle" fill="#86868b" font-size="8">Region hotspots · RCA</text>
-  <text x="256" y="94" text-anchor="middle" fill="#86868b" font-size="8">Care + NOC unified</text>
+  <text x="256" y="42" text-anchor="middle" fill="#f5f5f7" font-size="9" font-weight="600">iPhone 18 ready</text>
+  <text x="256" y="62" text-anchor="middle" fill="#9a9aa0" font-size="8">Launch forecast</text>
+  <text x="256" y="78" text-anchor="middle" fill="#9a9aa0" font-size="8">Region hotspots · RCA</text>
+  <text x="256" y="94" text-anchor="middle" fill="#9a9aa0" font-size="8">Care + NOC unified</text>
   <text x="256" y="118" text-anchor="middle" fill="#008009" font-size="8" font-weight="600">Sept 2026</text>
   <defs>
     <marker id="m1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0071e3"/></marker>
@@ -533,11 +572,11 @@ Each phase breaks a **different layer** — subscribers only see *"my iPhone 18 
 <div>
 
 <svg viewBox="0 0 320 175" width="100%">
-  <text x="8" y="14" fill="#86868b" font-size="9" font-weight="600">Activation curve · launch weekend</text>
-  <line x1="24" y1="145" x2="300" y2="145" stroke="#d2d2d7"/>
-  <line x1="24" y1="28" x2="24" y2="145" stroke="#d2d2d7"/>
+  <text x="8" y="14" fill="#9a9aa0" font-size="9" font-weight="600">Activation curve · launch weekend</text>
+  <line x1="24" y1="145" x2="300" y2="145" stroke="#2a2a2e"/>
+  <line x1="24" y1="28" x2="24" y2="145" stroke="#2a2a2e"/>
   <path d="M24 135 C 60 130, 80 115, 100 85 S 140 32, 170 25 S 220 48, 250 95 S 280 125, 300 133" fill="none" stroke="#0071e3" stroke-width="3"/>
-  <path d="M24 135 C 60 133, 90 120, 120 90 S 160 42, 190 37 S 230 52, 260 100" fill="none" stroke="#86868b" stroke-width="2" stroke-dasharray="4 3"/>
+  <path d="M24 135 C 60 133, 90 120, 120 90 S 160 42, 190 37 S 230 52, 260 100" fill="none" stroke="#9a9aa0" stroke-width="2" stroke-dasharray="4 3"/>
   <circle cx="170" cy="25" r="5" fill="#bf4800"/>
   <text x="178" y="29" fill="#bf4800" font-size="8" font-weight="600">14.2K/min</text>
   <text x="230" y="18" fill="#0071e3" font-size="7">ML forecast</text>
@@ -617,22 +656,22 @@ Each phase breaks a **different layer** — subscribers only see *"my iPhone 18 
 # Less NOC toil · signal funnel
 
 <svg viewBox="0 0 620 125" width="100%">
-  <rect x="0" y="15" width="110" height="85" rx="12" fill="#f5f5f7" stroke="#d2d2d7"/>
-  <text x="55" y="42" text-anchor="middle" fill="#86868b" font-size="9" font-weight="600">Static alerts</text>
-  <text x="55" y="68" text-anchor="middle" fill="#1d1d1f" font-size="18" font-weight="700">4,200</text>
+  <rect x="0" y="15" width="110" height="85" rx="12" fill="#161b28" stroke="#2a2a2e"/>
+  <text x="55" y="42" text-anchor="middle" fill="#9a9aa0" font-size="9" font-weight="600">Static alerts</text>
+  <text x="55" y="68" text-anchor="middle" fill="#f5f5f7" font-size="18" font-weight="700">4,200</text>
   <path d="M115 58 H145" stroke="#0071e3" stroke-width="2" marker-end="url(#f1)"/>
   <rect x="150" y="15" width="110" height="85" rx="12" fill="#0071e3" fill-opacity="0.08" stroke="#0071e3"/>
   <text x="205" y="42" text-anchor="middle" fill="#0071e3" font-size="9" font-weight="600">ML scored</text>
-  <text x="205" y="68" text-anchor="middle" fill="#1d1d1f" font-size="18" font-weight="700">340</text>
+  <text x="205" y="68" text-anchor="middle" fill="#f5f5f7" font-size="18" font-weight="700">340</text>
   <path d="M265 58 H295" stroke="#0071e3" stroke-width="2" marker-end="url(#f1)"/>
   <rect x="300" y="15" width="110" height="85" rx="12" fill="#0071e3" fill-opacity="0.12" stroke="#0071e3"/>
   <text x="355" y="42" text-anchor="middle" fill="#0071e3" font-size="9" font-weight="600">Correlated</text>
-  <text x="355" y="68" text-anchor="middle" fill="#1d1d1f" font-size="18" font-weight="700">48</text>
+  <text x="355" y="68" text-anchor="middle" fill="#f5f5f7" font-size="18" font-weight="700">48</text>
   <path d="M415 58 H445" stroke="#008009" stroke-width="2" marker-end="url(#f2)"/>
   <rect x="450" y="15" width="110" height="85" rx="12" fill="#008009" fill-opacity="0.1" stroke="#008009"/>
   <text x="505" y="42" text-anchor="middle" fill="#008009" font-size="9" font-weight="600">You act on</text>
-  <text x="505" y="68" text-anchor="middle" fill="#1d1d1f" font-size="18" font-weight="700">12</text>
-  <text x="310" y="112" text-anchor="middle" fill="#86868b" font-size="8">NOC acts on launch context — not pager fatigue · iPhone 18 weekend</text>
+  <text x="505" y="68" text-anchor="middle" fill="#f5f5f7" font-size="18" font-weight="700">12</text>
+  <text x="310" y="112" text-anchor="middle" fill="#9a9aa0" font-size="8">NOC acts on launch context — not pager fatigue · iPhone 18 weekend</text>
   <defs>
     <marker id="f1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0071e3"/></marker>
     <marker id="f2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#008009"/></marker>
