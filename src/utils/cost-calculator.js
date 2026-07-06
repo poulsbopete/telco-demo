@@ -242,10 +242,12 @@ export function formatBytes(bytes) {
 }
 
 export function formatNumber(n) {
-  if (n >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
-  if (n >= 1e6) return `${(n / 1e6).toFixed(2)}M`;
-  if (n >= 1e3) return `${(n / 1e3).toFixed(1)}K`;
-  return n.toFixed(0);
+  const x = Number(n);
+  if (!Number.isFinite(x)) return '—';
+  if (x >= 1e9) return `${(x / 1e9).toFixed(2)}B`;
+  if (x >= 1e6) return `${(x / 1e6).toFixed(2)}M`;
+  if (x >= 1e3) return `${(x / 1e3).toFixed(1)}K`;
+  return x.toFixed(0);
 }
 
 /** Compact USD for narrow cost cards — full value available via title/tooltip */

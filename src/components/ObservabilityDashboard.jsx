@@ -16,7 +16,7 @@ import {
   generateTraceSummary,
 } from '../utils/data-generator';
 import { IPHONE_LAUNCH } from '../lib/iphone-launch-event';
-import { formatNumber, formatDailyVolume, traceVolumeFromSpansPerMinute } from '../utils/cost-calculator';
+import { formatNumber } from '../utils/cost-calculator';
 import traces from '../data/sample-traces.json';
 import { A2AFederationPanel } from './A2AFederationPanel';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
@@ -250,14 +250,7 @@ export function ObservabilityDashboard() {
         <StatCard
           label="Logs/day"
           value={`${ingestion.logsPerDay.toFixed(1)} PB`}
-          trend={`${formatDailyVolume(ingestion.logsPerDay)} indexed`}
-          kibanaUrl={kibanaUrl}
-          kibanaSection="discover"
-        />
-        <StatCard
-          label="Traces/min"
-          value={formatNumber(traceVolumeFromSpansPerMinute(ingestion.spansPerMinute))}
-          trend={`${ingestion.spansPerMinute.toLocaleString()} spans/min`}
+          trend="Launch weekend ingest"
           kibanaUrl={kibanaUrl}
           kibanaSection="discover"
         />
