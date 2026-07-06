@@ -38,6 +38,52 @@ style: |
   .persona { background: #fff; border: 1px solid #d2d2d7; border-radius: 10px; padding: 8px 10px; }
   .persona b { color: #0071e3; display: block; margin-bottom: 0.15em; }
   svg text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  section.dark {
+    background: #050816;
+    color: #f5f5f7;
+    padding: 36px 48px 28px;
+  }
+  section.dark h1 { color: #fff; font-size: 1.35em; line-height: 1.25; margin-top: 0.15em; }
+  section.dark .kicker {
+    display: inline-block;
+    background: #00bfb3;
+    color: #050816;
+    font-size: 0.52em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    margin-bottom: 0.5em;
+  }
+  section.dark .subhead { color: #9a9aa0; font-size: 0.72em; line-height: 1.45; margin: 0.4em 0 0.8em; max-width: 92%; }
+  section.dark .shift-list { margin-top: 0.35em; }
+  section.dark .shift-item {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 14px;
+    align-items: start;
+    margin-bottom: 0.55em;
+    font-size: 0.68em;
+    line-height: 1.4;
+  }
+  section.dark .shift-num {
+    width: 52px; height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.35em; font-weight: 700; color: #fff;
+  }
+  section.dark .shift-num.n1 { background: #e8478b; }
+  section.dark .shift-num.n2 { background: #fec514; color: #1d1d1f; }
+  section.dark .shift-num.n3 { background: #0071e3; }
+  section.dark .shift-item b { display: block; color: #fff; font-size: 1.05em; margin-bottom: 0.2em; }
+  section.dark .shift-item span { color: #9a9aa0; }
+  section.dark .slide-foot {
+    position: absolute; bottom: 22px; left: 48px; right: 48px;
+    border-top: 2px solid #00bfb3;
+    padding-top: 8px;
+    font-size: 0.52em;
+    color: #9a9aa0;
+    display: flex; justify-content: space-between;
+  }
+  section.dark .cite { font-size: 0.58em; color: #6e6e73; margin-top: 0.2em; }
 ---
 
 <!-- _class: lead -->
@@ -63,6 +109,35 @@ telco-demo-sage.vercel.app
 </div>
 
 <p class="muted">Modeled on Elastic Telecom webinar narrative · use case = iPhone 18 Pro Launch weekend</p>
+
+---
+
+<!-- _class: dark -->
+
+<span class="kicker">THE LAUNCH SHIFT</span>
+
+# iPhone 18 launch is a software event.<br/>Your observability architecture hasn't caught up.
+
+<p class="subhead">Not a failure of tooling or teams. A mismatch between how launch traffic actually flows — eSIM, provisioning, retail, care — and how each layer is watched in isolation.</p>
+
+<div class="shift-list">
+  <div class="shift-item">
+    <div class="shift-num n1">01</div>
+    <div><b>Activations are digital workflows — not a single RAN attach</b><span>iPhone 18 turns on through eSIM OTA downloads, provisioning queues, SM-DP+ profiles, and billing triggers. SNMP-era monitoring can't trace a subscriber across those boundaries when 124K profiles/min hit the edge.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n2">02</div>
+    <div><b>Launch day spans retail, CDN, core, and care — not one NOC view</b><span>Midnight West-coast wave, NYC flagship pickup, national CDN restore — failures originate in regions your core dashboard never sees. Launch is a continuum; your tools still mirror org silos.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n3">03</div>
+    <div><b>Every layer emits telemetry. Almost none of it correlates by design.</b><span>OTel logs, metrics, traces, NetFlow, care CRM, retail POS — different pipelines, different teams, different alert thresholds. On iPhone 18 weekend, 4,200 raw alerts become noise without a unified launch context.</span></div>
+  </div>
+</div>
+
+<p class="cite">Elastic Observability · iPhone 18 Launch Event demo · telco-demo-sage.vercel.app</p>
+
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>iPhone 18 Launch · Sept 2026</span></div>
 
 ---
 
