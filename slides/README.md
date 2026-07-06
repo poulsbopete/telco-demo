@@ -1,7 +1,7 @@
 # Elastic Observability for Telco — slides
 
 **Live (Vercel):** https://telco-demo-sage.vercel.app/slides/  
-**GitHub Pages:** https://poulsbopete.github.io/telco-demo/ *(repo Pages build currently failing — use Vercel link)*
+**Presenter walk:** [DEMO-WALK.md](./DEMO-WALK.md) (~12 min, aligned to slides + app)
 
 Edit `slides/public-launch-slides.md`, then:
 

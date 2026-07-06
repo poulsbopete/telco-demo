@@ -95,6 +95,33 @@ style: |
     line-height: 0;
   }
   section.dark .ecosystem-img img { width: 100%; height: auto; display: block; }
+  .walk-steps { margin-top: 0.35em; font-size: 0.72em; }
+  .walk-step {
+    display: grid;
+    grid-template-columns: 36px 140px 1fr;
+    gap: 10px;
+    align-items: start;
+    padding: 8px 0;
+    border-bottom: 1px solid #d2d2d7;
+  }
+  .walk-step:last-child { border-bottom: none; }
+  .walk-step .num {
+    width: 28px; height: 28px; border-radius: 6px;
+    background: #0071e3; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85em; font-weight: 700;
+  }
+  .walk-step b { color: #1d1d1f; }
+  .walk-step span { color: #86868b; display: block; margin-top: 0.15em; }
+  section.dark .walk-step { border-bottom-color: #2a2a2e; }
+  section.dark .walk-step b { color: #fff; }
+  section.dark .walk-step span { color: #9a9aa0; }
+  section.dark .bridge-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 0.72em; margin-top: 0.5em; }
+  section.dark .bridge-box { border: 1px solid #2a2a2e; border-radius: 10px; padding: 12px 14px; }
+  section.dark .bridge-box h3 { color: #fff; font-size: 1em; margin: 0 0 0.35em; }
+  section.dark .bridge-box p { color: #9a9aa0; margin: 0; line-height: 1.45; }
+  section.dark .bridge-box.risk { border-color: #bf4800; background: rgba(191,72,0,.08); }
+  section.dark .bridge-box.win { border-color: #00bfb3; background: rgba(0,191,179,.06); }
 ---
 
 <!-- _class: lead -->
@@ -103,6 +130,8 @@ style: |
 ## iPhone 18 Launch Event · Sept 2026
 
 **Unlock launch-weekend value from the OTel data you already collect**
+
+**Narrative:** Connectivity is commoditizing — iPhone 18 launch is when subscribers decide if you're still their carrier.
 
 telco-demo-sage.vercel.app
 
@@ -115,7 +144,7 @@ telco-demo-sage.vercel.app
 <div class="agenda">
   <div><b>1 · Why Elastic</b><br/>Search AI Platform · meet you where you are</div>
   <div><b>2 · Data ecosystem</b><br/>Primary &amp; enabling roles across your stack</div>
-  <div><b>3 · iPhone 18 launch event</b><br/>The 72-hour surge · business stakes · demo walk</div>
+  <div><b>3 · iPhone 18 launch event</b><br/>Bridge · 72-hour surge · live demo walk</div>
   <div><b>4 · Outcomes</b><br/>Less NOC toil · higher CSAT · protected revenue</div>
 </div>
 
@@ -180,6 +209,31 @@ telco-demo-sage.vercel.app
 </div>
 
 <p class="callout"><strong>Bottom line:</strong> You already sold the upgrades. Launch weekend decides whether you keep them.</p>
+
+---
+
+<!-- _class: dark -->
+
+<span class="kicker">THE STRATEGIC CONTEXT</span>
+
+# Connectivity is commoditizing.<br/>Launch weekend is when carriers prove they're still essential.
+
+<p class="subhead">Starlink, satellite-to-phone, Apple, and eSIM portability change the long game. They don't remove the moment when a subscriber chooses you — or leaves — during iPhone 18 activation.</p>
+
+<div class="bridge-cols">
+  <div class="bridge-box risk">
+    <h3>What keeps execs up at night</h3>
+    <p>Disintermediation · dumb-pipe fears · OS and AI owning the relationship · easier switching · ARPU erosion when the experience breaks at go-live.</p>
+  </div>
+  <div class="bridge-box win">
+    <h3>Where carriers still win</h3>
+    <p>Flawless activation · port · trade-in · pickup in the first 48 hours. Operational excellence = relationship defense while the platform war plays out.</p>
+  </div>
+</div>
+
+<p class="subhead" style="margin-top:0.6em"><strong>Today's demo:</strong> iPhone 18 launch observability ties live OTel → ML forecast → business impact (revenue, churn risk, care load) — the chain execs and NOC need in one view.</p>
+
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Bridge · iPhone 18 Launch</span></div>
 
 ---
 
@@ -524,18 +578,37 @@ Each phase breaks a **different layer** — subscribers only see *"my iPhone 18 
 
 ---
 
-# Live demo · iPhone 18 Pro Launch
+# Demo story arc · one narrative spine
 
-<div class="stat-row">
-  <div class="stat"><b>847K</b><span>activations · first 6h</span></div>
-  <div class="stat"><b>340%</b><span>provisioning spike</span></div>
-  <div class="stat"><b>ML</b><span>lifecycle forecast · surge &amp; taper</span></div>
-  <div class="stat"><b>OTel</b><span>live Serverless telemetry</span></div>
+**Slides and live app tell the same story — ops telemetry connected to business outcomes.**
+
+| Act | Message | Where in demo |
+|-----|---------|---------------|
+| **1 · Stakes** | $142M · 847K activations · 84K churn risk | Launch metrics strip · Telemetry tab |
+| **2 · See it early** | ML forecast before static alerts | Lifecycle chart · ML anomalies |
+| **3 · Act precisely** | Staff hotspots · cut 4,200 → 12 | Region tiles · signal funnel |
+| **4 · Protect the relationship** | Care load · revenue next 4h · CSAT | Business KPI tiles |
+| **5 · Prove resilience** | Fault → correlate → remediate | Networks tab · optional Security SIM swap |
+
+<p class="callout"><strong>Say it once:</strong> "You already sold the upgrade — launch weekend decides if they stay your subscriber."</p>
+
+---
+
+# Live demo walk · ~12 minutes
+
+**Open** [telco-demo-sage.vercel.app](https://telco-demo-sage.vercel.app) → **Network Telemetry**
+
+<div class="walk-steps">
+  <div class="walk-step"><div class="num">1</div><div><b>Telemetry · Launch strip</b></div><div><span>Point to <strong>iPhone 18 Pro Launch</strong> — 847K activations, 340% provisioning spike, $142M gross-add. "This is the revenue event."</span></div></div>
+  <div class="walk-step"><div class="num">2</div><div><b>Live OTel</b></div><div><span>Scroll ingestion — real Serverless data, same agents they run today. "Meet you where you are."</span></div></div>
+  <div class="walk-step"><div class="num">3</div><div><b>ML lifecycle</b></div><div><span>Launch weekend curve — surge vs forecast vs threshold. "See the wave 2h before the war room."</span></div></div>
+  <div class="walk-step"><div class="num">4</div><div><b>Region hotspots</b></div><div><span>NYC retail · CDN edge · West fiber. "Staff the spike, not the whole network."</span></div></div>
+  <div class="walk-step"><div class="num">5</div><div><b>Business KPI tiles</b></div><div><span>Churn-risk subs (84K) · care load next 4h · revenue next 4h. "This is the exec view — tied to the same launch event."</span></div></div>
+  <div class="walk-step"><div class="num">6</div><div><b>Networks · fault inject</b></div><div><span>Inject fault on iPhone 18 load → incident flow · ML correlate · workflow. "From alert to action."</span></div></div>
+  <div class="walk-step"><div class="num">7</div><div><b>Security · optional</b></div><div><span>Launch-window SIM swap alert — 30 sec. "Fraud spikes on launch weekend too."</span></div></div>
 </div>
 
-<p class="callout"><strong>Walk:</strong> Telemetry → iPhone 18 ML lifecycle → region hotspots · Networks → fault inject on launch load</p>
-
-<p class="muted">telco-demo-sage.vercel.app → <strong>Telemetry</strong> · same OTel agents you run today</p>
+<p class="muted">Full presenter script: <code>slides/DEMO-WALK.md</code> · Observability tab = deep links to Kibana if configured</p>
 
 ---
 
@@ -545,8 +618,8 @@ Each phase breaks a **different layer** — subscribers only see *"my iPhone 18 
 
 ## iPhone 18 launch · Sept 2026
 
+**Commoditization is the long game · launch execution is how you win today**
+
 **Why Elastic: Unify · Open · Predict · Act**
 
-**We meet you where you are · proof in the demo**
-
-telco-demo-sage.vercel.app
+telco-demo-sage.vercel.app → **Telemetry**
