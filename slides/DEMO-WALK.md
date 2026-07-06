@@ -27,6 +27,8 @@
 
 ---
 
+## Before you start
+
 - Confirm Telemetry tab loads and shows **iPhone 18 Pro Launch** strip.
 - Optional: Observability / Security Kibana deep links configured in `.env.local`.
 - Keep slides on **Demo story arc** or **Live demo walk** slide visible on second screen.
