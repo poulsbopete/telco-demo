@@ -3,7 +3,23 @@
 **App:** https://telco-demo-sage.vercel.app  
 **Slides:** https://telco-demo-sage.vercel.app/slides/  
 **Landscape reference:** [TELCO-LANDSCAPE-2026-REFERENCE.md](./TELCO-LANDSCAPE-2026-REFERENCE.md)  
-**Primary tab:** Network Telemetry
+**Primary tab:** Telemetry
+
+## Slide deck (9 slides)
+
+| # | Slide | Role |
+|---|-------|------|
+| 1 | When the network cannot see itself | Open · set stakes |
+| 2 | The launch shift | Problem · 3 structural gaps |
+| 3 | iPhone 18 at stake | Metrics · anchor line |
+| 4 | 2026 telco reality | D2D/Starlink · boardroom · bridge to demo |
+| 5 | Why Elastic | Unify · Open · Predict · Act |
+| 6 | Data ecosystem | Fan chart · meet you where you are |
+| 7 | Fragmented → connected | MTTR · 4,200 → 12 |
+| 8 | Live demo | 7-step walk · switch to app here |
+| 9 | Close | Unify · Open · Predict · Act |
+
+*Removed from slides (detail lives in this script + TELCO-LANDSCAPE-2026-REFERENCE.md): agenda, five dimensions, Observability Labs stats grid, partner playbook table, Search AI speed, personas, three questions, separate story-arc slide.*
 
 ## Narrative spine (say this once, repeat at close)
 
@@ -13,20 +29,18 @@
 
 ## What we borrowed from Session 2 · Observability
 
-| Session 2 component | Our adaptation |
-|---------------------|----------------|
-| Opening · "network cannot see itself" | Lead slide |
-| THE STARTING POINT · visibility gap | Dark slide after Agenda |
-| THE STRUCTURAL SHIFT | THE LAUNCH SHIFT (iPhone 18) |
-| Five telecom dimensions | Customer impact window → iPhone 18 |
-| Observability Labs research (96/97/71/80) | Launch challenge slide |
-| MTTR symptom · 20 min → seconds | Fragmented vs connected slide |
-| Three questions | Pre-demo slide |
-| Telefónica proof | Before/after + personas |
+| Session 2 component | Where it lives now |
+|---------------------|-------------------|
+| Opening · "network cannot see itself" | Slide 1 |
+| THE STARTING POINT · visibility gap | Folded into slide 2 subhead |
+| THE STRUCTURAL SHIFT | Slide 2 · three launch shifts |
+| Five telecom dimensions | DEMO-WALK talk track · landscape reference |
+| Observability Labs research (96/97/71/80) | Slide 3 one-liner · full stats in reference doc |
+| MTTR symptom · 20 min → seconds | Slide 7 |
+| Three questions | Ask verbally before demo · not on slides |
+| Telefónica proof | Slide 7 |
 
-**Added from 2026 Telco Landscape:** THE STRATEGIC CONTEXT (D2D JV, Starlink 9M+), 2026 BOARDROOM (four realities), Partner playbook slide.
-
-**Skipped (avoid bloat):** full 3-session arc, Gartner/Forrester, Search AI Session 3 preview — unless you're presenting the full series.
+**2026 Telco Landscape:** slide 4 (strategic + boardroom merged). Partner playbook · Search AI · personas → reference doc + Acts below.
 
 ---
 
@@ -34,14 +48,14 @@
 
 - Confirm Telemetry tab loads and shows **iPhone 18 Pro Launch** strip.
 - Optional: Observability / Security Kibana deep links configured in `.env.local`.
-- Keep slides on **Demo story arc** or **Live demo walk** slide visible on second screen.
+- Keep slides on **Live demo** (slide 8) visible on second screen during the app walk.
 - Skim **TELCO-LANDSCAPE-2026-REFERENCE.md** — pick one carrier hook (Verizon OpEx, AT&T Lumen, T-Mobile 8M migration) for the room.
 
 ---
 
 ## Act 0 · Bridge (slides only, ~2 min)
 
-**Slides:** THE STRATEGIC CONTEXT → 2026 BOARDROOM → (optional) Partner playbook
+**Slide:** 2026 telco reality (slide 4) · optional skim slide 5 (Why Elastic)
 
 **Say — strategic context:**
 
@@ -50,14 +64,14 @@
 - "Near-term battle: **subscriber execution** — activation, port, trade-in, first 48 hours."
 - "Same pattern as **8 million plan migrations** at T-Mobile — if portals slip, churn follows."
 
-**Say — boardroom (pick 2 of 4):**
+**Say — boardroom (pick 2 of 4 on slide):**
 
 - "**EBITDA ~35%**, flat ARPU, OpEx reset — projects that don't cut cost or prevent penalties get delayed."
 - "**Frontier $20B**, **Lumen $5.75B** — Frankenstein stacks need federated visibility, not rip-and-replace."
 - "**Techco pivot** — private 5G, AI transport; Elastic as co-innovation engine for their enterprise clients."
 - "**CISA 72-hour**, FCC **$2,500/call** KYC, **4-year retention** — launch SLA slips hit churn *and* compliance surface."
 
-**Say — partner playbook (30 sec, optional):**
+**Say — partner playbook (30 sec, optional — not on slides):**
 
 - "ES|QL → disclosure windows. Searchable Snapshots → retention without hot-storage blowout. OTel → terrestrial + satellite without lock-in. ML → SLA before penalties."
 
@@ -71,7 +85,7 @@
 
 ### Step 1 · Launch strip
 
-**Click:** Network Telemetry tab (default)
+**Click:** Telemetry tab (default)
 
 **Point to:** iPhone 18 Pro Launch banner + business metrics
 
@@ -136,7 +150,7 @@
 
 ### Step 6 · Fault inject + incident flow
 
-**Click:** Adaptive Networks (or Networks) tab
+**Click:** Networks tab
 
 **Say:**
 
@@ -176,14 +190,12 @@
 
 | Slide | Demo proof |
 |-------|------------|
-| THE LAUNCH SHIFT | Step 3 — digital workflows, not RAN-only |
-| THE STRATEGIC CONTEXT | Step 5 — exec KPIs + D2D/Starlink bridge |
-| 2026 BOARDROOM | Act 0 talk track; Steps 2–5 — OpEx, M&A, compliance |
-| Partner playbook | Step 2 — OTel once; Step 7 — Security; Step 5 — ML/SLA |
-| Why Elastic (Unify/Open/Predict/Act) | Steps 2–6 |
-| Data ecosystem | Step 2 — OTel ingest; Step 7 — Security enabling |
-| Before / after | Step 6 — 4,200 → 12 funnel |
-| Personas | Steps 4–5 — NOC regions + exec tiles |
+| Launch shift (slide 2) | Step 3 — digital workflows, not RAN-only |
+| iPhone 18 at stake (slide 3) | Step 1 — launch strip metrics |
+| 2026 telco reality (slide 4) | Step 5 — exec KPIs + bridge talk track |
+| Why Elastic (slide 5) | Steps 2–6 · Unify/Open/Predict/Act |
+| Data ecosystem (slide 6) | Step 2 OTel · Step 7 Security enabling |
+| Fragmented → connected (slide 7) | Step 6 — 4,200 → 12 narrative |
 
 ---
 
