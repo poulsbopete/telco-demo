@@ -37,15 +37,6 @@ style: |
 <!-- _class: lead -->
 
 # iPhone 18 launch is coming
-## Sept 2026 · one weekend decides the quarter
-
-**$142M gross-add revenue · 847K activations in 6 hours · 84K subs at churn risk if you miss SLA**
-
-telco-demo-sage.vercel.app → **Telemetry**
-
----
-
-# iPhone 18 launch is coming
 ## Why Elastic? · Sept 2026 · one weekend decides the quarter
 
 **$142M gross-add revenue · 847K activations in 6 hours · 84K subs at churn risk if you miss SLA**
@@ -94,6 +85,109 @@ telco-demo-sage.vercel.app → **Telemetry**
 </svg>
 
 <p class="callout"><strong>Why Elastic vs. more point tools?</strong> Launch weekend needs correlation across domains — not another dashboard that only sees one layer.</p>
+
+---
+
+# Elastic across your launch data ecosystem
+
+**Primary &amp; enabling roles — Elastic meets you where you are and scales with iPhone 18 launch complexity.**
+
+<svg viewBox="0 0 720 310" width="100%">
+  <!-- Wedge backgrounds: 5 domains, 3 rings each -->
+  <!-- Network telemetry · blue -->
+  <path d="M 95 268 A 55 55 0 0 1 131 218 L 191 178 A 115 115 0 0 0 95 268 Z" fill="#5b9bd5" fill-opacity="0.35"/>
+  <path d="M 131 218 A 115 115 0 0 1 191 178 L 251 138 A 175 175 0 0 0 131 218 Z" fill="#5b9bd5" fill-opacity="0.55"/>
+  <path d="M 191 178 A 175 175 0 0 1 251 138 L 270 105 A 175 175 0 0 0 191 178 Z" fill="#5b9bd5"/>
+  <!-- Ingest & access · orange -->
+  <path d="M 131 218 A 55 55 0 0 1 185 185 L 225 145 A 115 115 0 0 0 131 218 Z" fill="#ed7d31" fill-opacity="0.35"/>
+  <path d="M 185 185 A 115 115 0 0 1 225 145 L 265 105 A 175 175 0 0 0 185 185 Z" fill="#ed7d31" fill-opacity="0.55"/>
+  <path d="M 225 145 A 175 175 0 0 1 265 105 L 270 105 A 175 175 0 0 0 225 145 Z" fill="#ed7d31"/>
+  <!-- Analytics & ML · red -->
+  <path d="M 185 185 A 55 55 0 0 1 225 175 L 265 135 A 115 115 0 0 0 185 185 Z" fill="#c0504d" fill-opacity="0.35"/>
+  <path d="M 225 175 A 115 115 0 0 1 265 135 L 305 95 A 175 175 0 0 0 225 175 Z" fill="#c0504d" fill-opacity="0.55"/>
+  <path d="M 265 135 A 175 175 0 0 1 305 95 L 315 95 A 175 175 0 0 0 265 135 Z" fill="#c0504d"/>
+  <!-- Ops & automation · purple -->
+  <path d="M 225 175 A 55 55 0 0 1 265 185 L 305 145 A 115 115 0 0 0 225 175 Z" fill="#7030a0" fill-opacity="0.35"/>
+  <path d="M 265 185 A 115 115 0 0 1 305 145 L 345 105 A 175 175 0 0 0 265 185 Z" fill="#7030a0" fill-opacity="0.55"/>
+  <path d="M 305 145 A 175 175 0 0 1 345 105 L 365 105 A 175 175 0 0 0 305 145 Z" fill="#7030a0"/>
+  <!-- Launch insight · navy -->
+  <path d="M 265 185 A 55 55 0 0 1 319 218 L 359 178 A 115 115 0 0 0 265 185 Z" fill="#1f4e79" fill-opacity="0.35"/>
+  <path d="M 319 218 A 115 115 0 0 1 359 178 L 399 138 A 175 175 0 0 0 319 218 Z" fill="#1f4e79" fill-opacity="0.55"/>
+  <path d="M 359 178 A 175 175 0 0 1 399 138 L 445 268 A 175 175 0 0 0 359 178 Z" fill="#1f4e79"/>
+
+  <!-- Inner foundation core -->
+  <path d="M 95 268 A 55 55 0 0 1 445 268 L 270 268 Z" fill="#f5f5f7" stroke="#d2d2d7"/>
+  <text x="270" y="252" text-anchor="middle" fill="#86868b" font-size="7" font-weight="600">LAUNCH FOUNDATION</text>
+  <text x="130" y="262" text-anchor="middle" fill="#1d1d1f" font-size="6">OTel</text>
+  <text x="195" y="262" text-anchor="middle" fill="#1d1d1f" font-size="6">Network</text>
+  <text x="270" y="262" text-anchor="middle" fill="#1d1d1f" font-size="6">ML</text>
+  <text x="345" y="262" text-anchor="middle" fill="#1d1d1f" font-size="6">SLA</text>
+  <text x="410" y="262" text-anchor="middle" fill="#1d1d1f" font-size="6">Subscriber</text>
+
+  <!-- Wedge titles (outer arc) -->
+  <text x="155" y="118" fill="#fff" font-size="8" font-weight="700" transform="rotate(-55 155 118)">Network telemetry</text>
+  <text x="248" y="72" fill="#fff" font-size="8" font-weight="700" transform="rotate(-18 248 72)">Ingest &amp; access</text>
+  <text x="295" y="58" fill="#fff" font-size="8" font-weight="700">Analytics &amp; ML</text>
+  <text x="340" y="72" fill="#fff" font-size="8" font-weight="700" transform="rotate(18 340 72)">Ops &amp; automation</text>
+  <text x="395" y="118" fill="#fff" font-size="8" font-weight="700" transform="rotate(55 395 118)">Launch insight</text>
+
+  <!-- Ring labels · iPhone 18 examples -->
+  <text x="168" y="198" fill="#1d1d1f" font-size="6.5">RAN · Core logs</text>
+  <text x="168" y="168" fill="#1d1d1f" font-size="6.5">Integrated traces</text>
+  <text x="168" y="138" fill="#1d1d1f" font-size="6.5">OTel metrics</text>
+  <text x="248" y="168" fill="#1d1d1f" font-size="6.5">NOC · Care access</text>
+  <text x="248" y="138" fill="#1d1d1f" font-size="6.5">OTel collectors</text>
+  <text x="295" y="138" fill="#1d1d1f" font-size="6.5">Launch forecast</text>
+  <text x="295" y="118" fill="#1d1d1f" font-size="6.5">ES|QL · anomalies</text>
+  <text x="340" y="168" fill="#1d1d1f" font-size="6.5">Workflows · RCA</text>
+  <text x="340" y="138" fill="#1d1d1f" font-size="6.5">Alert routing</text>
+  <text x="395" y="168" fill="#1d1d1f" font-size="6.5">Region hotspots</text>
+  <text x="395" y="138" fill="#1d1d1f" font-size="6.5">Revenue · CSAT</text>
+
+  <!-- Primary role markers (blue dots) -->
+  <circle cx="175" cy="155" r="5" fill="#0071e3"/><circle cx="175" cy="155" r="2.5" fill="#fff"/>
+  <circle cx="255" cy="125" r="5" fill="#0071e3"/><circle cx="255" cy="125" r="2.5" fill="#fff"/>
+  <circle cx="300" cy="105" r="5" fill="#0071e3"/><circle cx="300" cy="105" r="2.5" fill="#fff"/>
+  <circle cx="345" cy="125" r="5" fill="#0071e3"/><circle cx="345" cy="125" r="2.5" fill="#fff"/>
+  <circle cx="390" cy="155" r="5" fill="#0071e3"/><circle cx="390" cy="155" r="2.5" fill="#fff"/>
+  <!-- Enabling role markers (grey) -->
+  <circle cx="210" cy="175" r="5" fill="#b0b0b5" fill-opacity="0.8"/>
+  <circle cx="320" cy="175" r="5" fill="#b0b0b5" fill-opacity="0.8"/>
+  <circle cx="275" cy="145" r="5" fill="#b0b0b5" fill-opacity="0.8"/>
+
+  <!-- Product icons on foundation row -->
+  <rect x="108" y="274" width="3" height="8" fill="#e8478b"/><rect x="112" y="276" width="3" height="6" fill="#0071e3"/>
+  <rect x="118" y="275" width="8" height="2" fill="#fec514"/><rect x="118" y="278" width="8" height="2" fill="#fec514"/><rect x="118" y="281" width="8" height="2" fill="#fec514"/>
+  <rect x="178" y="274" width="3" height="8" fill="#e8478b"/><rect x="182" y="276" width="3" height="6" fill="#0071e3"/>
+  <rect x="188" y="275" width="8" height="2" fill="#fec514"/><rect x="188" y="278" width="8" height="2" fill="#fec514"/>
+  <path d="M 258 274 L 262 282 L 266 274 Z" fill="#00bfb3"/>
+  <rect x="328" y="274" width="3" height="8" fill="#e8478b"/><rect x="332" y="276" width="3" height="6" fill="#0071e3"/>
+  <path d="M 398 274 L 402 282 L 406 274 Z" fill="#00bfb3"/>
+
+  <!-- Legend -->
+  <rect x="490" y="20" width="215" height="268" rx="12" fill="#fff" stroke="#d2d2d7"/>
+  <text x="598" y="42" text-anchor="middle" fill="#1d1d1f" font-size="10" font-weight="700">Key</text>
+  <circle cx="508" cy="62" r="5" fill="#0071e3"/><circle cx="508" cy="62" r="2.5" fill="#fff"/>
+  <text x="522" y="65" fill="#1d1d1f" font-size="8">Elastic primary role</text>
+  <circle cx="508" cy="82" r="5" fill="#b0b0b5"/>
+  <text x="522" y="85" fill="#1d1d1f" font-size="8">Elastic enabling role</text>
+  <rect x="504" y="98" width="3" height="8" fill="#e8478b"/><rect x="508" y="100" width="3" height="6" fill="#0071e3"/>
+  <text x="522" y="106" fill="#1d1d1f" font-size="8">Elastic Observability</text>
+  <rect x="504" y="118" width="10" height="2" fill="#fec514"/><rect x="504" y="121" width="10" height="2" fill="#fec514"/><rect x="504" y="124" width="10" height="2" fill="#fec514"/>
+  <text x="522" y="124" fill="#1d1d1f" font-size="8">Elasticsearch</text>
+  <path d="M 504 136 L 508 144 L 512 136 Z" fill="#00bfb3"/>
+  <text x="522" y="142" fill="#1d1d1f" font-size="8">Elastic Security</text>
+  <line x1="500" y1="156" x2="695" y2="156" stroke="#d2d2d7"/>
+  <text x="598" y="172" text-anchor="middle" fill="#0071e3" font-size="8" font-weight="700">iPhone 18 launch mapping</text>
+  <text x="505" y="188" fill="#1d1d1f" font-size="7.5">• O11Y primary on OTel ingest &amp; ML forecast</text>
+  <text x="505" y="202" fill="#1d1d1f" font-size="7.5">• Elasticsearch primary on log search &amp; ES|QL</text>
+  <text x="505" y="216" fill="#1d1d1f" font-size="7.5">• Security enabling on launch fraud · SIM swap</text>
+  <text x="505" y="230" fill="#1d1d1f" font-size="7.5">• Start with one wedge · expand before Sept 2026</text>
+  <text x="505" y="252" fill="#86868b" font-size="7">Meet you where you are — no rip-and-replace</text>
+  <text x="505" y="268" fill="#86868b" font-size="7">Scale across the full launch data ecosystem</text>
+</svg>
+
+<p class="muted">Adapted from Elastic data-ecosystem model · Observability leads iPhone 18 launch · Security &amp; Search enable as you grow.</p>
 
 ---
 
