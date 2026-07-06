@@ -1,10 +1,25 @@
-import { COOKIE_NAME, cookieIsValid } from './lib/presenter-auth.js';
+const COOKIE_NAME = 'presenter_auth';
+const AUTH_TOKEN = process.env.PRESENTER_AUTH_TOKEN || 'telco-presenter-elastic';
 
 const PUBLIC_PATHS = new Set([
   '/presenter/login.html',
   '/presenter/presenter.css',
   '/presenter/presenter-gate.js',
 ]);
+
+function readCookie(request, name) {
+  const header = request.headers.get('cookie');
+  if (!header) return undefined;
+
+  for (const part of header.split(';')) {
+    const idx = part.indexOf('=');
+    if (idx === -1) continue;
+    const key = part.slice(0, idx).trim();
+    if (key === name) return decodeURIComponent(part.slice(idx + 1).trim());
+  }
+
+  return undefined;
+}
 
 export default function middleware(request) {
   const url = new URL(request.url);
@@ -18,8 +33,7 @@ export default function middleware(request) {
     return;
   }
 
-  const token = request.cookies.get(COOKIE_NAME)?.value;
-  if (cookieIsValid(token)) {
+  if (readCookie(request, COOKIE_NAME) === AUTH_TOKEN) {
     return;
   }
 
