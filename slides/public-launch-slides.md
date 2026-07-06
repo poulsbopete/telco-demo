@@ -43,7 +43,8 @@ style: |
     color: #f5f5f7;
     padding: 36px 48px 28px;
   }
-  section.dark h1 { color: #fff; font-size: 1.35em; line-height: 1.25; margin-top: 0.15em; }
+  section.dark h1 { color: #fff; font-size: 1.35em; line-height: 1.25; margin-top: 0.15em; margin-bottom: 0; }
+  section.dark h2 { color: #fff; font-size: 1.35em; line-height: 1.25; font-weight: 700; margin: 0 0 0.35em; letter-spacing: -0.02em; }
   section.dark .kicker {
     display: inline-block;
     background: #00bfb3;
@@ -84,6 +85,16 @@ style: |
     display: flex; justify-content: space-between;
   }
   section.dark .cite { font-size: 0.58em; color: #6e6e73; margin-top: 0.2em; }
+  section.dark .ecosystem-panel { font-size: 0.72em; line-height: 1.45; }
+  section.dark .ecosystem-panel b { color: #fff; }
+  section.dark .ecosystem-panel li { color: #9a9aa0; }
+  section.dark .ecosystem-img {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    line-height: 0;
+  }
+  section.dark .ecosystem-img img { width: 100%; height: auto; display: block; }
 ---
 
 <!-- _class: lead -->
@@ -116,7 +127,8 @@ telco-demo-sage.vercel.app
 
 <span class="kicker">THE LAUNCH SHIFT</span>
 
-# iPhone 18 launch is a software event.<br/>Your observability architecture hasn't caught up.
+# iPhone 18 launch is a software event.
+## Your observability architecture hasn't caught up.
 
 <p class="subhead">Not a failure of tooling or teams. A mismatch between how launch traffic actually flows — eSIM, provisioning, retail, care — and how each layer is watched in isolation.</p>
 
@@ -134,8 +146,6 @@ telco-demo-sage.vercel.app
     <div><b>Every layer emits telemetry. Almost none of it correlates by design.</b><span>OTel logs, metrics, traces, NetFlow, care CRM, retail POS — different pipelines, different teams, different alert thresholds. On iPhone 18 weekend, 4,200 raw alerts become noise without a unified launch context.</span></div>
   </div>
 </div>
-
-<p class="cite">Elastic Observability · iPhone 18 Launch Event demo · telco-demo-sage.vercel.app</p>
 
 <div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>iPhone 18 Launch · Sept 2026</span></div>
 
@@ -297,27 +307,32 @@ Pure **OpenTelemetry** — no proprietary layers compromising portability.
 
 ---
 
-# Data ecosystem · primary &amp; enabling roles
+<!-- _class: dark -->
 
-**Elastic meets you where you are — then scales across the launch data ecosystem.**
+<span class="kicker">DATA ECOSYSTEM</span>
+
+# Elastic primary &amp; enabling roles across your launch stack
+
+<p class="subhead">Meet you where you are today — then scale Observability, Security, and Search across the iPhone 18 launch data ecosystem.</p>
 
 <div class="cols">
 
-<div>
+<div class="ecosystem-img">
 
-![width:100%](./assets/elastic-data-ecosystem.png)
+![width:100%](/slides/assets/elastic-data-ecosystem.png)
 
 </div>
 
-<div style="font-size:0.74em">
+<div class="ecosystem-panel">
 
-**Think in layers** (Elastic Telecom webinar model):
+**Think in layers**
 
 - **Foundation:** OTel signals · network context · SLA oversight
 - **Mature:** curated launch data · ML forecast · region hotspots
 - **Advanced:** automated RCA · business KPI tiles · experimentation
 
-**iPhone 18 mapping:**
+**iPhone 18 mapping**
+
 - O11Y **primary** on ingest &amp; ML forecast
 - Elasticsearch **primary** on ES\|QL &amp; log search
 - Security **enabling** on SIM swap · launch fraud
@@ -325,6 +340,8 @@ Pure **OpenTelemetry** — no proprietary layers compromising portability.
 </div>
 
 </div>
+
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Data Ecosystem · iPhone 18</span></div>
 
 ---
 
