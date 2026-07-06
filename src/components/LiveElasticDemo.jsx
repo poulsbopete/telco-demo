@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  AlertCircle, ArrowRight, Bot, ExternalLink,
+  AlertCircle, ArrowRight, Bot,
   RefreshCw, Workflow, Zap, GitBranch, ChevronRight, Search,
 } from 'lucide-react';
 import {
@@ -11,10 +11,12 @@ import {
   runWorkflow,
   kibanaDiscoverUrl,
   kibanaO11yDashboardUrl,
+  elasticWorkflowUrl,
   TELCO_DISCOVER_ESQL,
   formatCount,
 } from '../lib/elastic-api';
 import { ModuleHeader, StatCard } from './shared/ModuleHeader';
+import { ElasticDeepLinks, SectionElasticLink } from './shared/ElasticDeepLinks';
 import { RegionDetailPanel } from './RegionDetailPanel';
 import { A2AFederationPanel } from './A2AFederationPanel';
 import { ElasticWorkflowLink } from './ElasticWorkflowLink';
@@ -140,6 +142,7 @@ export function LiveElasticDemo() {
   const kibanaUrl = health?.kibanaUrl || import.meta.env.VITE_KIBANA_URL;
   const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
   const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
+  const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
   const trace = data?.traceDrilldown;
   const anomaly = selectedAnomaly || data?.primaryAnomaly;
   const anomalyRegion = anomaly
@@ -158,11 +161,13 @@ export function LiveElasticDemo() {
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </button>
-        {discoverUrl && (
-          <a href={discoverUrl} target="_blank" rel="noopener noreferrer" className="btn-primary flex items-center gap-1.5">
-            <ExternalLink className="w-4 h-4" /> Discover
-          </a>
-        )}
+        <ElasticDeepLinks
+          links={[
+            { href: discoverUrl, label: 'Discover', primary: true },
+            { href: o11yDashboardUrl, label: 'Dashboard' },
+            { href: workflowsUrl, label: 'Workflows' },
+          ]}
+        />
       </ModuleHeader>
 
       {health?.connected && (
@@ -183,7 +188,14 @@ export function LiveElasticDemo() {
 
       {data && (
         <>
-          {data.launchEvent && <LaunchBusinessMetrics launchEvent={data.launchEvent} className="mb-8" />}
+          {data.launchEvent && (
+            <LaunchBusinessMetrics
+              launchEvent={data.launchEvent}
+              className="mb-8"
+              kibanaDashboardUrl={o11yDashboardUrl}
+              kibanaDiscoverUrl={discoverUrl}
+            />
+          )}
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
@@ -209,7 +221,10 @@ export function LiveElasticDemo() {
 
           <div className="grid lg:grid-cols-3 gap-5 mt-8">
             <div className="surface-card p-5">
-              <h3 className="text-[17px] font-semibold text-[#1d1d1f] mb-4">Regions</h3>
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Regions</h3>
+                <SectionElasticLink href={discoverUrl} label="Discover · regions" />
+              </div>
               <div className="space-y-2 max-h-[320px] overflow-y-auto">
                 {data.regions?.map(m => (
                   <button key={m.regionId} type="button" onClick={() => handleRegionClick(m.regionId)}
@@ -239,7 +254,10 @@ export function LiveElasticDemo() {
 
             {/* Network core pipeline */}
             <div className="surface-card p-5">
-              <h3 className="text-[17px] font-semibold text-[#1d1d1f] mb-4">Core pipeline</h3>
+              <div className="flex items-center justify-between gap-3 mb-4">
+                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Core pipeline</h3>
+                <SectionElasticLink href={discoverUrl} label="Discover · services" />
+              </div>
               <div className="space-y-3">
                 {data.networkPipeline?.map(p => (
                   <div key={p.service}>
@@ -269,6 +287,10 @@ export function LiveElasticDemo() {
 
             {/* ML signal intelligence */}
             <div className="surface-card p-5">
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">ML signals</h3>
+                <SectionElasticLink href={o11yDashboardUrl} label="Dashboard · ML" />
+              </div>
               <MlSignalIntelligence
                 intelligence={data.mlSignalIntelligence}
                 anomalies={data.mlAnomalies}
@@ -310,9 +332,12 @@ export function LiveElasticDemo() {
           {/* Drill-down + Workflow */}
           <div className="grid lg:grid-cols-2 gap-5 mt-8">
             <div className="surface-card p-5">
-              <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
-                <GitBranch className="w-4 h-4 text-elastic-teal" />
-                Unified Troubleshooting — {anomaly?.regionId}
+              <h3 className="text-sm font-semibold text-elastic-dark flex items-center justify-between gap-2 mb-3">
+                <span className="flex items-center gap-2">
+                  <GitBranch className="w-4 h-4 text-elastic-teal" />
+                  Unified Troubleshooting — {anomaly?.regionId}
+                </span>
+                <SectionElasticLink href={discoverUrl} label="Discover · traces" />
               </h3>
 
               {drillView === 'metrics' && anomaly && (

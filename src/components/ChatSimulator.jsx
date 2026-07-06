@@ -6,6 +6,7 @@ import {
 import { semanticSearch } from '../utils/semantic-search';
 import { evaluateRules, getCustomers } from '../utils/rules-engine';
 import { ModuleHeader, StatCard } from './shared/ModuleHeader';
+import { ElasticDeepLinks } from './shared/ElasticDeepLinks';
 import { LaunchEventStrip } from './shared/LaunchEventStrip';
 import {
   getSearchKibanaUrl,
@@ -84,11 +85,13 @@ export function ChatSimulator() {
         title="Enterprise Search"
         subtitle="Semantic search and AI-assisted care deflection."
       >
-        {searchHomeUrl && (
-          <a href={searchHomeUrl} target="_blank" rel="noopener noreferrer" className="btn-link flex items-center gap-1">
-            Search <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
+        <ElasticDeepLinks
+          links={[
+            { href: searchHomeUrl, label: 'Discover', primary: true },
+            { href: searchDashboardUrl, label: 'Dashboard' },
+            { href: agentBuilderUrl, label: 'Agent Builder' },
+          ]}
+        />
         <select
           value={customerId}
           onChange={e => setCustomerId(e.target.value)}

@@ -9,6 +9,7 @@ import { DataRetentionPolicy } from './shared/DataRetentionPolicy';
 import { StreamsRetentionCallout } from './shared/StreamsRetentionCallout';
 import { CostCalculator } from './CostCalculator';
 import { ModuleHeader, StatCard } from './shared/ModuleHeader';
+import { ElasticDeepLinks } from './shared/ElasticDeepLinks';
 import {
   generateMetricsSeries,
   generateIngestionStats,
@@ -28,6 +29,10 @@ import {
   runWorkflow,
   simulateElasticSearchA2A,
   simulateElasticSecurityA2A,
+  kibanaDiscoverUrl,
+  kibanaO11yDashboardUrl,
+  elasticWorkflowUrl,
+  TELCO_DISCOVER_ESQL,
 } from '../lib/elastic-api';
 
 export function ObservabilityDashboard() {
@@ -149,6 +154,9 @@ export function ObservabilityDashboard() {
 
   const activeTrace = selectedTrace || traces[0];
   const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
+  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
+  const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
   const demoMlIntelligence = buildDemoMlSignalIntelligence(DEMO_ML_ANOMALIES);
 
   return (
@@ -157,6 +165,13 @@ export function ObservabilityDashboard() {
         title="Observability at scale"
         subtitle={`${IPHONE_LAUNCH.eventName} — ${(IPHONE_LAUNCH.metrics.activationsFirst6h / 1_000_000).toFixed(2)}M activations in 6h · ${IPHONE_LAUNCH.metrics.provisioningSpikePct}% provisioning spike.`}
       >
+        <ElasticDeepLinks
+          links={[
+            { href: discoverUrl, label: 'Discover', primary: true },
+            { href: o11yDashboardUrl, label: 'Dashboard' },
+            { href: workflowsUrl, label: 'Workflows' },
+          ]}
+        />
         <button
           type="button"
           onClick={triggerIncident}
@@ -167,7 +182,11 @@ export function ObservabilityDashboard() {
         </button>
       </ModuleHeader>
 
-      <LaunchBusinessMetrics className="mb-8" />
+      <LaunchBusinessMetrics
+        className="mb-8"
+        kibanaDashboardUrl={o11yDashboardUrl}
+        kibanaDiscoverUrl={discoverUrl}
+      />
 
       <div className="surface-card p-5 mb-8">
         <MlSignalIntelligence
@@ -218,21 +237,36 @@ export function ObservabilityDashboard() {
           value={formatNumber(ingestion.launchActivationsPerMin || IPHONE_LAUNCH.metrics.activationsPerMinutePeak)}
           trend={IPHONE_LAUNCH.eventName}
           highlight
+          kibanaUrl={kibanaUrl}
+          kibanaSection="discover"
         />
         <StatCard
           label="eSIM OTA/min"
           value={formatNumber(ingestion.launchEsimOtaPerMin || IPHONE_LAUNCH.metrics.esimDownloadsPerMin)}
           trend="SM-DP+ profile downloads"
+          kibanaUrl={kibanaUrl}
+          kibanaSection="discover"
         />
         <StatCard
           label="Logs/day"
           value={`${ingestion.logsPerDay.toFixed(1)} PB`}
-          trend="Launch weekend ingest"
+          trend={`${formatDailyVolume(ingestion.logsPerDay)} indexed`}
+          kibanaUrl={kibanaUrl}
+          kibanaSection="discover"
+        />
+        <StatCard
+          label="Traces/min"
+          value={formatNumber(traceVolumeFromSpansPerMinute(ingestion.spansPerMinute))}
+          trend={`${ingestion.spansPerMinute.toLocaleString()} spans/min`}
+          kibanaUrl={kibanaUrl}
+          kibanaSection="discover"
         />
         <StatCard
           label="Query latency"
           value={`${ingestion.queryLatencyMs}ms`}
           trend="< 1 sec at PB scale"
+          kibanaUrl={kibanaUrl}
+          kibanaSection="discover"
         />
       </div>
 

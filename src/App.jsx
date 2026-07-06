@@ -61,6 +61,8 @@ export default function App() {
                   )}
                 </button>
               ))}
+              <a href="/presenter/" className="nav-link ml-2">Presenter</a>
+              <a href="/slides/" className="nav-link">Slides</a>
             </nav>
 
             <button
@@ -88,6 +90,8 @@ export default function App() {
                 {mod.label}
               </button>
             ))}
+            <a href="/presenter/" className="block py-2 text-[17px] text-[#86868b]">Presenter guides</a>
+            <a href="/slides/" className="block py-2 text-[17px] text-[#86868b]">Slides</a>
           </nav>
         )}
       </header>
@@ -116,6 +120,13 @@ export default function App() {
           <p className="mt-1">
             {activeMeta?.live ? 'Live cluster data.' : 'Simulated sample data.'}
             {' '}Synthetic demo content only.
+          </p>
+          <p className="mt-2">
+            <a href="/presenter/view.html?doc=demo-walk" className="text-[#0071e3] hover:underline">Demo walk script</a>
+            {' · '}
+            <a href="/presenter/view.html?doc=landscape" className="text-[#0071e3] hover:underline">Telco landscape</a>
+            {' · '}
+            <a href="/slides/" className="text-[#0071e3] hover:underline">Slides</a>
           </p>
         </div>
       </footer>

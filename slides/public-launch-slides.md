@@ -298,7 +298,7 @@ telco-demo-sage.vercel.app · live demo ~12 min
   <div class="walk-step"><div class="num">7</div><div><b>Security · optional</b></div><div><span>Launch SIM swap · 30 sec</span></div></div>
 </div>
 
-<p class="muted">Full script: <code>slides/DEMO-WALK.md</code> · landscape detail: <code>TELCO-LANDSCAPE-2026-REFERENCE.md</code></p>
+<p class="muted"><a href="/presenter/view.html?doc=demo-walk">Full script</a> · <a href="/presenter/view.html?doc=landscape">Landscape reference</a> · <a href="/presenter/">All guides</a></p>
 
 ---
 

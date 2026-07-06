@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { TrendingDown, TrendingUp, Minus } from 'lucide-react';
 import { TimeSeriesChart } from './TimeSeriesChart';
+import { SectionElasticLink } from './ElasticDeepLinks';
 import {
   IPHONE_LAUNCH,
   buildLaunchBusinessForecast,
@@ -26,7 +27,13 @@ function trendLabel(trend) {
   return 'Steady';
 }
 
-export function LaunchBusinessMetrics({ launchEvent, compact = false, className = '' }) {
+export function LaunchBusinessMetrics({
+  launchEvent,
+  compact = false,
+  className = '',
+  kibanaDashboardUrl,
+  kibanaDiscoverUrl,
+}) {
   const event = launchEvent || IPHONE_LAUNCH;
   const m = event.metrics || IPHONE_LAUNCH.metrics;
   const forecast = event.businessForecast || buildLaunchBusinessForecast();
@@ -78,12 +85,20 @@ export function LaunchBusinessMetrics({ launchEvent, compact = false, className 
               Activations/min · actual vs Elastic ML forecast · when to staff up or scale down
             </p>
           </div>
-          <div className="text-right shrink-0">
-            <p className="text-[11px] text-[#86868b]">Now · {currentPhase.label}</p>
-            <p className="text-[13px] font-medium text-[#1d1d1f] flex items-center justify-end gap-1 mt-0.5">
-              <TrendIcon trend={currentPhase.trend} />
-              {trendLabel(currentPhase.trend)}
-            </p>
+          <div className="flex flex-col items-end gap-1 shrink-0">
+            {(kibanaDashboardUrl || kibanaDiscoverUrl) && (
+              <SectionElasticLink
+                href={kibanaDashboardUrl || kibanaDiscoverUrl}
+                label="Elastic · launch metrics"
+              />
+            )}
+            <div className="text-right">
+              <p className="text-[11px] text-[#86868b]">Now · {currentPhase.label}</p>
+              <p className="text-[13px] font-medium text-[#1d1d1f] flex items-center justify-end gap-1 mt-0.5">
+                <TrendIcon trend={currentPhase.trend} />
+                {trendLabel(currentPhase.trend)}
+              </p>
+            </div>
           </div>
         </div>
 

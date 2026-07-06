@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ExternalLink, GitBranch, Loader2, Radio, Workflow } from 'lucide-react';
 import { IncidentFlowChart } from './IncidentFlowChart';
 import { ModuleHeader } from './shared/ModuleHeader';
+import { ElasticDeepLinks, SectionElasticLink } from './shared/ElasticDeepLinks';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
 import { FAULT_CHANNELS, INCIDENT_STEPS } from '../lib/adaptive-networks/channels';
@@ -223,11 +224,14 @@ export function AdaptiveNetworksDemo() {
         subtitle="Inject a transport or routing fault and watch ML correlate telemetry before remediation runs."
         badge="Live"
       >
-        {discoverUrl && (
-          <a href={discoverUrl} target="_blank" rel="noopener noreferrer" className="btn-link flex items-center gap-1">
-            Discover <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
+        <ElasticDeepLinks
+          links={[
+            { href: discoverUrl, label: 'Discover', primary: true },
+            { href: o11yDashboardUrl, label: 'Dashboard' },
+            { href: casesUrl, label: 'Cases' },
+            { href: workflowsUrl, label: 'Workflows' },
+          ]}
+        />
       </ModuleHeader>
 
       <LaunchEventStrip className="mb-8" />
@@ -246,7 +250,10 @@ export function AdaptiveNetworksDemo() {
         )}
 
         <section className="mb-8">
-          <h2 className="text-[21px] font-semibold text-[#1d1d1f] mb-4">Choose a fault</h2>
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <h2 className="text-[21px] font-semibold text-[#1d1d1f]">Choose a fault</h2>
+            <SectionElasticLink href={discoverUrl} label="Discover · transport logs" />
+          </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {FAULT_CHANNELS.map(fault => (
               <button

@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import { IncidentResponseDiagram } from './IncidentResponseDiagram';
 import { ModuleHeader } from './shared/ModuleHeader';
+import { ElasticDeepLinks } from './shared/ElasticDeepLinks';
 import { P1IncidentCounter } from './shared/P1IncidentCounter';
 import {
   LOOPS,
@@ -13,8 +14,10 @@ import {
 import {
   elasticWorkflowUrl,
   getSearchKibanaUrl,
+  kibanaDiscoverUrl,
   kibanaO11yDashboardUrl,
   kibanaSearchDiscoverUrl,
+  TELCO_DISCOVER_ESQL,
 } from '../lib/elastic-api';
 
 const LOOP_ORDER = ['reactive', 'proactive', 'knowledge'];
@@ -31,6 +34,7 @@ export function IncidentResponseDemo() {
   const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
   const searchKibanaUrl = getSearchKibanaUrl();
   const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
+  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
   const searchUrl = kibanaSearchDiscoverUrl(searchKibanaUrl);
   const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
 
@@ -95,6 +99,14 @@ export function IncidentResponseDemo() {
         <button type="button" onClick={reset} className="btn-quiet flex items-center gap-1.5">
           <RefreshCw className="w-4 h-4" /> Reset
         </button>
+        <ElasticDeepLinks
+          links={[
+            { href: o11yDashboardUrl, label: 'Dashboard', primary: true },
+            { href: discoverUrl, label: 'Discover' },
+            { href: searchUrl, label: 'Runbooks' },
+            { href: workflowsUrl, label: 'Workflows' },
+          ]}
+        />
       </ModuleHeader>
 
       <div className="grid lg:grid-cols-3 gap-2 mb-4">

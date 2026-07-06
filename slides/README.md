@@ -1,7 +1,9 @@
 # Elastic Observability for Telco — slides
 
 **Live (Vercel):** https://telco-demo-sage.vercel.app/slides/  
-**Presenter walk:** [DEMO-WALK.md](./DEMO-WALK.md) (~12 min, aligned to slides + app)
+**Presenter walk:** https://telco-demo-sage.vercel.app/presenter/view.html?doc=demo-walk  
+**Landscape reference:** https://telco-demo-sage.vercel.app/presenter/view.html?doc=landscape  
+**Source:** [DEMO-WALK.md](./DEMO-WALK.md) · [TELCO-LANDSCAPE-2026-REFERENCE.md](./TELCO-LANDSCAPE-2026-REFERENCE.md)
 
 Edit `slides/public-launch-slides.md`, then:
 

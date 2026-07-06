@@ -7,6 +7,7 @@ import { AlertFeed } from './shared/AlertFeed';
 import { CostCalculator } from './CostCalculator';
 import { ElasticWorkflowLink } from './ElasticWorkflowLink';
 import { ModuleHeader, StatCard } from './shared/ModuleHeader';
+import { ElasticDeepLinks, SectionElasticLink } from './shared/ElasticDeepLinks';
 import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
 import { buildDemoMlSignalIntelligence } from '../lib/ml-signal-intelligence';
 import { IPHONE_LAUNCH } from '../lib/iphone-launch-event';
@@ -216,11 +217,14 @@ export function SecurityDashboard() {
         title="Elastic Security"
         subtitle="SIEM, entity analytics, and automated response on one platform."
       >
-        {securityLinks.alerts && (
-          <a href={securityLinks.alerts} target="_blank" rel="noopener noreferrer" className="btn-link flex items-center gap-1">
-            Alerts <ExternalLink className="w-3.5 h-3.5" />
-          </a>
-        )}
+        <ElasticDeepLinks
+          links={[
+            { href: securityLinks.alerts, label: 'Alerts', primary: true },
+            { href: securityDashboardUrl, label: 'Dashboard' },
+            { href: securityLinks.cases, label: 'Cases' },
+            { href: securityLinks.rules, label: 'Rules' },
+          ]}
+        />
       </ModuleHeader>
 
       <LaunchEventStrip className="mb-8" />

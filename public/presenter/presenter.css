@@ -1,0 +1,108 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: #fbfbfd;
+  color: #1d1d1f;
+  line-height: 1.5;
+}
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid rgba(210, 210, 215, 0.6);
+  background: rgba(251, 251, 253, 0.85);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.brand {
+  font-size: 21px;
+  font-weight: 600;
+  color: #1d1d1f;
+  text-decoration: none;
+}
+.top nav { display: flex; gap: 16px; }
+.top nav a {
+  font-size: 14px;
+  color: #86868b;
+  text-decoration: none;
+}
+.top nav a:hover { color: #0071e3; }
+.wrap {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 40px 24px 64px;
+}
+h1 { font-size: 2rem; letter-spacing: -0.02em; margin: 0 0 0.5rem; }
+.lead { color: #86868b; margin: 0 0 2rem; }
+.cards { display: grid; gap: 16px; }
+@media (min-width: 640px) { .cards { grid-template-columns: 1fr 1fr; } }
+.card {
+  display: block;
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #d2d2d7;
+  background: #fff;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s;
+}
+.card:hover {
+  border-color: #0071e3;
+  box-shadow: 0 4px 20px rgba(0, 113, 227, 0.12);
+}
+.card h2 { font-size: 1.1rem; margin: 0 0 0.5rem; color: #1d1d1f; }
+.card p { font-size: 14px; color: #86868b; margin: 0 0 1rem; }
+.cta { font-size: 14px; font-weight: 600; color: #0071e3; }
+.muted { color: #86868b; font-size: 13px; }
+.error { color: #cc0000; font-size: 14px; }
+.hidden { display: none; }
+.prose { font-size: 15px; }
+.prose h1 { font-size: 1.75rem; margin-top: 0; }
+.prose h2 {
+  font-size: 1.25rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #d2d2d7;
+}
+.prose h3 { font-size: 1.05rem; margin-top: 1.5rem; }
+.prose p, .prose li { color: #1d1d1f; }
+.prose a { color: #0071e3; }
+.prose blockquote {
+  margin: 1rem 0;
+  padding: 12px 16px;
+  border-left: 4px solid #0071e3;
+  background: rgba(0, 113, 227, 0.06);
+  border-radius: 0 12px 12px 0;
+  color: #1d1d1f;
+}
+.prose code {
+  font-size: 0.9em;
+  background: #f5f5f7;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.prose pre {
+  background: #050816;
+  color: #f5f5f7;
+  padding: 14px;
+  border-radius: 12px;
+  overflow-x: auto;
+}
+.prose pre code { background: none; padding: 0; color: inherit; }
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 1rem 0;
+}
+.prose th, .prose td {
+  border: 1px solid #d2d2d7;
+  padding: 8px 10px;
+  text-align: left;
+}
+.prose th { background: #f5f5f7; }
+.prose hr { border: none; border-top: 1px solid #d2d2d7; margin: 2rem 0; }

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Presenter guide · Telco NOC demo</title>
+  <link rel="stylesheet" href="/presenter/presenter.css" />
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">Telco NOC</a>
+    <nav>
+      <a href="/presenter/">Guides</a>
+      <a href="/slides/">Slides</a>
+      <a href="/">Demo app</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <p id="loading" class="muted">Loading…</p>
+    <article id="content" class="prose hidden"></article>
+    <p id="error" class="error hidden"></p>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script>
+    const DOCS = {
+      'demo-walk': {
+        title: 'Demo walk · ~12 min',
+        file: '/presenter/DEMO-WALK.md',
+      },
+      landscape: {
+        title: '2026 telco landscape',
+        file: '/presenter/TELCO-LANDSCAPE-2026-REFERENCE.md',
+      },
+    };
+
+    const params = new URLSearchParams(location.search);
+    const key = params.get('doc') || 'demo-walk';
+    const meta = DOCS[key];
+
+    const loading = document.getElementById('loading');
+    const content = document.getElementById('content');
+    const error = document.getElementById('error');
+
+    if (!meta) {
+      loading.classList.add('hidden');
+      error.textContent = 'Unknown guide. Use ?doc=demo-walk or ?doc=landscape';
+      error.classList.remove('hidden');
+    } else {
+      document.title = `${meta.title} · Telco NOC demo`;
+      fetch(meta.file)
+        .then(r => {
+          if (!r.ok) throw new Error(`Could not load ${meta.file}`);
+          return r.text();
+        })
+        .then(md => {
+          loading.classList.add('hidden');
+          content.innerHTML = marked.parse(md, { gfm: true, breaks: true });
+          content.classList.remove('hidden');
+        })
+        .catch(err => {
+          loading.classList.add('hidden');
+          error.textContent = err.message;
+          error.classList.remove('hidden');
+        });
+    }
+  </script>
+</body>
+</html>
