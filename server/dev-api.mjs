@@ -21,6 +21,7 @@ import anChannels from '../api/adaptive-networks/channels.js';
 import anInject from '../api/adaptive-networks/inject.js';
 import anExecutions from '../api/adaptive-networks/executions.js';
 import anResume from '../api/adaptive-networks/resume.js';
+import presenterAuth from '../api/presenter-auth.js';
 
 config({ path: '.env.local' });
 config({ path: '.env' });
@@ -51,6 +52,7 @@ mount('/api/adaptive-networks/channels', anChannels);
 mount('/api/adaptive-networks/inject', anInject);
 mount('/api/adaptive-networks/executions', anExecutions);
 mount('/api/adaptive-networks/resume', anResume);
+mount('/api/presenter-auth', presenterAuth);
 
 app.listen(PORT, () => {
   console.log(`[dev-api] http://localhost:${PORT}/api/health`);

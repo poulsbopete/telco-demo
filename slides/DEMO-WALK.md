@@ -5,11 +5,13 @@
 **Landscape reference:** [2026 telco landscape](/presenter/view.html?doc=landscape)  
 **Primary tab:** Telemetry
 
+**Tone (Garrett):** Keep urgency and proof — lead with empathy. Frame gaps as industry-wide and solvable together, not as failures in the room. We're building partnerships, not winning arguments.
+
 ## Slide deck (9 slides)
 
 | # | Slide | Role |
 |---|-------|------|
-| 1 | When the network cannot see itself | Open · set stakes |
+| 1 | When the launch picture doesn't connect | Open · set stakes |
 | 2 | The launch shift | Problem · 3 structural gaps |
 | 3 | iPhone 18 at stake | Metrics · anchor line |
 | 4 | 2026 telco reality | D2D/Starlink · boardroom · bridge to demo |
@@ -23,7 +25,7 @@
 
 ## Narrative spine (say this once, repeat at close)
 
-> "Connectivity is commoditizing — tri-carrier D2D vs Starlink, Apple, eSIM. **2026 boardrooms** care about EBITDA, OpEx reset, and M&A integration — not another point tool. But **iPhone 18 launch weekend** is when subscribers decide if you're still *their* carrier. You already sold the upgrade. Observability decides if you keep them."
+> "Connectivity is commoditizing — tri-carrier D2D vs Starlink, Apple, eSIM. **2026 boardrooms** care about EBITDA, OpEx reset, and M&A integration — not another point tool. But **iPhone 18 launch weekend** is when subscribers decide if you're still *their* carrier. You already sold the upgrade. **Connected observability** helps you deliver on that promise."
 
 ---
 
@@ -31,7 +33,7 @@
 
 | Session 2 component | Where it lives now |
 |---------------------|-------------------|
-| Opening · "network cannot see itself" | Slide 1 |
+| Opening · visibility gap on launch | Slide 1 |
 | THE STARTING POINT · visibility gap | Folded into slide 2 subhead |
 | THE STRUCTURAL SHIFT | Slide 2 · three launch shifts |
 | Five telecom dimensions | DEMO-WALK talk track · landscape reference |
@@ -66,7 +68,7 @@
 
 **Say — boardroom (pick 2 of 4 on slide):**
 
-- "**EBITDA ~35%**, flat ARPU, OpEx reset — projects that don't cut cost or prevent penalties get delayed."
+- "**EBITDA ~35%**, flat ARPU, OpEx reset — boards prioritize what cuts cost or prevents penalties."
 - "**Frontier $20B**, **Lumen $5.75B** — Frankenstein stacks need federated visibility, not rip-and-replace."
 - "**Techco pivot** — private 5G, AI transport; Elastic as co-innovation engine for their enterprise clients."
 - "**CISA 72-hour**, FCC **$2,500/call** KYC, **4-year retention** — launch SLA slips hit churn *and* compliance surface."
@@ -180,7 +182,7 @@
 
 **Say:**
 
-- "Commoditization and D2D are the long game. **Launch execution is how you win today.**"
+- "Commoditization and D2D are the long game. **Launch execution is where you earn trust today.**"
 - "Elastic: **Unify · Open · Predict · Act** — vendor consolidation on the OTel you already have."
 - "Pilot one hotspot region before Sept 2026. Quantify churn-risk and alert reduction — then expand across the data ecosystem."
 
@@ -203,9 +205,9 @@
 
 **Acknowledge:** "Yes — the connectivity layer is under pressure. Starlink has 9M+ subs; Big Three responded with a D2D JV."
 
-**Pivot:** "That's exactly why **launch weekend execution** matters more, not less. When switching gets easier, a bad activation pushes them out the door faster. Elastic gives you one view from eSIM OTA to **84K churn-risk** before the social posts start."
+**Pivot:** "That's exactly why **launch weekend execution** matters more, not less. When switching gets easier, a rough activation makes leaving easier too. Elastic gives you one view from eSIM OTA to **84K churn-risk** — so your team can respond before frustration shows up in care queues and social feeds."
 
-**Do not:** Claim Elastic solves disintermediation. Claim it protects **subscriber relationship at the highest-stakes moment** and **defends EBITDA** via consolidation and storage efficiency.
+**Do not:** Claim Elastic solves disintermediation. Claim it helps **protect the subscriber relationship at the highest-stakes moment** and **supports EBITDA goals** via consolidation and storage efficiency.
 
 ---
 

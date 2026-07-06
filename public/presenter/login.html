@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Presenter sign-in · Telco NOC demo</title>
+  <link rel="stylesheet" href="/presenter/presenter.css" />
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">Telco NOC</a>
+    <nav>
+      <a href="/slides/">Slides</a>
+      <a href="/">Demo app</a>
+    </nav>
+  </header>
+  <main class="wrap">
+    <h1>Presenter sign-in</h1>
+    <p class="lead">Enter the presenter password to open demo scripts and reference guides.</p>
+    <form class="login-form" id="login">
+      <label for="password">Password</label>
+      <input
+        id="password"
+        name="password"
+        type="password"
+        autocomplete="current-password"
+        required
+        autofocus
+      />
+      <button type="submit">Continue</button>
+      <p id="error" class="error hidden"></p>
+    </form>
+  </main>
+  <script>
+    const form = document.getElementById('login');
+    const error = document.getElementById('error');
+    const redirect = new URLSearchParams(location.search).get('redirect') || '/presenter/';
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      error.classList.add('hidden');
+
+      const password = new FormData(form).get('password');
+      try {
+        const res = await fetch('/api/presenter-auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password }),
+        });
+
+        if (res.ok) {
+          location.href = redirect;
+          return;
+        }
+
+        error.textContent = res.status === 401 ? 'Incorrect password.' : 'Sign-in failed. Try again.';
+        error.classList.remove('hidden');
+      } catch {
+        error.textContent = 'Could not reach the sign-in service.';
+        error.classList.remove('hidden');
+      }
+    });
+  </script>
+</body>
+</html>

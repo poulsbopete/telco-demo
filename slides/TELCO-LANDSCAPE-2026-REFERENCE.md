@@ -6,7 +6,7 @@ Condensed from *Telco Landscape 2026* for Elastic iPhone 18 launch demos. Use fo
 
 ## How telcos buy in 2026
 
-U.S. carriers invest in platforms that either **defend margins (OpEx compression)** or **enable new B2B revenue (Techco pivot)**. If a project doesn't cut cost, consolidate vendors, or prevent SLA/regulatory penalties, it gets delayed.
+U.S. carriers invest in platforms that either **defend margins (OpEx compression)** or **enable new B2B revenue (Techco pivot)**. Boards tend to prioritize projects that cut cost, consolidate vendors, or prevent SLA/regulatory penalties.
 
 **Wall Street lens:** ~35% EBITDA margins · flat ARPU · post-5G CapEx peak · heavy debt.
 
@@ -78,7 +78,7 @@ U.S. carriers invest in platforms that either **defend margins (OpEx compression
 
 | They say | You say |
 |----------|---------|
-| "Starlink makes us irrelevant" | "Multi-transport is the long game. **Launch weekend** is when switching gets easier — bad activation pushes them out faster. Elastic connects OTel to **84K churn-risk** before social posts." |
+| "Starlink makes us irrelevant" | "Multi-transport is the long game. **Launch weekend** is when switching gets easier — a rough activation makes leaving easier too. Elastic connects OTel to **84K churn-risk** so teams can act while the relationship is still recoverable." |
 | "We can't afford another tool" | "This is **vendor consolidation** — one indexed stream for SecOps, SRE, and compliance. Frontier/Lumen integrations need federated search, not another rip-and-replace." |
 | "Our EBITDA target won't fund this" | "Searchable Snapshots cut storage 50–75%; ML reduces alert toil for lean NOC teams. Pilot one launch hotspot region — quantify before Sept 2026." |
 | "We're mid-M&A" | "Cross-Cluster Search monitors acquired networks **where they sit** — months off integration timeline vs centralizing everything first." |

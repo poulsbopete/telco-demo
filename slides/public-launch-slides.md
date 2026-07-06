@@ -130,10 +130,10 @@ style: |
 
 <!-- _class: lead -->
 
-# When the network cannot see itself
+# When the launch picture doesn't connect
 ## iPhone 18 Launch · Observability for US telecom
 
-**The monitoring architecture most carriers run was built for a network that no longer exists.**
+**Launch weekend spans eSIM, core, RAN, and care — most teams still correlate those signals by hand.**
 
 telco-demo-sage.vercel.app · live demo ~12 min
 
@@ -142,9 +142,9 @@ telco-demo-sage.vercel.app · live demo ~12 min
 <span class="kicker">THE LAUNCH SHIFT</span>
 
 # iPhone 18 launch is a software event.
-## Your observability architecture hasn't caught up.
+## The visibility model many teams inherited wasn't built for it.
 
-<p class="subhead">When activation degrades — how long until NOC knows <em>where in the stack</em> it started? For most teams, hours. Launch weekend breaks across eSIM, core, RAN, and care — but tools still mirror org silos.</p>
+<p class="subhead">When activation degrades — how long until NOC knows <em>where in the stack</em> it started? For most teams, still hours. Launch weekend spans eSIM, core, RAN, and care — yet signals often live in separate tools and teams.</p>
 
 <div class="shift-list">
   <div class="shift-item">
@@ -153,11 +153,11 @@ telco-demo-sage.vercel.app · live demo ~12 min
   </div>
   <div class="shift-item">
     <div class="shift-num n2">02</div>
-    <div><b>One launch · many regions</b><span>Midnight PT wave · NYC pickup · national CDN — failures your core dashboard never sees.</span></div>
+    <div><b>One launch · many regions</b><span>Midnight PT wave · NYC pickup · national CDN — failures that don't surface in a single core view.</span></div>
   </div>
   <div class="shift-item">
     <div class="shift-num n3">03</div>
-    <div><b>Telemetry everywhere · correlation nowhere</b><span>4,200 raw alerts on iPhone 18 weekend. ML must find the 12 that threaten SLA.</span></div>
+    <div><b>Rich telemetry · limited correlation</b><span>4,200 raw alerts on iPhone 18 weekend. ML helps surface the 12 that truly threaten SLA.</span></div>
   </div>
 </div>
 
@@ -177,7 +177,7 @@ telco-demo-sage.vercel.app · live demo ~12 min
   <div class="stat"><b>84K</b><span>churn-risk if SLA slips</span></div>
 </div>
 
-<p class="subhead" style="margin-top:0.6em">97% of execs report observability roadblocks despite continued investment. Structure — not budget — is the gap. <strong>Investment isn't the problem. Correlation is.</strong></p>
+<p class="subhead" style="margin-top:0.6em">97% of execs report observability roadblocks despite continued investment. Teams are spending — <strong>the opportunity is connecting signals across the stack.</strong></p>
 
 <p class="callout"><strong>Anchor line:</strong> You already sold the upgrade — launch weekend decides if they stay your subscriber.</p>
 
@@ -186,14 +186,14 @@ telco-demo-sage.vercel.app · live demo ~12 min
 <span class="kicker">2026 TELCO REALITY</span>
 
 # Connectivity is commoditizing.
-## Launch execution is how carriers prove they're still essential.
+## Launch execution is where customer trust is earned.
 
 <p class="subhead">Tri-carrier D2D JV vs <strong>Starlink Mobile (9M+ subs)</strong> · flat ARPU · ~35% EBITDA · OpEx reset · Frontier · Lumen integration.</p>
 
 <div class="bridge-cols">
   <div class="bridge-box risk">
     <h3>Boardroom pressure</h3>
-    <p>Vendor consolidation · federated visibility without rip-and-replace · CISA 72hr · FCC retention — projects that don't cut cost or prevent penalties get delayed.</p>
+    <p>Vendor consolidation · federated visibility without rip-and-replace · CISA 72hr · FCC retention — boards prioritize what cuts cost or prevents penalties.</p>
   </div>
   <div class="bridge-box win">
     <h3>Where carriers win · iPhone 18</h3>
@@ -204,7 +204,7 @@ telco-demo-sage.vercel.app · live demo ~12 min
 <div class="board-grid">
   <div class="board-item"><b>EBITDA &amp; OpEx</b>Wall Street judges ~35% margins — CFO language is consolidation</div>
   <div class="board-item"><b>M&amp;A visibility</b>Cross-cluster search across acquired stacks — no multi-year migration first</div>
-  <div class="board-item"><b>Techco pivot</b>Private 5G · edge · AI transport — co-innovation, not dumb pipe</div>
+  <div class="board-item"><b>Techco pivot</b>Private 5G · edge · AI transport — co-innovation partner on enterprise outcomes</div>
   <div class="board-item"><b>Regulatory clock</b>ES|QL for disclosure · Searchable Snapshots for 4-year retention</div>
 </div>
 
@@ -259,11 +259,11 @@ telco-demo-sage.vercel.app · live demo ~12 min
 
 # Fragmented → connected
 
-**MTTR is the symptom. Fragmented telemetry is the cause.** Telefónica Germany: 80% RCA reduction.
+**Long MTTR often traces back to fragmented telemetry.** Telefónica Germany: 80% RCA reduction when signals connect.
 
 <div class="gap-compare">
   <div class="gap-box before">
-    <span>SILOED TOOLS</span>
+    <span>DISCONNECTED VIEW</span>
     <b>20 min</b>
     <span>Manual correlation · RAN · core · care</span>
   </div>
@@ -308,7 +308,7 @@ telco-demo-sage.vercel.app · live demo ~12 min
 
 ## iPhone 18 launch · Sept 2026
 
-**Commoditization is the long game · launch execution is how you win today**
+**Commoditization is the long game · launch execution is where you earn trust today**
 
 **Unify · Open · Predict · Act**
 

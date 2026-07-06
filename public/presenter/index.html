@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Presenter guides · Telco NOC demo</title>
   <link rel="stylesheet" href="/presenter/presenter.css" />
+  <script src="/presenter/presenter-gate.js"></script>
 </head>
 <body>
   <header class="top">
@@ -12,6 +13,7 @@
     <nav>
       <a href="/slides/">Slides</a>
       <a href="/">Demo app</a>
+      <button type="button" class="nav-logout" id="logout">Sign out</button>
     </nav>
   </header>
   <main class="wrap">
@@ -31,5 +33,11 @@
     </div>
     <p class="muted">Source: <code>slides/DEMO-WALK.md</code> · <code>slides/TELCO-LANDSCAPE-2026-REFERENCE.md</code></p>
   </main>
+  <script>
+    document.getElementById('logout')?.addEventListener('click', async () => {
+      await fetch('/api/presenter-auth', { method: 'DELETE' });
+      location.href = '/presenter/login.html';
+    });
+  </script>
 </body>
 </html>
