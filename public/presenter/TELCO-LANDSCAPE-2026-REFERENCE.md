@@ -93,4 +93,33 @@ U.S. carriers invest in platforms that either **defend margins (OpEx compression
 
 ---
 
+## Agentic observability appendix (slide 9 · presenter depth)
+
+Condensed from *Engineering the Future of Agentic Observability* — use after live demo, not instead of iPhone 18 proof.
+
+### Intelligence gap (macro)
+
+- Telemetry volume growing faster than human resolution capacity — teams need **reasoning**, not more consoles.
+- Tie to slide 7 sprawl costs: **data drop** under storage pressure creates blind spots exactly when launch complexity peaks.
+
+### Infrastructure as threat signal
+
+- Metric surges are often the **first indicator** of cross-domain issues — congestion vs DDoS misclassification during activation spikes.
+- Elastic Security on the same foundation (demo Step 7) — SRE and SOC share context in real time.
+
+### Legacy → agentic shift (verbal, optional)
+
+| Pillar | Today | Agentic path |
+|--------|-------|----------------|
+| Data standards | Proprietary silos | Native OTel · unified tiers |
+| Incident resolution | Threshold alerts | Reasoning assistants with guardrails |
+| Economics | Linear scale | Cold/frozen tiers · Searchable Snapshots |
+| Boardroom view | OpEx cost center | Strategic resilience driver |
+
+### Objection: "We're not ready for AI agents in the core"
+
+"We're not asking you to hand the core to a chatbot on day one. Start with **connected telemetry** for iPhone 18 — then add **AI investigation** and **guarded remediation** where your runbooks already exist. Deterministic guardrails keep actions inside approved launch playbooks."
+
+---
+
 *Source: Telco Landscape 2026 (internal Elastic telco field guide). Full document available separately.*

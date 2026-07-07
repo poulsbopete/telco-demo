@@ -68,6 +68,7 @@ style: |
   .shift-num.n1 { background: #e8478b; }
   .shift-num.n2 { background: #fec514; color: #1d1d1f; }
   .shift-num.n3 { background: #0071e3; }
+  .shift-num.n4 { background: #00bfb3; color: #050816; }
   .shift-item b { display: block; color: #fff; font-size: 1.05em; margin-bottom: 0.2em; }
   .shift-item span { color: #9a9aa0; }
   .slide-foot {
@@ -280,7 +281,7 @@ telco-demo-sage.vercel.app · live demo ~12 min
   </div>
 </div>
 
-<p class="subhead" style="margin-top:0.5em">NOC · Care · Network ops · Executives — same launch event, different outcomes. Live demo ties OTel to <strong>$142M revenue</strong> and <strong>84K churn-risk</strong>.</p>
+<p class="subhead" style="margin-top:0.5em">Three hidden costs of sprawl: <strong>MTTR penalty</strong> (rotating consoles) · <strong>data drop</strong> (shedding logs under cost pressure) · <strong>persona silos</strong> (SRE vs RAN at peak). NOC · Care · Network ops · Executives — same launch event, different outcomes. Live demo ties OTel to <strong>$142M revenue</strong> and <strong>84K churn-risk</strong>.</p>
 
 ---
 
@@ -302,6 +303,36 @@ telco-demo-sage.vercel.app · live demo ~12 min
 
 ---
 
+<span class="kicker">WHAT'S NEXT</span>
+
+# From connected telemetry to agentic intelligence
+## Launch weekend needs data clarity — not more dashboards.
+
+<p class="subhead">Telemetry volume is outpacing human resolution capacity. The next step: systems that <strong>reason across your stack</strong> — with guardrails — surfacing intent, not just symptoms. Metric surges can be security signals too: unify SRE and SOC context before DDoS is misread as congestion.</p>
+
+<div class="shift-list">
+  <div class="shift-item">
+    <div class="shift-num n1">01</div>
+    <div><b>Unified telemetry</b><span>Logs, metrics, traces in one tier — AI handles structure so teams stop building manual pipelines.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n2">02</div>
+    <div><b>AI detections</b><span>Anomalies and dependencies mapped before subscribers feel it — the unknown unknowns behind launch spikes.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n3">03</div>
+    <div><b>AI investigation</b><span>Root cause in plain language across RAN, core, and care — not another dashboard rotation.</span></div>
+  </div>
+  <div class="shift-item">
+    <div class="shift-num n4">04</div>
+    <div><b>Faster resolution</b><span>Agents recommend and execute fixes with deterministic guardrails — from 12 actionable alerts to remediated launch paths.</span></div>
+  </div>
+</div>
+
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Agentic Observability · iPhone 18</span></div>
+
+---
+
 <!-- _class: lead -->
 
 # Your Elastic era starts now
@@ -310,6 +341,8 @@ telco-demo-sage.vercel.app · live demo ~12 min
 
 **Commoditization is the long game · launch execution is where you earn trust today**
 
-**Unify · Open · Predict · Act**
+**Unify · Open · Predict · Act · Agentic**
+
+Engineering the future of telecom resilience — together
 
 telco-demo-sage.vercel.app → **Telemetry**

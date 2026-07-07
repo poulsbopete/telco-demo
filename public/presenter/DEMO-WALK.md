@@ -7,7 +7,7 @@
 
 **Tone (Garrett):** Keep urgency and proof — lead with empathy. Frame gaps as industry-wide and solvable together, not as failures in the room. We're building partnerships, not winning arguments.
 
-## Slide deck (9 slides)
+## Slide deck (10 slides)
 
 | # | Slide | Role |
 |---|-------|------|
@@ -17,9 +17,10 @@
 | 4 | 2026 telco reality | D2D/Starlink · boardroom · bridge to demo |
 | 5 | Why Elastic | Unify · Open · Predict · Act |
 | 6 | Data ecosystem | Fan chart · meet you where you are |
-| 7 | Fragmented → connected | MTTR · 4,200 → 12 |
+| 7 | Fragmented → connected | MTTR · sprawl costs · 4,200 → 12 |
 | 8 | Live demo | 7-step walk · switch to app here |
-| 9 | Close | Unify · Open · Predict · Act |
+| 9 | Agentic observability | 4-step ladder · what's next after unify |
+| 10 | Close | Unify · Open · Predict · Act · together |
 
 *Removed from slides (detail lives in this script + TELCO-LANDSCAPE-2026-REFERENCE.md): agenda, five dimensions, Observability Labs stats grid, partner playbook table, Search AI speed, personas, three questions, separate story-arc slide.*
 
@@ -41,6 +42,7 @@
 | MTTR symptom · 20 min → seconds | Slide 7 |
 | Three questions | Ask verbally before demo · not on slides |
 | Telefónica proof | Slide 7 |
+| Agentic observability ladder | Slide 9 · *Engineering the Future of Agentic Observability* deck |
 
 **2026 Telco Landscape:** slide 4 (strategic + boardroom merged). Partner playbook · Search AI · personas → reference doc + Acts below.
 
@@ -178,13 +180,20 @@
 
 ## Close (~1 min)
 
-**Return to slides:** Your Elastic era starts now
+**Optional bridge (slide 9, ~30 sec)** — after demo, before close:
+
+- "What you just saw is **connected telemetry** — unify, predict, act on launch weekend."
+- "The next evolution is **agentic intelligence**: AI that investigates in plain language and recommends fixes with guardrails — not more dashboards."
+- "Metric surges can be security signals too — one context for SRE and SOC during peak activation."
+- "Pilot one hotspot region now; expand to agentic remediation as your team is ready."
+
+**Return to slides:** Your Elastic era starts now (slide 10)
 
 **Say:**
 
 - "Commoditization and D2D are the long game. **Launch execution is where you earn trust today.**"
-- "Elastic: **Unify · Open · Predict · Act** — vendor consolidation on the OTel you already have."
-- "Pilot one hotspot region before Sept 2026. Quantify churn-risk and alert reduction — then expand across the data ecosystem."
+- "Elastic: **Unify · Open · Predict · Act** — and a path to **agentic** remediation on the OTel you already have."
+- "**Engineering telecom resilience together** — pilot one hotspot region before Sept 2026. Quantify churn-risk and alert reduction — then expand across the data ecosystem."
 
 ---
 
@@ -197,7 +206,8 @@
 | 2026 telco reality (slide 4) | Step 5 — exec KPIs + bridge talk track |
 | Why Elastic (slide 5) | Steps 2–6 · Unify/Open/Predict/Act |
 | Data ecosystem (slide 6) | Step 2 OTel · Step 7 Security enabling |
-| Fragmented → connected (slide 7) | Step 6 — 4,200 → 12 narrative |
+| Fragmented → connected (slide 7) | Step 6 — 4,200 → 12 narrative · sprawl costs talk track |
+| Agentic observability (slide 9) | Post-demo bridge · A2A / workflow / Agent Builder in app |
 
 ---
 
