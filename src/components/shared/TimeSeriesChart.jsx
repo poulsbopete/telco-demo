@@ -4,11 +4,16 @@ import {
 } from 'recharts';
 
 function formatTimeLabel(time) {
-  try {
-    return new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  } catch {
-    return time;
+  const d = new Date(time);
+  if (Number.isNaN(d.getTime())) {
+    return typeof time === 'string' ? time : '';
   }
+  return d.toLocaleString('en-US', {
+    weekday: 'short',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
 }
 
 export function TimeSeriesChart({ data, lines = [], height = 200, type = 'line', onClick }) {

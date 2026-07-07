@@ -8,8 +8,10 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { getElasticConfig } from './elastic.js';
 
+import { TELCO_CORE_WORKFLOW_SLUG } from '../../lib/telco-workflow-ids.js';
+
 export const TELCO_CORE_WORKFLOW_NAME = 'Telco 5G Core Latency Auto-Remediation';
-export const TELCO_CORE_WORKFLOW_SLUG = 'telco-core-latency-auto-remediation';
+export { TELCO_CORE_WORKFLOW_SLUG };
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const WORKFLOW_YAML = readFileSync(
@@ -157,7 +159,7 @@ export async function runTelcoCheckoutWorkflow({ regionId = 'REG-8847291', trace
   return {
     linked: true,
     kibanaWorkflowId: workflow.id,
-    kibanaWorkflowName: workflow.name || PAYPAL_CHECKOUT_WORKFLOW_NAME,
+    kibanaWorkflowName: workflow.name || TELCO_CORE_WORKFLOW_NAME,
     kibanaWorkflowUrl: kibanaWorkflowAppUrl(kibanaUrl, { workflowId: workflow.id }),
     kibanaExecutionId: executionId || null,
     kibanaExecutionUrl: executionId

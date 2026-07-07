@@ -8,23 +8,14 @@ import {
   REGIONS,
 } from '../_lib/telco-context.js';
 import { enrichMlAnomalies, buildMlSignalIntelligence } from '../_lib/ml-signal-intelligence.js';
+import {
+  buildTelcoNetworkPipelineStatsEsql,
+  buildTelcoRecentErrorsEsql,
+} from '../../lib/telco-discover-esql.js';
 
-const NETWORK_PIPELINE_QUERY = `
-FROM logs-generic.otel-default
-| WHERE service.name IN ("checkout", "payment", "cart", "checkoutservice", "paymentservice")
-| STATS session_count = COUNT(*), errors = COUNT(*) WHERE log.level == "ERROR" OR log.level == "Error"
-  BY service.name
-| SORT session_count DESC
-`.trim();
+const NETWORK_PIPELINE_QUERY = buildTelcoNetworkPipelineStatsEsql();
 
-const RECENT_PAYMENT_ERRORS = `
-FROM logs-generic.otel-default
-| WHERE service.name IN ("checkout", "payment", "cart")
-  AND (log.level == "ERROR" OR log.level == "Error")
-| KEEP @timestamp, service.name, log.level, body.text, host.name, trace.id
-| SORT @timestamp DESC
-| LIMIT 20
-`.trim();
+const RECENT_PAYMENT_ERRORS = buildTelcoRecentErrorsEsql();
 
 async function loadBaseData() {
   const [cluster, pipelineRes, errorsRes] = await Promise.all([

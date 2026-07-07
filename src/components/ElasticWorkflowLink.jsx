@@ -1,5 +1,5 @@
 import { ExternalLink } from 'lucide-react';
-import { elasticWorkflowUrl } from '../lib/elastic-api';
+import { elasticWorkflowUrl, resolveElasticWorkflowId } from '../lib/elastic-api';
 
 export function ElasticWorkflowLink({
   kibanaUrl,
@@ -9,7 +9,8 @@ export function ElasticWorkflowLink({
   label,
   className = 'text-[10px] text-elastic-teal hover:underline inline-flex items-center gap-1 shrink-0',
 }) {
-  const link = href || elasticWorkflowUrl(kibanaUrl, { workflowId, executionId });
+  const resolvedWorkflowId = workflowId ? resolveElasticWorkflowId(workflowId) : null;
+  const link = href || elasticWorkflowUrl(kibanaUrl, { workflowId: resolvedWorkflowId, executionId });
   if (!link) return null;
 
   const text = label || (executionId ? 'View execution' : 'Open workflow');

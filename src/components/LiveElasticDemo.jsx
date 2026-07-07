@@ -13,6 +13,9 @@ import {
   kibanaO11yDashboardUrl,
   elasticWorkflowUrl,
   TELCO_DISCOVER_ESQL,
+  buildTelcoLaunchDiscoverEsql,
+  buildTelcoRegionsDiscoverEsql,
+  buildTelcoTracesDiscoverEsql,
   formatCount,
 } from '../lib/elastic-api';
 import { ModuleHeader, StatCard } from './shared/ModuleHeader';
@@ -140,11 +143,21 @@ export function LiveElasticDemo() {
   }
 
   const kibanaUrl = health?.kibanaUrl || import.meta.env.VITE_KIBANA_URL;
-  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
-  const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
-  const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
   const trace = data?.traceDrilldown;
   const anomaly = selectedAnomaly || data?.primaryAnomaly;
+  const pipelineDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const regionsDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, {
+    query: buildTelcoRegionsDiscoverEsql(selectedRegionId || null),
+  });
+  const launchDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: buildTelcoLaunchDiscoverEsql() });
+  const tracesDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, {
+    query: buildTelcoTracesDiscoverEsql({
+      traceId: anomaly?.traceId || trace?.trace_id,
+      regionId: selectedRegionId || anomaly?.regionId,
+    }),
+  });
+  const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
+  const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
   const anomalyRegion = anomaly
     ? data?.regions?.find(r => r.regionId === anomaly.regionId)
     : null;
@@ -163,7 +176,7 @@ export function LiveElasticDemo() {
         </button>
         <ElasticDeepLinks
           links={[
-            { href: discoverUrl, label: 'Discover', primary: true },
+            { href: pipelineDiscoverUrl, label: 'Discover', primary: true },
             { href: o11yDashboardUrl, label: 'Dashboard' },
             { href: workflowsUrl, label: 'Workflows' },
           ]}
@@ -193,7 +206,7 @@ export function LiveElasticDemo() {
               launchEvent={data.launchEvent}
               className="mb-8"
               kibanaDashboardUrl={o11yDashboardUrl}
-              kibanaDiscoverUrl={discoverUrl}
+              kibanaDiscoverUrl={launchDiscoverUrl}
             />
           )}
 
@@ -223,7 +236,7 @@ export function LiveElasticDemo() {
             <div className="surface-card p-5">
               <div className="flex items-center justify-between gap-3 mb-4">
                 <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Regions</h3>
-                <SectionElasticLink href={discoverUrl} label="Discover · regions" />
+                <SectionElasticLink href={regionsDiscoverUrl} label="Discover · regions" />
               </div>
               <div className="space-y-2 max-h-[320px] overflow-y-auto">
                 {data.regions?.map(m => (
@@ -256,7 +269,7 @@ export function LiveElasticDemo() {
             <div className="surface-card p-5">
               <div className="flex items-center justify-between gap-3 mb-4">
                 <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Core pipeline</h3>
-                <SectionElasticLink href={discoverUrl} label="Discover · services" />
+                <SectionElasticLink href={pipelineDiscoverUrl} label="Discover · services" />
               </div>
               <div className="space-y-3">
                 {data.networkPipeline?.map(p => (
@@ -337,7 +350,7 @@ export function LiveElasticDemo() {
                   <GitBranch className="w-4 h-4 text-elastic-teal" />
                   Unified Troubleshooting — {anomaly?.regionId}
                 </span>
-                <SectionElasticLink href={discoverUrl} label="Discover · traces" />
+                <SectionElasticLink href={tracesDiscoverUrl} label="Discover · traces" />
               </h3>
 
               {drillView === 'metrics' && anomaly && (

@@ -1,3 +1,15 @@
+import {
+  buildTelcoLaunchDiscoverEsql,
+  buildTelcoPipelineDiscoverEsql,
+  buildTelcoRegionsDiscoverEsql,
+  buildTelcoTracesDiscoverEsql,
+  escapeEsql,
+} from '../../lib/telco-discover-esql.js';
+import {
+  resolveElasticWorkflowId,
+  TELCO_CORE_WORKFLOW_SLUG,
+} from '../../lib/telco-workflow-ids.js';
+
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 
 async function fetchJson(path, options = {}) {
@@ -136,48 +148,50 @@ export function runEsql(query) {
   });
 }
 
-/** ES|QL preloaded in Kibana Discover — Telco payment pipeline by service */
-export const TELCO_DISCOVER_ESQL = [
-  'FROM logs-generic.otel-default',
-  '| WHERE service.name IN ("checkout", "payment", "cart")',
-  '| STATS volume = COUNT(*), errors = COUNT(*) WHERE log.level IN ("ERROR", "Error", "WARN", "Warning")',
-  '  BY service.name',
-  '| EVAL error_rate_pct = ROUND(errors * 100.0 / volume, 3)',
-  '| SORT volume DESC',
-  '| LIMIT 10',
-].join(' ');
+/** ES|QL preloaded in Kibana Discover — telco core pipeline (renamed from OTel service names) */
+export const TELCO_DISCOVER_ESQL = buildTelcoPipelineDiscoverEsql();
+
+export {
+  buildTelcoLaunchDiscoverEsql,
+  buildTelcoPipelineDiscoverEsql,
+  buildTelcoRegionsDiscoverEsql,
+  buildTelcoTracesDiscoverEsql,
+};
 
 /** OTel demo cluster data can lag — use a wide window so Discover always hits indexed docs */
 export const TELCO_DISCOVER_TIME = { from: 'now-90d', to: 'now' };
 
-function escapeEsql(value) {
-  return String(value || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+function escapeEsqlLog(value) {
+  return escapeEsql(value);
 }
 
 /** ES|QL for Discover deep link scoped to a single log event */
 export function buildLogDiscoverEsql(log) {
   if (log?.traceId) {
-    return [
-      'FROM logs-generic.otel-default',
-      `| WHERE trace.id == "${escapeEsql(log.traceId)}"`,
-      '| KEEP @timestamp, service.name, log.level, body.text, trace.id, host.name',
-      '| SORT @timestamp DESC',
-      '| LIMIT 50',
-    ].join(' ');
+    return buildTelcoTracesDiscoverEsql({ traceId: log.traceId, regionId: log.regionId });
   }
 
-  const filters = ['service.name IN ("checkout", "payment", "cart")'];
-  if (log?.service) filters.push(`service.name == "${escapeEsql(log.service)}"`);
+  if (log?.regionId) {
+    return buildTelcoRegionsDiscoverEsql(log.regionId);
+  }
+
+  const clauses = ['service.name IN ("checkout", "payment", "cart", "checkoutservice", "paymentservice")'];
+  if (log?.service) clauses.push(`service.name == "${escapeEsqlLog(log.service)}"`);
   if (log?.level) {
     const upper = log.level.toUpperCase();
-    filters.push(`log.level IN ("${escapeEsql(log.level)}", "${escapeEsql(upper)}")`);
+    clauses.push(`log.level IN ("${escapeEsqlLog(log.level)}", "${escapeEsqlLog(upper)}")`);
   }
-  if (log?.host) filters.push(`host.name == "${escapeEsql(log.host)}"`);
+  if (log?.host) clauses.push(`host.name == "${escapeEsqlLog(log.host)}"`);
 
   return [
     'FROM logs-generic.otel-default',
-    `| WHERE ${filters.join(' AND ')}`,
-    '| KEEP @timestamp, service.name, log.level, body.text, trace.id, host.name',
+    `| WHERE ${clauses.join(' AND ')}`,
+    '| EVAL telco_service = CASE(',
+    'service.name == "checkout" OR service.name == "checkoutservice", "Core Signaling (5G AMF/SMF)",',
+    'service.name == "payment" OR service.name == "paymentservice", "Billing & Charging",',
+    'service.name == "cart", "Service Provisioning",',
+    'COALESCE(service.name, "Unknown"))',
+    '| KEEP @timestamp, telco_service, service.name, log.level, body.text, trace.id, host.name',
     '| SORT @timestamp DESC',
     '| LIMIT 25',
   ].join(' ');
@@ -211,17 +225,10 @@ function risonEncode(value) {
   return String(value);
 }
 
-/** Registered Elastic Workflows slug for the Telco checkout remediation workflow */
-export const ELASTIC_CORE_WORKFLOW_SLUG = 'telco-core-latency-auto-remediation';
+/** Registered Elastic Workflows slug (bootstrap via npm run bootstrap:workflow) */
+export const ELASTIC_CORE_WORKFLOW_SLUG = TELCO_CORE_WORKFLOW_SLUG;
 
-const DEMO_WORKFLOW_SLUGS = {
-  'wf-core-latency-remediation': ELASTIC_CORE_WORKFLOW_SLUG,
-};
-
-export function resolveElasticWorkflowId(workflowId) {
-  if (!workflowId) return null;
-  return DEMO_WORKFLOW_SLUGS[workflowId] || workflowId;
-}
+export { resolveElasticWorkflowId, TELCO_CORE_WORKFLOW_SLUG };
 
 /** Deep link to Elastic Workflows in Serverless (/app/workflows) */
 export function elasticWorkflowUrl(elasticBase, { workflowId, executionId, url } = {}) {

@@ -189,7 +189,7 @@ telco-demo-sage.vercel.app · live demo ~12 min
 # Connectivity is commoditizing.
 ## Launch execution is where customer trust is earned.
 
-<p class="subhead">Tri-carrier D2D JV vs <strong>Starlink Mobile (9M+ subs)</strong> · flat ARPU · ~35% EBITDA · OpEx reset · Frontier · Lumen integration.</p>
+<p class="subhead">Tri-carrier D2D JV vs <strong>Starlink Mobile (9M+ subs)</strong> · flat ARPU · ~35% EBITDA · OpEx reset · post-merger integration pressure.</p>
 
 <div class="bridge-cols">
   <div class="bridge-box risk">

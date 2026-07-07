@@ -53,7 +53,7 @@
 - Confirm Telemetry tab loads and shows **iPhone 18 Pro Launch** strip.
 - Optional: Observability / Security Kibana deep links configured in `.env.local`.
 - Keep slides on **Live demo** (slide 8) visible on second screen during the app walk.
-- Skim **[2026 telco landscape](/presenter/view.html?doc=landscape)** — pick one carrier hook (Verizon OpEx, AT&T Lumen, T-Mobile 8M migration) for the room.
+- Skim **[2026 telco landscape](/presenter/view.html?doc=landscape)** — pick one carrier hook (Verizon OpEx, AT&T cyber-finance, T-Mobile 8M migration) for the room.
 
 ---
 
@@ -71,7 +71,7 @@
 **Say — boardroom (pick 2 of 4 on slide):**
 
 - "**EBITDA ~35%**, flat ARPU, OpEx reset — boards prioritize what cuts cost or prevents penalties."
-- "**Frontier $20B**, **Lumen $5.75B** — Frankenstein stacks need federated visibility, not rip-and-replace."
+- "**Recent M&A** — Frankenstein stacks need federated visibility, not rip-and-replace."
 - "**Techco pivot** — private 5G, AI transport; Elastic as co-innovation engine for their enterprise clients."
 - "**CISA 72-hour**, FCC **$2,500/call** KYC, **4-year retention** — launch SLA slips hit churn *and* compliance surface."
 
@@ -131,7 +131,7 @@
 
 - "Three different failure modes — retail RAN attach, eSIM OTA, midnight West-coast wave."
 - "One launch event. Region context on every signal."
-- "Post-M&A: same pattern across acquired Frontier/Lumen footprints — federated visibility, one launch playbook."
+- "Post-M&A: same pattern across acquired footprints — federated visibility, one launch playbook."
 
 ---
 
@@ -225,6 +225,6 @@
 
 | Carrier | Lead with |
 |---------|-----------|
-| **Verizon** | $5B OpEx mandate · Frontier $500M synergies · tool consolidation · Searchable Snapshots for absorbed data |
-| **AT&T** | Biry cyber-finance lens · Lumen cross-cluster search · $250B buildout telemetry surge · Dynamic Defense |
+| **Verizon** | $5B OpEx mandate · integration synergies · tool consolidation · Searchable Snapshots for absorbed data |
+| **AT&T** | Biry cyber-finance lens · acquisition cross-cluster search · $250B buildout telemetry surge · Dynamic Defense |
 | **T-Mobile** | 8M plan migration churn parallel · Mint/Ultra integration · T-Satellite + D2D — one OTel layer, negligible satellite OpEx |

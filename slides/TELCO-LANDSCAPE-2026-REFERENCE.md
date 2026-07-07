@@ -17,7 +17,7 @@ U.S. carriers invest in platforms that either **defend margins (OpEx compression
 | # | Reality | Elastic angle |
 |---|---------|---------------|
 | 1 | **EBITDA & OpEx reset** — price wars (Verizon Simplicity, AT&T Build-A-Plan), vendor consolidation | One platform replaces SIEM + APM + log silos; Searchable Snapshots protect storage EBITDA |
-| 2 | **M&A chaos** — Frontier ($20B), Lumen mass markets ($5.75B), Mint/Ultra, US Cellular | Federated visibility via Cross-Cluster Search — no rip-and-replace |
+| 2 | **M&A chaos** — fiber and mass-market acquisitions, Mint/Ultra, US Cellular | Federated visibility via Cross-Cluster Search — no rip-and-replace |
 | 3 | **Techco pivot** — private 5G, AI transport, edge monetization | Co-innovation: anomaly detection + unified visibility for *their* enterprise clients |
 | 4 | **Regulatory clock** — CISA 72hr, SEC 4-day, FCC KYC $2,500/call, 4-year retention | ES|QL for disclosure windows; tiered storage for retention without hot-storage blowout |
 
@@ -31,7 +31,7 @@ U.S. carriers invest in platforms that either **defend margins (OpEx compression
 | Searchable Snapshots · tiered storage | FCC 4-year KYC/SMS retention without crushing EBITDA |
 | Native OpenTelemetry | Terrestrial + D2D satellite without proprietary lock-in |
 | ML · behavioral anomalies | SLA protection before penalties — launch surge in context |
-| Security + O11Y + Search on one stack | Vendor consolidation — e.g. Verizon $500M Frontier synergy target |
+| Security + O11Y + Search on one stack | Vendor consolidation — e.g. major integration synergy targets |
 
 ---
 
@@ -49,13 +49,13 @@ U.S. carriers invest in platforms that either **defend margins (OpEx compression
 ### Verizon
 - CEO **Dan Schulman** (ex-PayPal) — "cost reductions are a way of life."
 - **$5B OpEx** + **$4B CapEx** cuts; 13–15K layoffs; automation mandate.
-- **Frontier $20B** — **$500M run-rate synergies** by year three → tool consolidation pitch.
+- **Recent fiber acquisition** — **$500M run-rate synergies** by year three → tool consolidation pitch.
 - **BT Global JV** ($4B) — international enterprise footprint merge.
 
 ### AT&T
 - **Jennifer Biry** (ex-McAfee CFO) — finance views security/data as financial health.
 - **$250B** connectivity commitment; fiber to 60M locations by 2030.
-- **Lumen mass markets $5.75B** — cross-cluster search vs multi-year migration.
+- **Mass-market acquisition** — cross-cluster search vs multi-year migration.
 - **Dynamic Defense** — Security + O11Y + Search as embedded edge engine.
 
 ### T-Mobile
@@ -79,7 +79,7 @@ U.S. carriers invest in platforms that either **defend margins (OpEx compression
 | They say | You say |
 |----------|---------|
 | "Starlink makes us irrelevant" | "Multi-transport is the long game. **Launch weekend** is when switching gets easier — a rough activation makes leaving easier too. Elastic connects OTel to **84K churn-risk** so teams can act while the relationship is still recoverable." |
-| "We can't afford another tool" | "This is **vendor consolidation** — one indexed stream for SecOps, SRE, and compliance. Frontier/Lumen integrations need federated search, not another rip-and-replace." |
+| "We can't afford another tool" | "This is **vendor consolidation** — one indexed stream for SecOps, SRE, and compliance. Post-merger integrations need federated search, not another rip-and-replace." |
 | "Our EBITDA target won't fund this" | "Searchable Snapshots cut storage 50–75%; ML reduces alert toil for lean NOC teams. Pilot one launch hotspot region — quantify before Sept 2026." |
 | "We're mid-M&A" | "Cross-Cluster Search monitors acquired networks **where they sit** — months off integration timeline vs centralizing everything first." |
 

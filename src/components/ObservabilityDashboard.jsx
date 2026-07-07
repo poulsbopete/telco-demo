@@ -33,6 +33,7 @@ import {
   kibanaO11yDashboardUrl,
   elasticWorkflowUrl,
   TELCO_DISCOVER_ESQL,
+  buildTelcoLaunchDiscoverEsql,
 } from '../lib/elastic-api';
 
 export function ObservabilityDashboard() {
@@ -155,6 +156,7 @@ export function ObservabilityDashboard() {
   const activeTrace = selectedTrace || traces[0];
   const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
   const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const launchDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: buildTelcoLaunchDiscoverEsql() });
   const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
   const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
   const demoMlIntelligence = buildDemoMlSignalIntelligence(DEMO_ML_ANOMALIES);
@@ -185,7 +187,7 @@ export function ObservabilityDashboard() {
       <LaunchBusinessMetrics
         className="mb-8"
         kibanaDashboardUrl={o11yDashboardUrl}
-        kibanaDiscoverUrl={discoverUrl}
+        kibanaDiscoverUrl={launchDiscoverUrl}
       />
 
       <div className="surface-card p-5 mb-8">

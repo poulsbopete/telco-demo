@@ -7,7 +7,7 @@ import {
   Activity, AlertCircle, ArrowLeft, Bot, Brain, ExternalLink,
   GitBranch, Shield, Workflow, Zap,
 } from 'lucide-react';
-import { formatCount, kibanaDiscoverUrl, TELCO_DISCOVER_ESQL } from '../lib/elastic-api';
+import { formatCount, kibanaDiscoverUrl, buildTelcoRegionsDiscoverEsql } from '../lib/elastic-api';
 import { ChurnRiskTile } from './shared/ChurnRiskTile';
 import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
 import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
@@ -40,12 +40,14 @@ export function RegionDetailPanel({
   const anomaly = detail.primaryAnomaly;
   const trace = detail.traceDrilldown;
   const chartData = detail.hourlyTrend?.map(h => ({
-    time: h.label,
+    time: h.hour,
     sessions: h.sessions,
     p99Ms: h.p99Ms,
   })) || [];
 
-  const kibanaRegionUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const kibanaRegionUrl = kibanaDiscoverUrl(kibanaUrl, {
+    query: buildTelcoRegionsDiscoverEsql(m?.regionId),
+  });
 
   return (
     <div className="mt-4 bg-white rounded-xl border-2 border-telco-magenta/30 shadow-sm overflow-hidden">

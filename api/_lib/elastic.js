@@ -140,7 +140,7 @@ FROM logs-generic.otel-default
 export function buildLogSearchQuery({ service, level, text, limit = 25, paymentOnly = false }) {
   const filters = [];
   if (paymentOnly) {
-    filters.push('service.name IN ("checkout", "payment", "cart", "checkoutservice", "paymentservice")');
+    filters.push('service.name IN ("checkout", "payment", "cart", "checkoutservice", "paymentservice", "frauddetectionservice", "frontend-web", "kafka")');
   }
   if (service) filters.push(`service.name == "${service.replace(/"/g, '')}"`);
   if (level) filters.push(`log.level == "${level.replace(/"/g, '')}"`);

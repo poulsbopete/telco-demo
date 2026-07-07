@@ -1,5 +1,6 @@
 import { WORKFLOW_TEMPLATES } from '../_lib/telco-context.js';
-import { runTelcoCheckoutWorkflow } from '../_lib/kibana-workflows.js';
+import { runTelcoCheckoutWorkflow, kibanaWorkflowAppUrl } from '../_lib/kibana-workflows.js';
+import { getKibanaCoreWorkflowId } from '../../lib/telco-workflow-ids.js';
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -80,6 +81,11 @@ export default async function handler(req, res) {
       message = `Demo resolution started — ${kibana.error}`;
     }
 
+    const kibanaUrl = process.env.KIBANA_URL || process.env.VITE_KIBANA_URL;
+    const fallbackWorkflowUrl = kibanaWorkflowAppUrl(kibanaUrl, {
+      workflowId: getKibanaCoreWorkflowId(),
+    });
+
     return res.status(200).json({
       ok: true,
       workflowId,
@@ -95,9 +101,9 @@ export default async function handler(req, res) {
       aiSummary,
       estimatedResolutionMin: isSecurityWorkflow ? 8 : 4,
       executedAt: new Date().toISOString(),
-      kibanaWorkflowId: kibana?.kibanaWorkflowId || null,
+      kibanaWorkflowId: kibana?.kibanaWorkflowId || getKibanaCoreWorkflowId(),
       kibanaWorkflowName: kibana?.kibanaWorkflowName || template.name,
-      kibanaWorkflowUrl: kibana?.kibanaWorkflowUrl || null,
+      kibanaWorkflowUrl: kibana?.kibanaWorkflowUrl || fallbackWorkflowUrl,
       kibanaExecutionId: kibana?.kibanaExecutionId || null,
       kibanaExecutionUrl: kibana?.kibanaExecutionUrl || null,
       kibanaLinked: Boolean(kibana?.linked),
