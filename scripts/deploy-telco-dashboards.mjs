@@ -135,11 +135,38 @@ const ES_QL = {
 /** Dashboard time range — required when %timefield% is set on Vega ES|QL data sources */
 const ES_QL_TIME_WHERE = '| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend';
 
+/** Maps otel-demo microservices to telco NOC labels (see lib/telco-discover-esql.js) */
+const TELCO_OTEL_INDEX = 'logs-generic.otel-default';
+const TELCO_OTEL_SERVICE_FILTER =
+  'service.name IN ("checkout", "payment", "cart", "checkoutservice", "paymentservice", "frauddetectionservice", "frontend-web", "kafka")';
+const TELCO_SERVICE_EVAL = [
+  '| EVAL telco_service = CASE(',
+  'service.name == "checkout" OR service.name == "checkoutservice", "Core Signaling (5G AMF/SMF)",',
+  'service.name == "payment" OR service.name == "paymentservice", "Billing & Charging",',
+  'service.name == "cart", "Service Provisioning",',
+  'service.name == "frauddetectionservice", "Fraud & Abuse Detection",',
+  'service.name == "frontend-web", "Customer Self-Care Portal",',
+  'service.name == "kafka", "Network Event Bus",',
+  'COALESCE(service.name, "Unknown"))',
+].join(' ');
+const TELCO_LAUNCH_FILTER =
+  '(body.text LIKE "*iPhone*" OR body.text LIKE "*eSIM*" OR body.text LIKE "*provisioning*" OR body.text LIKE "*launch*" OR body.text LIKE "*SM-DP*" OR body.text LIKE "*activation*")';
+
+const TELCO_CORE_COLORS = {
+  'Core Signaling (5G AMF/SMF)': '#6092C0',
+  'Billing & Charging': '#00bfb3',
+  'Service Provisioning': '#e20074',
+  'Fraud & Abuse Detection': '#f5a700',
+  'Customer Self-Care Portal': '#54b399',
+  'Network Event Bus': '#9170b8',
+};
+
 const TARGETS = {
   observability: {
     dashboardId: 'telco-demo-network-telemetry',
     title: 'Telco NOC — Network Telemetry',
-    description: '5G core OTel logs, service volume, errors, and Adaptive Networks fault injection (otel-demo).',
+    description:
+      '5G core OTel logs remapped to telco services, iPhone launch signals, errors, and Adaptive Networks fault injection (otel-demo).',
     visualizations: [
       {
         id: 'telco-o11y-log-volume',
@@ -147,50 +174,189 @@ const TARGETS = {
         spec: {
           $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
           title: 'OTel Log Volume Over Time',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
           data: {
             url: {
               ...ES_QL,
-              query: `FROM logs-generic.otel-default
+              query: `FROM ${TELCO_OTEL_INDEX}
 | STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend)
 | SORT bucket ASC`,
             },
           },
-          mark: { type: 'area', line: true, opacity: 0.35 },
+          mark: { type: 'area', line: true, opacity: 0.35, color: '#6092C0' },
           encoding: {
             x: { field: 'bucket', type: 'temporal', title: 'Time' },
             y: { field: 'count', type: 'quantitative', title: 'Log events' },
             tooltip: [
               { field: 'bucket', type: 'temporal', title: 'Time' },
-              { field: 'count', type: 'quantitative', title: 'Events' },
+              { field: 'count', type: 'quantitative', title: 'Events', format: ',.0f' },
             ],
           },
         },
-        layout: { x: 0, y: 0, w: 48, h: 12 },
+        layout: { x: 0, y: 0, w: 48, h: 10 },
       },
       {
-        id: 'telco-o11y-top-services',
-        title: 'Top Services by Log Volume',
+        id: 'telco-o11y-core-pipeline',
+        title: '5G Core Pipeline — Volume by Telco Service',
         spec: {
           $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
-          title: 'Top Services by Log Volume',
+          title: '5G Core Pipeline — Volume by Telco Service',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
           data: {
             url: {
               ...ES_QL,
-              query: `FROM logs-generic.otel-default
+              query: `FROM ${TELCO_OTEL_INDEX}
 ${ES_QL_TIME_WHERE}
-| STATS volume = COUNT(*) BY service = \`service.name\`
+| WHERE ${TELCO_OTEL_SERVICE_FILTER}
+${TELCO_SERVICE_EVAL}
+| STATS volume = COUNT(*) BY telco_service
 | SORT volume DESC
 | LIMIT 10`,
             },
           },
           mark: 'bar',
           encoding: {
-            y: { field: 'service', type: 'nominal', sort: '-x', title: 'Service' },
-            x: { field: 'volume', type: 'quantitative', title: 'Events' },
-            color: { field: 'volume', type: 'quantitative', legend: null, scale: { scheme: 'blues' } },
+            y: { field: 'telco_service', type: 'nominal', sort: '-x', title: 'Telco service' },
+            x: { field: 'volume', type: 'quantitative', title: 'Log events', axis: { format: '~s' } },
+            color: {
+              field: 'telco_service',
+              type: 'nominal',
+              legend: null,
+              scale: {
+                domain: Object.keys(TELCO_CORE_COLORS),
+                range: Object.values(TELCO_CORE_COLORS),
+              },
+            },
+            tooltip: [
+              { field: 'telco_service', type: 'nominal', title: 'Service' },
+              { field: 'volume', type: 'quantitative', title: 'Events', format: ',.0f' },
+            ],
           },
         },
-        layout: { x: 0, y: 12, w: 24, h: 12 },
+        layout: { x: 0, y: 10, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-o11y-error-rate',
+        title: '5G Core Pipeline — Error Rate by Service',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: '5G Core Pipeline — Error Rate by Service',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+${ES_QL_TIME_WHERE}
+| WHERE ${TELCO_OTEL_SERVICE_FILTER}
+${TELCO_SERVICE_EVAL}
+| STATS volume = COUNT(*), errors = COUNT(*) WHERE log.level IN ("ERROR", "Error") BY telco_service
+| EVAL error_rate_pct = ROUND(errors * 100.0 / volume, 3)
+| SORT error_rate_pct DESC
+| LIMIT 10`,
+            },
+          },
+          mark: 'bar',
+          encoding: {
+            y: { field: 'telco_service', type: 'nominal', sort: '-x', title: 'Telco service' },
+            x: { field: 'error_rate_pct', type: 'quantitative', title: 'Error rate (%)' },
+            color: {
+              field: 'error_rate_pct',
+              type: 'quantitative',
+              legend: null,
+              scale: { scheme: 'reds' },
+            },
+            tooltip: [
+              { field: 'telco_service', type: 'nominal', title: 'Service' },
+              { field: 'errors', type: 'quantitative', title: 'Errors', format: ',.0f' },
+              { field: 'volume', type: 'quantitative', title: 'Total events', format: ',.0f' },
+              { field: 'error_rate_pct', type: 'quantitative', title: 'Error rate %', format: '.3f' },
+            ],
+          },
+        },
+        layout: { x: 24, y: 10, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-o11y-core-over-time',
+        title: '5G Core Pipeline — Volume Over Time',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: '5G Core Pipeline — Volume Over Time',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+| WHERE ${TELCO_OTEL_SERVICE_FILTER}
+${TELCO_SERVICE_EVAL}
+| STATS volume = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend), telco_service
+| SORT bucket ASC`,
+            },
+          },
+          mark: { type: 'area', line: true, opacity: 0.55 },
+          encoding: {
+            x: { field: 'bucket', type: 'temporal', title: 'Time' },
+            y: { field: 'volume', type: 'quantitative', title: 'Events', stack: 'zero', axis: { format: '~s' } },
+            color: {
+              field: 'telco_service',
+              type: 'nominal',
+              title: 'Telco service',
+              scale: {
+                domain: Object.keys(TELCO_CORE_COLORS),
+                range: Object.values(TELCO_CORE_COLORS),
+              },
+            },
+            tooltip: [
+              { field: 'bucket', type: 'temporal', title: 'Time' },
+              { field: 'telco_service', type: 'nominal', title: 'Service' },
+              { field: 'volume', type: 'quantitative', title: 'Events', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 0, y: 22, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-o11y-launch-signals',
+        title: 'iPhone Launch — Provisioning & Activation Signals',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'iPhone Launch — Provisioning & Activation Signals',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+| WHERE ${TELCO_OTEL_SERVICE_FILTER} AND ${TELCO_LAUNCH_FILTER}
+${TELCO_SERVICE_EVAL}
+| STATS events = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend), telco_service
+| SORT bucket ASC`,
+            },
+          },
+          mark: { type: 'line', point: { filled: true, size: 40 }, interpolate: 'monotone' },
+          encoding: {
+            x: { field: 'bucket', type: 'temporal', title: 'Time' },
+            y: { field: 'events', type: 'quantitative', title: 'Launch signals' },
+            color: {
+              field: 'telco_service',
+              type: 'nominal',
+              title: 'Telco service',
+              scale: {
+                domain: Object.keys(TELCO_CORE_COLORS),
+                range: Object.values(TELCO_CORE_COLORS),
+              },
+            },
+            tooltip: [
+              { field: 'bucket', type: 'temporal', title: 'Time' },
+              { field: 'telco_service', type: 'nominal', title: 'Service' },
+              { field: 'events', type: 'quantitative', title: 'Signals', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 24, y: 22, w: 24, h: 12 },
       },
       {
         id: 'telco-o11y-errors',
@@ -198,23 +364,28 @@ ${ES_QL_TIME_WHERE}
         spec: {
           $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
           title: 'Errors & Warnings Over Time',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
           data: {
             url: {
               ...ES_QL,
-              query: `FROM logs-generic.otel-default
+              query: `FROM ${TELCO_OTEL_INDEX}
 | WHERE log.level IN ("ERROR", "Error", "WARN", "Warning")
 | STATS errors = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend)
 | SORT bucket ASC`,
             },
           },
-          mark: { type: 'line', point: true },
+          mark: { type: 'line', point: true, color: '#e20074' },
           encoding: {
             x: { field: 'bucket', type: 'temporal', title: 'Time' },
             y: { field: 'errors', type: 'quantitative', title: 'Events' },
-            color: { value: '#00bfb3' },
+            tooltip: [
+              { field: 'bucket', type: 'temporal', title: 'Time' },
+              { field: 'errors', type: 'quantitative', title: 'Events', format: ',.0f' },
+            ],
           },
         },
-        layout: { x: 24, y: 12, w: 24, h: 12 },
+        layout: { x: 0, y: 34, w: 24, h: 10 },
       },
       {
         id: 'telco-o11y-adaptive-faults',
@@ -222,6 +393,8 @@ ${ES_QL_TIME_WHERE}
         spec: {
           $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
           title: 'Adaptive Networks Fault Types',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
           data: {
             url: {
               ...ES_QL,
@@ -243,9 +416,13 @@ ${ES_QL_TIME_WHERE}
             y: { field: 'fault', type: 'nominal', sort: '-x', title: 'Fault type' },
             x: { field: 'errors', type: 'quantitative', title: 'Events' },
             color: { value: '#00bfb3' },
+            tooltip: [
+              { field: 'fault', type: 'nominal', title: 'Fault' },
+              { field: 'errors', type: 'quantitative', title: 'Events', format: ',.0f' },
+            ],
           },
         },
-        layout: { x: 0, y: 24, w: 48, h: 12 },
+        layout: { x: 24, y: 34, w: 24, h: 10 },
       },
     ],
   },

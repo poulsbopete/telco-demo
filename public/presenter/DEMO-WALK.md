@@ -20,7 +20,7 @@
 | 7 | Fragmented → connected | MTTR · sprawl costs · 4,200 → 12 |
 | 8 | Live demo | 7-step walk · switch to app here |
 | 9 | Agentic observability | 4-step ladder · what's next after unify |
-| 10 | Close | Unify · Open · Predict · Act · together |
+| 10 | Close | Unify · Open · Predict · Act · analyst recognition · together |
 
 *Removed from slides (detail lives in this script + TELCO-LANDSCAPE-2026-REFERENCE.md): agenda, five dimensions, Observability Labs stats grid, partner playbook table, Search AI speed, personas, three questions, separate story-arc slide.*
 
@@ -193,6 +193,7 @@
 
 - "Commoditization and D2D are the long game. **Launch execution is where you earn trust today.**"
 - "Elastic: **Unify · Open · Predict · Act** — and a path to **agentic** remediation on the OTel you already have."
+- "**Analyst-validated platform:** Gartner **Leader** in Observability; Gartner **Visionary** in SIEM; Forrester **Leader** in Security Analytics; IDC **Leader** in XDR — one Search AI foundation for launch weekend and beyond."
 - "**Engineering telecom resilience together** — pilot one hotspot region before Sept 2026. Quantify churn-risk and alert reduction — then expand across the data ecosystem."
 
 ---

@@ -107,6 +107,10 @@ style: |
   }
   .walk-step b { color: #fff; }
   .walk-step span { color: #9a9aa0; display: block; margin-top: 0.1em; }
+  .analyst-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 1.1em; max-width: 92%; margin-left: auto; margin-right: auto; }
+  .analyst-badge { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 12px; padding: 10px 12px; font-size: 0.58em; line-height: 1.35; text-align: left; }
+  .analyst-badge b { display: block; color: #00bfb3; font-size: 1.05em; margin-bottom: 0.2em; }
+  .analyst-badge span { color: #9a9aa0; }
   .bridge-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; font-size: 0.68em; margin-top: 0.4em; }
   .bridge-box { border: 1px solid #2a2a2e; border-radius: 10px; padding: 10px 12px; }
   .bridge-box h3 { color: #fff; font-size: 0.95em; margin: 0 0 0.3em; }
@@ -342,6 +346,13 @@ telco-demo-sage.vercel.app · live demo ~12 min
 **Commoditization is the long game · launch execution is where you earn trust today**
 
 **Unify · Open · Predict · Act · Agentic**
+
+<div class="analyst-row">
+  <div class="analyst-badge"><b>Gartner® Magic Quadrant™</b><span><strong>Leader</strong> — Observability Platforms (2025)</span></div>
+  <div class="analyst-badge"><b>Gartner® Magic Quadrant™</b><span><strong>Visionary</strong> — Security Information &amp; Event Management (2025)</span></div>
+  <div class="analyst-badge"><b>Forrester Wave™</b><span><strong>Leader</strong> — Security Analytics Platforms, Q2 2025</span></div>
+  <div class="analyst-badge"><b>IDC MarketScape</b><span><strong>Leader</strong> — Worldwide XDR Software (2025)</span></div>
+</div>
 
 Engineering the future of telecom resilience — together
 
