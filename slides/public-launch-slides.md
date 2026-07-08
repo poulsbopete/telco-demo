@@ -120,6 +120,15 @@ style: |
   .board-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.62em; margin-top: 0.4em; }
   .board-item { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 8px; padding: 8px 10px; }
   .board-item b { color: #00bfb3; display: block; margin-bottom: 0.15em; }
+  .ingest-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; font-size: 0.62em; margin-top: 0.45em; }
+  .ingest-card { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 10px; padding: 9px 10px; line-height: 1.38; }
+  .ingest-card b { color: #fff; display: block; font-size: 1.02em; margin-bottom: 0.2em; }
+  .ingest-card span { color: #9a9aa0; }
+  .ingest-card.accent { border-color: #00bfb3; background: rgba(0,191,179,.06); }
+  .signal-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 0.5em; font-size: 0.6em; }
+  .signal-pill { border-radius: 10px; padding: 8px 9px; border: 1px solid #2a2a2e; background: rgba(255,255,255,.03); }
+  .signal-pill b { display: block; color: #00bfb3; margin-bottom: 0.15em; }
+  .signal-pill span { color: #9a9aa0; line-height: 1.35; display: block; }
   .gap-compare { display: grid; grid-template-columns: 1fr 32px 1fr 1fr; gap: 8px; align-items: center; margin-top: 0.4em; font-size: 0.65em; }
   .gap-box { border-radius: 12px; padding: 12px 10px; text-align: center; }
   .gap-box.before { background: rgba(191,72,0,.12); border: 1px solid #bf4800; }
@@ -232,33 +241,32 @@ telco-demo-sage.vercel.app · live demo ~12 min
 
 ---
 
-<span class="kicker">DATA ECOSYSTEM</span>
+<span class="kicker">DATA INGESTION</span>
 
-# Meet you where you are. Scale where you need to.
+# Everything flows in. Nothing waits on a schema.
+## Schemaless ingest — index first, shape later with ES\|QL.
 
-<div class="cols">
+<p class="subhead">Elastic accepts <strong>any structure at ingest</strong> — no warehouse preload, no rigid star schema. Fields emerge from OTel, agents, APIs, and syslog; you query across logs, metrics, traces, and business signals in one tier.</p>
 
-<div class="ecosystem-img">
-
-![width:100%](/slides/assets/elastic-data-ecosystem.png)
-
+<div class="signal-row">
+  <div class="signal-pill"><b>Logs</b><span>App &amp; core · RAN/syslog · care transcripts · audit trails</span></div>
+  <div class="signal-pill"><b>Metrics</b><span>Infra (CPU, latency) · <strong>log-derived</strong> · custom app counters</span></div>
+  <div class="signal-pill"><b>Traces</b><span>OTel spans · service maps · cross-tier correlation</span></div>
+  <div class="signal-pill"><b>Business signals</b><span>Activations · churn-risk · revenue KPIs · SLA timers</span></div>
 </div>
 
-<div class="ecosystem-panel">
-
-**iPhone 18 mapping**
-
-- O11Y **primary** — OTel ingest · ML forecast · region hotspots
-- Elasticsearch **primary** — ES\|QL · log search · compliance query
-- Security **enabling** — SIM swap · launch fraud · same foundation
-
-**Pilot one hotspot region** → launch-weekend visibility → workflows &amp; ML at scale.
-
+<div class="ingest-grid">
+  <div class="ingest-card accent"><b>OpenTelemetry</b><span>SDKs &amp; collectors — apps, 5G core, SM-DP+, CDN edge (this demo)</span></div>
+  <div class="ingest-card"><b>Elastic Agent &amp; Beats</b><span>Hosts · containers · network taps · unified shipper</span></div>
+  <div class="ingest-card"><b>Kafka &amp; event bus</b><span>Streaming pipelines · replay · fan-out to analytics</span></div>
+  <div class="ingest-card"><b>Cloud-native</b><span>AWS/GCP/Azure metrics &amp; audit · CloudWatch · Pub/Sub</span></div>
+  <div class="ingest-card"><b>Syslog &amp; SNMP</b><span>RAN/backhaul · Adaptive Networks fault inject (this demo)</span></div>
+  <div class="ingest-card"><b>APIs &amp; bulk</b><span>REST bulk · S3/blob replay · custom ETL · security feeds</span></div>
 </div>
 
-</div>
+<p class="callout" style="margin-top:0.55em"><strong>Schemaless advantage:</strong> launch-weekend spikes bring new fields — provisioning errors, region tags, trace IDs — without a schema migration. <strong>ES\|QL</strong> and runtime fields connect RAN, core, and care in one query.</p>
 
-<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Data Ecosystem · iPhone 18</span></div>
+<div class="slide-foot"><span>elastic.co | Elastic Observability</span><span>Data Ingestion · Schemaless</span></div>
 
 ---
 

@@ -16,7 +16,7 @@
 | 3 | iPhone 18 at stake | Metrics · anchor line |
 | 4 | 2026 telco reality | D2D/Starlink · boardroom · bridge to demo |
 | 5 | Why Elastic | Unify · Open · Predict · Act |
-| 6 | Data ecosystem | Fan chart · meet you where you are |
+| 6 | Data ingestion | Schemaless ingest · logs · metrics · traces · paths in |
 | 7 | Fragmented → connected | MTTR · sprawl costs · 4,200 → 12 |
 | 8 | Live demo | 7-step walk · switch to app here |
 | 9 | Agentic observability | 4-step ladder · what's next after unify |
@@ -82,6 +82,12 @@
 **Transition to demo:**
 
 - "This demo shows Elastic connecting **live OTel** to **business impact** for iPhone 18 launch — the exec chain NOC needs in one view."
+
+**Optional — slide 6 (Data ingestion, ~30 sec):**
+
+- "**Schemaless ingest** — no warehouse preload. OTel from core and provisioning lands as-is; new launch-weekend fields appear without a schema project."
+- "Four signal types in one tier: **logs**, **metrics** (infra + **log-derived**), **traces**, and **business KPIs** — activations, churn-risk, revenue."
+- "Ingest from **OTel, agents, Kafka, cloud APIs, syslog** — same platform you'll see in the live demo and Security tab."
 
 ---
 
@@ -206,7 +212,7 @@
 | iPhone 18 at stake (slide 3) | Step 1 — launch strip metrics |
 | 2026 telco reality (slide 4) | Step 5 — exec KPIs + bridge talk track |
 | Why Elastic (slide 5) | Steps 2–6 · Unify/Open/Predict/Act |
-| Data ecosystem (slide 6) | Step 2 OTel · Step 7 Security enabling |
+| Data ingestion (slide 6) | Step 2 OTel · log-derived metrics · Step 7 Security feeds |
 | Fragmented → connected (slide 7) | Step 6 — 4,200 → 12 narrative · sprawl costs talk track |
 | Agentic observability (slide 9) | Post-demo bridge · A2A / workflow / Agent Builder in app |
 

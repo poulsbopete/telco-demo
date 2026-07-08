@@ -8,7 +8,7 @@
  *   npm run deploy:dashboard:security
  *
  * Credentials (first match wins):
- *   observability — .env.local ES_API_KEY + VITE_KIBANA_URL
+ *   observability — KIBANA_API_KEY or ES_API_KEY + VITE_KIBANA_URL
  *   search        — telco-agent/.env KIBANA_API_KEY + KIBANA_BASE_URL (or env overrides)
  *   security      — SECURITY_KIBANA_API_KEY + VITE_SECURITY_KIBANA_URL (or env overrides)
  */
@@ -33,7 +33,7 @@ if (TARGET === 'search' && existsSync(resolve(ROOT, '../telco-agent/.env'))) {
 const TARGET_DEFAULTS = {
   observability: {
     kibanaUrl: process.env.VITE_KIBANA_URL || process.env.KIBANA_URL,
-    apiKey: process.env.ES_API_KEY,
+    apiKey: process.env.KIBANA_API_KEY || process.env.ES_API_KEY,
   },
   search: {
     kibanaUrl: process.env.KIBANA_BASE_URL || process.env.VITE_SEARCH_KIBANA_URL || process.env.SEARCH_KIBANA_URL,
@@ -135,6 +135,9 @@ const ES_QL = {
 /** Dashboard time range — required when %timefield% is set on Vega ES|QL data sources */
 const ES_QL_TIME_WHERE = '| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend';
 
+/** otel-demo cart/checkout/payment traffic clusters in bursts; 7d often misses it — default wider */
+const O11Y_DASHBOARD_TIME_FROM = 'now-30d';
+
 /** Maps otel-demo microservices to telco NOC labels (see lib/telco-discover-esql.js) */
 const TELCO_OTEL_INDEX = 'logs-generic.otel-default';
 const TELCO_OTEL_SERVICE_FILTER =
@@ -167,6 +170,7 @@ const TARGETS = {
     title: 'Telco NOC — Network Telemetry',
     description:
       '5G core OTel logs remapped to telco services, iPhone launch signals, errors, and Adaptive Networks fault injection (otel-demo).',
+    timeFrom: O11Y_DASHBOARD_TIME_FROM,
     visualizations: [
       {
         id: 'telco-o11y-log-volume',
@@ -320,39 +324,28 @@ ${TELCO_SERVICE_EVAL}
       },
       {
         id: 'telco-o11y-launch-signals',
-        title: 'iPhone Launch — Provisioning & Activation Signals',
+        title: 'Service Provisioning — Launch Weekend Volume',
         spec: {
           $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
-          title: 'iPhone Launch — Provisioning & Activation Signals',
+          title: 'Service Provisioning — Launch Weekend Volume',
           autosize: { type: 'fit', contains: 'padding' },
           config: { view: { stroke: null } },
           data: {
             url: {
               ...ES_QL,
               query: `FROM ${TELCO_OTEL_INDEX}
-| WHERE ${TELCO_OTEL_SERVICE_FILTER} AND ${TELCO_LAUNCH_FILTER}
-${TELCO_SERVICE_EVAL}
-| STATS events = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend), telco_service
+| WHERE service.name == "cart"
+| STATS events = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend)
 | SORT bucket ASC`,
             },
           },
-          mark: { type: 'line', point: { filled: true, size: 40 }, interpolate: 'monotone' },
+          mark: { type: 'line', point: { filled: true, size: 40 }, interpolate: 'monotone', color: '#e20074' },
           encoding: {
             x: { field: 'bucket', type: 'temporal', title: 'Time' },
-            y: { field: 'events', type: 'quantitative', title: 'Launch signals' },
-            color: {
-              field: 'telco_service',
-              type: 'nominal',
-              title: 'Telco service',
-              scale: {
-                domain: Object.keys(TELCO_CORE_COLORS),
-                range: Object.values(TELCO_CORE_COLORS),
-              },
-            },
+            y: { field: 'events', type: 'quantitative', title: 'Provisioning events' },
             tooltip: [
               { field: 'bucket', type: 'temporal', title: 'Time' },
-              { field: 'telco_service', type: 'nominal', title: 'Service' },
-              { field: 'events', type: 'quantitative', title: 'Signals', format: ',.0f' },
+              { field: 'events', type: 'quantitative', title: 'Events', format: ',.0f' },
             ],
           },
         },
@@ -665,7 +658,7 @@ async function main() {
       cfg.title,
       cfg.description,
       cfg.visualizations.map(v => ({ vizId: v.id, ...v.layout })),
-      cfg.timeFrom || 'now-7d',
+      cfg.timeFrom || (TARGET === 'observability' ? O11Y_DASHBOARD_TIME_FROM : 'now-7d'),
       cfg.timeTo || 'now',
     ),
   ];
