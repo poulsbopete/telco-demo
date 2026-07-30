@@ -9,13 +9,13 @@ tags:
   - DEMO
 triggers:
   - type: manual
-inputs:
-  - name: regionId
-    type: string
-    required: false
-  - name: traceId
-    type: string
-    required: false
+    inputs:
+      - name: regionId
+        type: string
+        required: false
+      - name: traceId
+        type: string
+        required: false
 steps:
   - name: ingest_ml_anomaly
     type: console
