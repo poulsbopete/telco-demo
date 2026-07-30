@@ -235,6 +235,10 @@ export function elasticWorkflowUrl(elasticBase, { workflowId, executionId, url }
   if (url) return url;
   const base = (elasticBase || import.meta.env.VITE_KIBANA_URL || '').replace(/\/$/, '');
   if (!base) return null;
+  // No explicit id → workflows list (avoid 404 on missing demo slug)
+  if (!workflowId && !executionId) {
+    return `${base}/app/workflows`;
+  }
   const resolvedWorkflowId = resolveElasticWorkflowId(workflowId);
   if (resolvedWorkflowId && executionId) {
     const params = new URLSearchParams({
