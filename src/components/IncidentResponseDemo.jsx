@@ -13,10 +13,8 @@ import {
 } from '../lib/incident-response/architecture';
 import {
   elasticWorkflowUrl,
-  getSearchKibanaUrl,
   kibanaDiscoverUrl,
   kibanaO11yDashboardUrl,
-  kibanaSearchDiscoverUrl,
   TELCO_DISCOVER_ESQL,
 } from '../lib/elastic-api';
 
@@ -32,10 +30,8 @@ export function IncidentResponseDemo() {
   const scenario = SCENARIOS[activeLoop];
   const loopMeta = LOOPS[activeLoop];
   const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
-  const searchKibanaUrl = getSearchKibanaUrl();
   const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
   const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
-  const searchUrl = kibanaSearchDiscoverUrl(searchKibanaUrl);
   const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
 
   const activeNode = stepIndex >= 0 ? scenario.steps[stepIndex]?.node : null;
@@ -101,10 +97,9 @@ export function IncidentResponseDemo() {
         </button>
         <ElasticDeepLinks
           links={[
-            { href: o11yDashboardUrl, label: 'Dashboard', primary: true },
+            { href: workflowsUrl, label: 'Workflows', primary: true },
+            { href: o11yDashboardUrl, label: 'Dashboard' },
             { href: discoverUrl, label: 'Discover' },
-            { href: searchUrl, label: 'Runbooks' },
-            { href: workflowsUrl, label: 'Workflows' },
           ]}
         />
       </ModuleHeader>
