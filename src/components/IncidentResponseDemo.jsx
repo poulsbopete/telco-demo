@@ -13,6 +13,7 @@ import {
 } from '../lib/incident-response/architecture';
 import {
   elasticWorkflowUrl,
+  getSearchKibanaUrl,
   kibanaDiscoverUrl,
   kibanaO11yDashboardUrl,
   TELCO_DISCOVER_ESQL,
@@ -30,9 +31,13 @@ export function IncidentResponseDemo() {
   const scenario = SCENARIOS[activeLoop];
   const loopMeta = LOOPS[activeLoop];
   const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
+  const searchKibanaUrl = getSearchKibanaUrl();
   const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
   const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
-  const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
+  // Knowledge / runbook workflows live on Search (ai-assistants), not O11Y
+  const workflowsUrl = elasticWorkflowUrl(searchKibanaUrl, {
+    workflowId: 'telco-core-latency-auto-remediation',
+  });
 
   const activeNode = stepIndex >= 0 ? scenario.steps[stepIndex]?.node : null;
 
