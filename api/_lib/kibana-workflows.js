@@ -1,6 +1,6 @@
 /**
- * Register and run Telco demo workflows in Kibana Serverless.
- * The demo UI simulates steps locally; this module ensures a real workflow exists in Kibana.
+ * Register and run Telco demo workflows in Kibana Serverless (Search project).
+ * The demo UI simulates steps locally; this module kicks off the real workflow in Kibana.
  */
 
 import { readFileSync } from 'fs';
@@ -12,6 +12,8 @@ import { TELCO_CORE_WORKFLOW_SLUG } from '../../lib/telco-workflow-ids.js';
 
 export const TELCO_CORE_WORKFLOW_NAME = 'Telco 5G Core Latency Auto-Remediation';
 export { TELCO_CORE_WORKFLOW_SLUG };
+
+const SEARCH_KIBANA_DEFAULT = 'https://ai-assistants-ffcafb.kb.us-east-1.aws.elastic.cloud';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const WORKFLOW_YAML = readFileSync(
@@ -29,8 +31,37 @@ function kibanaHeaders(apiKey) {
   };
 }
 
+/** Workflows live on the Search Serverless project (ai-assistants). */
+export function getWorkflowKibanaConfig() {
+  const kibanaUrl = (
+    process.env.SEARCH_KIBANA_URL
+    || process.env.VITE_SEARCH_KIBANA_URL
+    || SEARCH_KIBANA_DEFAULT
+  ).replace(/\/$/, '');
+
+  const apiKey = (
+    process.env.SEARCH_API_KEY
+    || process.env.SEARCH_KIBANA_API_KEY
+    || process.env.SEARCH_ES_API_KEY
+    || process.env.ES_API_KEY
+    || process.env.ELASTICSEARCH_API_KEY
+  );
+
+  if (!apiKey) {
+    const fallback = getElasticConfig();
+    if (!fallback.ok) return { ok: false, error: 'Missing SEARCH_API_KEY (or ES_API_KEY)' };
+    return {
+      ok: true,
+      kibanaUrl: kibanaUrl || fallback.kibanaUrl,
+      apiKey: fallback.apiKey,
+    };
+  }
+
+  return { ok: true, kibanaUrl, apiKey };
+}
+
 export function kibanaWorkflowAppUrl(kibanaUrl, { workflowId, executionId } = {}) {
-  const base = (kibanaUrl || '').replace(/\/$/, '');
+  const base = (kibanaUrl || getWorkflowKibanaConfig().kibanaUrl || '').replace(/\/$/, '');
   if (!base) return null;
   if (executionId && workflowId) {
     const params = new URLSearchParams({
@@ -47,11 +78,11 @@ export function kibanaWorkflowAppUrl(kibanaUrl, { workflowId, executionId } = {}
 }
 
 async function kibanaFetch(path, { method = 'GET', body } = {}) {
-  const config = getElasticConfig();
+  const config = getWorkflowKibanaConfig();
   if (!config.ok) return { ok: false, error: config.error };
 
-  const kibanaUrl = process.env.KIBANA_URL || process.env.VITE_KIBANA_URL || config.kibanaUrl;
-  if (!kibanaUrl) return { ok: false, error: 'Missing KIBANA_URL' };
+  const kibanaUrl = config.kibanaUrl;
+  if (!kibanaUrl) return { ok: false, error: 'Missing SEARCH_KIBANA_URL / VITE_SEARCH_KIBANA_URL' };
 
   const url = `${kibanaUrl.replace(/\/$/, '')}${path}`;
   const res = await fetch(url, {
@@ -68,9 +99,10 @@ async function kibanaFetch(path, { method = 'GET', body } = {}) {
 }
 
 export async function listKibanaWorkflows() {
-  const result = await kibanaFetch('/api/workflows/workflows?size=200&sortField=name&sortDirection=asc');
+  // Serverless Search uses GET /api/workflows (results[]). Older path kept as fallback.
+  const result = await kibanaFetch('/api/workflows?size=200');
   if (!result.ok) {
-    const fallback = await kibanaFetch('/api/workflows?size=200');
+    const fallback = await kibanaFetch('/api/workflows/workflows?size=200&sortField=name&sortDirection=asc');
     if (!fallback.ok) return fallback;
     return normalizeWorkflowList(fallback);
   }
@@ -79,7 +111,7 @@ export async function listKibanaWorkflows() {
 
 function normalizeWorkflowList(result) {
   const raw = result.data;
-  const items = raw?.workflows || raw?.data || raw?.items || (Array.isArray(raw) ? raw : []);
+  const items = raw?.results || raw?.workflows || raw?.data || raw?.items || (Array.isArray(raw) ? raw : []);
   return { ...result, workflows: items };
 }
 
@@ -109,34 +141,47 @@ export async function ensureTelcoCheckoutWorkflow() {
   const existing = await findTelcoCheckoutWorkflow();
   if (existing?.id) return existing;
 
-  const created = await kibanaFetch('/api/workflows/workflow', {
+  // Bulk create (Serverless Search); single-create path as fallback
+  const created = await kibanaFetch('/api/workflows', {
+    method: 'POST',
+    body: { workflows: [{ id: TELCO_CORE_WORKFLOW_SLUG, yaml: WORKFLOW_YAML }] },
+  });
+
+  if (created.ok) {
+    const wf = created.data?.created?.[0] || created.data?.workflows?.[0] || created.data;
+    if (wf?.id) return wf;
+  }
+
+  const legacy = await kibanaFetch('/api/workflows/workflow', {
     method: 'POST',
     body: { yaml: WORKFLOW_YAML },
   });
 
-  if (!created.ok) {
-    return { error: created.error, status: created.status, linked: false };
+  if (!legacy.ok) {
+    return { error: legacy.error || created.error, status: legacy.status || created.status, linked: false };
   }
 
-  return created.data?.workflow || created.data;
+  return legacy.data?.workflow || legacy.data;
 }
 
 export async function runTelcoCheckoutWorkflow({ regionId = 'REG-8847291', traceId = 'trace-checkout-001' } = {}) {
+  const config = getWorkflowKibanaConfig();
+  const kibanaUrl = config.kibanaUrl;
+
   const workflow = await ensureTelcoCheckoutWorkflow();
   if (!workflow?.id) {
     return {
       linked: false,
-      error: workflow?.error || 'Telco checkout workflow not found in Kibana',
-      kibanaWorkflowUrl: kibanaWorkflowAppUrl(process.env.KIBANA_URL || process.env.VITE_KIBANA_URL),
+      error: workflow?.error || 'Telco remediation workflow not found in Kibana',
+      kibanaWorkflowUrl: kibanaWorkflowAppUrl(kibanaUrl),
     };
   }
 
-  const kibanaUrl = process.env.KIBANA_URL || process.env.VITE_KIBANA_URL;
   const run = await kibanaFetch(`/api/workflows/workflow/${encodeURIComponent(workflow.id)}/run`, {
     method: 'POST',
     body: {
       inputs: { regionId, traceId },
-      metadata: { source: 'telco-o11y-demo' },
+      metadata: { source: 'telco-incident-response-demo' },
     },
   });
 

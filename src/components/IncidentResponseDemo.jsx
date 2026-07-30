@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  BookOpen, Bot, ExternalLink, Loader2, Play, RefreshCw, Workflow,
+  Bot, ExternalLink, Loader2, Play, RefreshCw, Workflow,
 } from 'lucide-react';
 import { IncidentResponseDiagram } from './IncidentResponseDiagram';
 import { ModuleHeader } from './shared/ModuleHeader';
@@ -16,10 +16,13 @@ import {
   getSearchKibanaUrl,
   kibanaDiscoverUrl,
   kibanaO11yDashboardUrl,
+  runWorkflow,
   TELCO_DISCOVER_ESQL,
 } from '../lib/elastic-api';
 
 const LOOP_ORDER = ['reactive', 'proactive', 'knowledge'];
+/** Proactive loop maps to Kibana alerting + Elastic Workflows on Search. */
+const WORKFLOW_LOOP = 'proactive';
 
 export function IncidentResponseDemo() {
   const [activeLoop, setActiveLoop] = useState('reactive');
@@ -27,6 +30,8 @@ export function IncidentResponseDemo() {
   const [stepIndex, setStepIndex] = useState(-1);
   const [completedNodes, setCompletedNodes] = useState(new Set());
   const [log, setLog] = useState([]);
+  const [workflowRun, setWorkflowRun] = useState(null);
+  const [workflowLoading, setWorkflowLoading] = useState(false);
 
   const scenario = SCENARIOS[activeLoop];
   const loopMeta = LOOPS[activeLoop];
@@ -38,6 +43,7 @@ export function IncidentResponseDemo() {
   const workflowsUrl = elasticWorkflowUrl(searchKibanaUrl, {
     workflowId: 'telco-core-latency-auto-remediation',
   });
+  const executionUrl = workflowRun?.kibanaExecutionUrl || workflowRun?.kibanaWorkflowUrl || workflowsUrl;
 
   const activeNode = stepIndex >= 0 ? scenario.steps[stepIndex]?.node : null;
 
@@ -75,6 +81,8 @@ export function IncidentResponseDemo() {
     setStepIndex(-1);
     setCompletedNodes(new Set());
     setLog([]);
+    setWorkflowRun(null);
+    setWorkflowLoading(false);
   }
 
   function selectLoop(loopId) {
@@ -82,11 +90,54 @@ export function IncidentResponseDemo() {
     reset();
   }
 
+  async function kickOffWorkflow() {
+    setWorkflowLoading(true);
+    try {
+      const result = await runWorkflow({
+        workflowId: 'wf-core-latency-remediation',
+        anomalyId: 'IR-PROACTIVE-001',
+        regionId: 'REG-8847291',
+      });
+      setWorkflowRun(result);
+      setLog(prev => [
+        {
+          loop: WORKFLOW_LOOP,
+          node: 'orchestrator',
+          detail: result?.kibanaExecutionId
+            ? `Elastic Workflow started — execution ${String(result.kibanaExecutionId).slice(0, 8)}…`
+            : result?.kibanaRunError
+              ? `Workflow trigger attempted — ${result.kibanaRunError}`
+              : result?.message || 'Elastic Workflow triggered from proactive loop.',
+          ts: Date.now(),
+          href: result?.kibanaExecutionUrl || result?.kibanaWorkflowUrl || null,
+        },
+        ...prev,
+      ].slice(0, 12));
+    } catch (err) {
+      setWorkflowRun({ ok: false, error: err.message });
+      setLog(prev => [
+        {
+          loop: WORKFLOW_LOOP,
+          node: 'orchestrator',
+          detail: `Workflow trigger failed — ${err.message}`,
+          ts: Date.now(),
+        },
+        ...prev,
+      ].slice(0, 12));
+    } finally {
+      setWorkflowLoading(false);
+    }
+  }
+
   function runSimulation() {
     setCompletedNodes(new Set());
     setLog([]);
+    setWorkflowRun(null);
     setPhase('running');
     setStepIndex(-1);
+    if (activeLoop === WORKFLOW_LOOP) {
+      void kickOffWorkflow();
+    }
   }
 
   const highlightedCount = nodesForLoop(activeLoop).size;
@@ -131,6 +182,9 @@ export function IncidentResponseDemo() {
               <p className="text-[10px] text-elastic-gray mt-2">
                 SLA target: <strong className="text-elastic-dark">{loopStats[loopId].sla}</strong>
                 {' · '}{loopStats[loopId].channel}
+                {loopId === WORKFLOW_LOOP && (
+                  <span className="ml-1 text-elastic-teal font-semibold">· kicks off Workflow</span>
+                )}
               </p>
             </button>
           );
@@ -155,7 +209,9 @@ export function IncidentResponseDemo() {
           >
             {phase === 'running'
               ? <><Loader2 className="w-4 h-4 animate-spin" /> Running…</>
-              : <><Play className="w-4 h-4" /> Run simulation</>}
+              : activeLoop === WORKFLOW_LOOP
+                ? <><Workflow className="w-4 h-4" /> Run + Workflow</>
+                : <><Play className="w-4 h-4" /> Run simulation</>}
           </button>
         </div>
 
@@ -191,14 +247,41 @@ export function IncidentResponseDemo() {
                     {LOOPS[entry.loop]?.label}
                   </span>
                   <p className="text-elastic-dark font-medium mt-0.5">{entry.detail}</p>
+                  {entry.href && (
+                    <a
+                      href={entry.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-elastic-teal mt-1 hover:underline"
+                    >
+                      Open execution <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
+          )}
+          {workflowLoading && (
+            <p className="text-xs text-elastic-gray mt-2 flex items-center gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" /> Starting Elastic Workflow on Search…
+            </p>
           )}
           {phase === 'done' && (
             <>
               <div className="mt-3 p-3 rounded-lg bg-success/5 border border-success/20 text-sm text-elastic-dark">
                 <strong>Outcome:</strong> {scenario.outcome}
+                {activeLoop === WORKFLOW_LOOP && executionUrl && (
+                  <a
+                    href={executionUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-flex items-center gap-1 text-elastic-teal hover:underline"
+                  >
+                    <Workflow className="w-3.5 h-3.5" />
+                    {workflowRun?.kibanaExecutionId ? 'View live workflow execution' : 'Open workflow in Elastic'}
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
               </div>
               <P1IncidentCounter
                 compact
@@ -206,7 +289,7 @@ export function IncidentResponseDemo() {
                   activeLoop === 'reactive'
                     ? 'Reactive loop — subscriber status in <90s, outage churn risk contained'
                     : activeLoop === 'proactive'
-                      ? 'Proactive loop — degradation resolved before customer-facing P1'
+                      ? 'Proactive loop — Elastic Workflow auto-remediation started before customer-facing P1'
                       : 'Knowledge loop — faster resolution on repeat incidents'
                 }
                 showMttr={activeLoop !== 'knowledge'}
@@ -228,7 +311,8 @@ export function IncidentResponseDemo() {
             <div>
               <dt className="font-semibold text-elastic-teal">Proactive loop</dt>
               <dd className="text-elastic-gray mt-0.5">
-                Kibana alerting + Elastic Workflows · cases and counters in observability · early warnings in the NOC console.
+                Kibana alerting + Elastic Workflows on Search · Run simulation starts{' '}
+                <code className="text-[10px]">telco-core-latency-auto-remediation</code> · cases and counters in observability.
               </dd>
             </div>
             <div>

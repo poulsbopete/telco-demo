@@ -1,5 +1,9 @@
 import { WORKFLOW_TEMPLATES } from '../_lib/telco-context.js';
-import { runTelcoCheckoutWorkflow, kibanaWorkflowAppUrl } from '../_lib/kibana-workflows.js';
+import {
+  runTelcoCheckoutWorkflow,
+  kibanaWorkflowAppUrl,
+  getWorkflowKibanaConfig,
+} from '../_lib/kibana-workflows.js';
 import { getKibanaCoreWorkflowId } from '../../lib/telco-workflow-ids.js';
 
 export default async function handler(req, res) {
@@ -25,9 +29,9 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET' && req.query?.bootstrap === '1') {
-    const { findTelcoCheckoutWorkflow, kibanaWorkflowAppUrl } = await import('../_lib/kibana-workflows.js');
+    const { findTelcoCheckoutWorkflow } = await import('../_lib/kibana-workflows.js');
     const wf = await findTelcoCheckoutWorkflow();
-    const kibanaUrl = process.env.KIBANA_URL || process.env.VITE_KIBANA_URL;
+    const kibanaUrl = getWorkflowKibanaConfig().kibanaUrl;
     return res.status(200).json({
       ok: true,
       registered: Boolean(wf?.id),
@@ -81,7 +85,7 @@ export default async function handler(req, res) {
       message = `Demo resolution started — ${kibana.error}`;
     }
 
-    const kibanaUrl = process.env.KIBANA_URL || process.env.VITE_KIBANA_URL;
+    const kibanaUrl = getWorkflowKibanaConfig().kibanaUrl;
     const fallbackWorkflowUrl = kibanaWorkflowAppUrl(kibanaUrl, {
       workflowId: getKibanaCoreWorkflowId(),
     });
