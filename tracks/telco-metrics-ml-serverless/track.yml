@@ -14,7 +14,7 @@ description: |
   - Investigate **machine learning** anomalies that surface degradation before customer tickets spike
   - Follow the path from alert signal to **workflow** remediation
 
-  Built for pre-sales and enablement conversations with telco operators (metrics, ML, Kubernetes/OTel migration).
+  Built for hands-on exploration with telco operators (metrics, ML, Kubernetes/OTel migration).
   No prior Elastic experience required. Each challenge builds on the last (~10–15 minutes).
 icon: ""
 tags:
@@ -39,5 +39,5 @@ lab_config:
     name: modern-dark
   override_challenge_layout: false
   hideStopButton: false
-checksum: "8817492555750504076"
+checksum: "16482077251965826431"
 enhanced_loading: false
