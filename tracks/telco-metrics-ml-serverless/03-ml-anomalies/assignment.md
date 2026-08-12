@@ -47,29 +47,40 @@ enhanced_loading: null
 
 # Investigate ML anomalies
 
-Open the **Elastic Serverless** tab — that is your **Serverless Observability** project (already logged in). It lands on Machine Learning.
+Open the **Elastic Serverless** tab — your **Serverless Observability** project. It opens on the **Machine Learning** overview.
+
+You should see three groups of cards: **Analyze your data**, **Surface insights**, and **Visualize your data**.
 
 ---
 
-## 1. Explore ML in Observability
+## 1. Orient on the ML overview
 
-In the left navigation, open **Machine Learning**:
+From this page:
 
-1. List any anomaly detection jobs or results available in this project
-2. Open one job / Anomaly Explorer view if present
-3. Note score, time range, and influenced fields (service, host, region-like labels)
+1. Under **Analyze your data → Anomaly detection**, click **Manage jobs** — note whether any jobs exist yet (a new lab project may be empty)
+2. Click **Open anomaly explorer** to see the explorer UI (even with no jobs, you learn where scores and influencers show up)
+3. Under **Surface insights**, open one AIOps path that works on live OTel data without a pre-built job:
+   - **Log rate analysis** → **Explain changes**, or
+   - **Log pattern analysis** → **Find patterns**, or
+   - **Change point detection** → **Find changes**
 
-If few ML jobs are present yet, inject a mild fault from **Chaos Controller**, wait 1–2 minutes, then re-check **Alerts** and **Discover** for elevated error rates — that is the raw signal ML learns from.
+These AIOps labs are the fastest way to surface unusual log/metric behavior on the telemetry already streaming into this project.
 
 ---
 
-## 2. Map to the Telco NOC story
+## 2. Optional — create a signal to analyze
+
+If the views look quiet, inject a mild fault from **Chaos Controller**, wait 1–2 minutes, then re-run **Log rate analysis** or check **Alerts** / **Discover** for elevated errors — that is the raw signal ML and AIOps learn from.
+
+---
+
+## 3. Map to the Telco NOC story
 
 In the companion app’s **Response** tab, the **Proactive loop** shows the end-to-end path:
 
 | Step | Elastic capability |
 |------|--------------------|
-| Agents detect degradation | Metrics + ML anomaly score |
+| Agents detect degradation | Metrics + ML / AIOps signal |
 | Early warning to ops | Alerting / cases |
 | Auto or assisted fix | Workflows (next lab) |
 
@@ -77,7 +88,7 @@ Key phrase: **proactive lead time** — minutes of warning before care tickets s
 
 ---
 
-## 3. Optional ES|QL signal check
+## 4. Optional ES|QL signal check
 
 ```esql
 FROM logs*
@@ -97,4 +108,4 @@ Compare before/after a chaos toggle if you used one.
 
 ---
 
-✅ **Ready for Check** when you can explain where ML / anomalies live in Kibana and how they feed a proactive NOC loop.
+✅ **Ready for Check** when you have opened the ML overview, tried Anomaly explorer or an AIOps lab, and can explain how that signal feeds a proactive NOC loop.
