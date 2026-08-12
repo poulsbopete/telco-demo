@@ -8,12 +8,6 @@ teaser: From ML / alert signal to Elastic Workflow remediation — the telco aut
 notes:
 - type: text
   contents: |
-    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#4"
-      width="100%" height="1400" frameborder="0"
-      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
-    </iframe>
-- type: text
-  contents: |
     ## Lab 4 — Workflow remediation
 
     **By the end of this challenge you will:**

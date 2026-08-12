@@ -1,8 +1,8 @@
 slug: telco-metrics-ml-serverless
 id: 7lo00znhzldf
 title: Telco Metrics + ML on Elastic Serverless
-teaser: Hands-on lab for telco — explore OpenTelemetry metrics, ML anomalies, and automated
-  remediation on Elastic Serverless.
+teaser: Hands-on lab for telco — explore OpenTelemetry metrics, ML anomalies, and
+  automated remediation on Elastic Serverless.
 description: |
   Telecom operators live and die by service quality. When core signaling latency spikes or a metro link degrades,
   the difference between a quiet night and a P1 outage is how fast you detect, explain, and remediate.
@@ -39,5 +39,5 @@ lab_config:
     name: modern-dark
   override_challenge_layout: false
   hideStopButton: false
-checksum: "14369540947127329420"
+checksum: "8887222495344869141"
 enhanced_loading: false
