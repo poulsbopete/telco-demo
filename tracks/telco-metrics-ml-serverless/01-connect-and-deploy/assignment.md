@@ -8,10 +8,17 @@ teaser: Confirm the Telco NOC demo is live and streaming OpenTelemetry into Elas
 notes:
 - type: text
   contents: |
-    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#1"
-      width="100%" height="1400" frameborder="0"
-      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
-    </iframe>
+    ## Lab 1 — Connect & confirm telemetry
+
+    **What's happening:** Your Elastic Cloud Serverless Observability project is being provisioned and the Telco NOC scenario is launching against it.
+
+    **By the end of this challenge you will:**
+
+    - Confirm the demo platform is healthy and a deployment is running
+    - Open Elastic Serverless (pre-authenticated) and see live data
+    - Know where metrics, logs, and traces live for later labs
+
+    Companion: **[Telco NOC](https://telco-demo-sage.vercel.app)** · *Setup usually takes 3–4 minutes.*
 tabs:
 - id: ncdab54nan2w
   title: Demo App
