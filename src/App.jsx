@@ -6,6 +6,7 @@ import { ChatSimulator } from './components/ChatSimulator';
 import { ObservabilityDashboard } from './components/ObservabilityDashboard';
 import { SecurityDashboard } from './components/SecurityDashboard';
 import { IncidentResponseDemo } from './components/IncidentResponseDemo';
+import { WorkshopDeckEmbed } from './components/WorkshopDeckEmbed';
 import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
 
 const MODULES = [
@@ -24,6 +25,7 @@ const MODULE_COMPONENTS = {
   search: ChatSimulator,
   observability: ObservabilityDashboard,
   security: SecurityDashboard,
+  'workshop-deck': WorkshopDeckEmbed,
 };
 
 /** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */
@@ -38,6 +40,7 @@ export default function App() {
 
   const ActiveComponent = MODULE_COMPONENTS[activeModule];
   const activeMeta = MODULES.find(m => m.id === activeModule);
+  const isWorkshopDeck = activeModule === 'workshop-deck';
 
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
@@ -68,7 +71,14 @@ export default function App() {
               ))}
               <a href="/presenter/" className="nav-link ml-2">Presenter</a>
               <a href="/slides/" className="nav-link">Slides</a>
-              <a href="/slides/workshop/" className="nav-link" title="Metrics + ML workshop deck">Workshop deck</a>
+              <button
+                type="button"
+                onClick={() => setActiveModule('workshop-deck')}
+                className={`nav-link ${isWorkshopDeck ? 'nav-link-active' : ''}`}
+                title="Metrics + ML workshop deck"
+              >
+                Workshop deck
+              </button>
               <a
                 href={INSTRUQT_URL}
                 target="_blank"
@@ -107,7 +117,15 @@ export default function App() {
             ))}
             <a href="/presenter/" className="block py-2 text-[17px] text-[#86868b]">Presenter guides</a>
             <a href="/slides/" className="block py-2 text-[17px] text-[#86868b]">Slides</a>
-            <a href="/slides/workshop/" className="block py-2 text-[17px] text-[#86868b]">Workshop deck</a>
+            <button
+              type="button"
+              onClick={() => { setActiveModule('workshop-deck'); setMobileMenuOpen(false); }}
+              className={`block w-full text-left py-2 text-[17px] ${
+                isWorkshopDeck ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
+              }`}
+            >
+              Workshop deck
+            </button>
             <a
               href={INSTRUQT_URL}
               target="_blank"
@@ -120,51 +138,61 @@ export default function App() {
         )}
       </header>
 
-      <main className="max-w-[980px] mx-auto px-6 py-10 md:py-14">
+      <main className={isWorkshopDeck ? 'w-full' : 'max-w-[980px] mx-auto px-6 py-10 md:py-14'}>
         <ActiveComponent />
       </main>
 
-      <section className="max-w-[980px] mx-auto px-6 pb-8">
-        <button
-          type="button"
-          onClick={() => setOutcomesOpen(v => !v)}
-          className="disclosure w-full py-4 flex items-center justify-between text-left text-[14px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
-        >
-          <span>Executive outcomes</span>
-          {outcomesOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-        </button>
-        {outcomesOpen && (
-          <ExecutiveOutcomesBanner compact className="mb-8 border-0 shadow-none" />
-        )}
-      </section>
+      {!isWorkshopDeck && (
+        <section className="max-w-[980px] mx-auto px-6 pb-8">
+          <button
+            type="button"
+            onClick={() => setOutcomesOpen(v => !v)}
+            className="disclosure w-full py-4 flex items-center justify-between text-left text-[14px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+          >
+            <span>Executive outcomes</span>
+            {outcomesOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+          {outcomesOpen && (
+            <ExecutiveOutcomesBanner compact className="mb-8 border-0 shadow-none" />
+          )}
+        </section>
+      )}
 
-      <footer className="border-t border-[#d2d2d7]/60 mt-4">
-        <div className="max-w-[980px] mx-auto px-6 py-6 text-[12px] text-[#86868b] leading-relaxed">
-          <p>Telco NOC × Elastic Serverless</p>
-          <p className="mt-1">
-            {activeMeta?.live ? 'Live cluster data.' : 'Simulated sample data.'}
-            {' '}Synthetic demo content only.
-          </p>
-          <p className="mt-2">
-            Hands-on lab — metrics, ML, and remediating telco incidents on Elastic Serverless.
-            {' '}
-            <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">
-              Try the workshop
-            </a>
-          </p>
-          <p className="mt-2">
-            <a href="/presenter/view.html?doc=demo-walk" className="text-[#0071e3] hover:underline">Demo walk script</a>
-            {' · '}
-            <a href="/presenter/view.html?doc=landscape" className="text-[#0071e3] hover:underline">Telco landscape</a>
-            {' · '}
-            <a href="/slides/" className="text-[#0071e3] hover:underline">Slides</a>
-            {' · '}
-            <a href="/slides/workshop/" className="text-[#0071e3] hover:underline">Workshop deck</a>
-            {' · '}
-            <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">Workshop</a>
-          </p>
-        </div>
-      </footer>
+      {!isWorkshopDeck && (
+        <footer className="border-t border-[#d2d2d7]/60 mt-4">
+          <div className="max-w-[980px] mx-auto px-6 py-6 text-[12px] text-[#86868b] leading-relaxed">
+            <p>Telco NOC × Elastic Serverless</p>
+            <p className="mt-1">
+              {activeMeta?.live ? 'Live cluster data.' : 'Simulated sample data.'}
+              {' '}Synthetic demo content only.
+            </p>
+            <p className="mt-2">
+              Hands-on lab — metrics, ML, and remediating telco incidents on Elastic Serverless.
+              {' '}
+              <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">
+                Try the workshop
+              </a>
+            </p>
+            <p className="mt-2">
+              <a href="/presenter/view.html?doc=demo-walk" className="text-[#0071e3] hover:underline">Demo walk script</a>
+              {' · '}
+              <a href="/presenter/view.html?doc=landscape" className="text-[#0071e3] hover:underline">Telco landscape</a>
+              {' · '}
+              <a href="/slides/" className="text-[#0071e3] hover:underline">Slides</a>
+              {' · '}
+              <button
+                type="button"
+                onClick={() => setActiveModule('workshop-deck')}
+                className="text-[#0071e3] hover:underline"
+              >
+                Workshop deck
+              </button>
+              {' · '}
+              <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">Workshop</a>
+            </p>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
