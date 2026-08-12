@@ -45,45 +45,51 @@ export function LaunchBusinessMetrics({
   const { currentPhase, nextPhase, mlOutlook, business } = forecast;
 
   return (
-    <div className={`space-y-6 ${className}`}>
-      <div className="py-4 border-y border-[#d2d2d7]/60">
-        <p className="text-[12px] text-[#86868b] uppercase tracking-wide">{event.tagline || IPHONE_LAUNCH.tagline}</p>
-        <p className="text-[17px] font-semibold text-[#1d1d1f] mt-1">{event.eventName || IPHONE_LAUNCH.eventName}</p>
-        <p className="text-[13px] text-[#86868b] mt-2">
-          ML outlook: {mlOutlook.summary}
-        </p>
+    <div className={`${compact ? 'space-y-4' : 'space-y-6'} ${className}`}>
+      <div className="py-3 border-b border-[#d2d2d7]/60">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <div>
+            <p className="text-[12px] text-[#86868b] uppercase tracking-wide">{event.tagline || IPHONE_LAUNCH.tagline}</p>
+            <p className="text-[17px] font-semibold text-[#1d1d1f] mt-0.5">{event.eventName || IPHONE_LAUNCH.eventName}</p>
+          </div>
+          {!compact && (
+            <p className="text-[13px] text-[#86868b]">ML outlook: {mlOutlook.summary}</p>
+          )}
+        </div>
       </div>
 
-      <div className={`grid ${compact ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'} gap-4`}>
+      <div className={`grid ${compact ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-2 lg:grid-cols-4'} gap-3`}>
         <div className="surface-card p-4">
           <p className="text-[12px] text-[#86868b]">Gross-add revenue (24h)</p>
-          <p className="text-[24px] font-semibold tracking-tight mt-1">{business.grossAddRevenue24h}</p>
+          <p className="text-[22px] font-semibold tracking-tight mt-1">{business.grossAddRevenue24h}</p>
           <p className="text-[11px] text-[#86868b] mt-1">{business.upgradeAttachRatePct}% upgrade attach</p>
         </div>
         <div className="surface-card p-4">
           <p className="text-[12px] text-[#86868b]">Activations next 4h (ML)</p>
-          <p className="text-[24px] font-semibold tracking-tight mt-1">{formatCount(business.projectedActivationsNext4h)}</p>
+          <p className="text-[22px] font-semibold tracking-tight mt-1">{formatCount(business.projectedActivationsNext4h)}</p>
           <p className="text-[11px] text-[#86868b] mt-1">{formatCount(currentPhase.activationsPerMin)}/min now</p>
         </div>
         <div className="surface-card p-4">
           <p className="text-[12px] text-[#86868b]">Care load next 4h</p>
-          <p className="text-[24px] font-semibold tracking-tight mt-1">{formatCount(business.projectedCareContactsNext4h)}</p>
+          <p className="text-[22px] font-semibold tracking-tight mt-1">{formatCount(business.projectedCareContactsNext4h)}</p>
           <p className="text-[11px] text-[#86868b] mt-1">Est. cost {business.careCostNext4h}</p>
         </div>
         <div className="surface-card p-4">
           <p className="text-[12px] text-[#86868b]">Churn risk if SLA slips</p>
-          <p className="text-[24px] font-semibold tracking-tight mt-1">{formatCount(business.churnRiskSubs)}</p>
+          <p className="text-[22px] font-semibold tracking-tight mt-1">{formatCount(business.churnRiskSubs)}</p>
           <p className="text-[11px] text-[#86868b] mt-1">subs · ${business.arpuUsd} ARPU/mo</p>
         </div>
       </div>
 
-      <div className="surface-card p-5">
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+      <div className="surface-card p-4">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
           <div>
-            <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Launch volume forecast</h3>
-            <p className="text-[13px] text-[#86868b] mt-1">
-              Activations/min · actual vs Elastic ML forecast · when to staff up or scale down
-            </p>
+            <h3 className="text-[15px] font-semibold text-[#1d1d1f]">Launch volume forecast</h3>
+            {!compact && (
+              <p className="text-[13px] text-[#86868b] mt-1">
+                Activations/min · actual vs Elastic ML forecast
+              </p>
+            )}
           </div>
           <div className="flex flex-col items-end gap-1 shrink-0">
             {(kibanaDashboardUrl || kibanaDiscoverUrl) && (
@@ -92,19 +98,16 @@ export function LaunchBusinessMetrics({
                 label="Elastic · launch metrics"
               />
             )}
-            <div className="text-right">
-              <p className="text-[11px] text-[#86868b]">Now · {currentPhase.label}</p>
-              <p className="text-[13px] font-medium text-[#1d1d1f] flex items-center justify-end gap-1 mt-0.5">
-                <TrendIcon trend={currentPhase.trend} />
-                {trendLabel(currentPhase.trend)}
-              </p>
-            </div>
+            <p className="text-[12px] font-medium text-[#1d1d1f] flex items-center gap-1">
+              <TrendIcon trend={currentPhase.trend} />
+              {trendLabel(currentPhase.trend)} · {currentPhase.label}
+            </p>
           </div>
         </div>
 
         <TimeSeriesChart
           data={volumeSeries}
-          height={compact ? 160 : 200}
+          height={compact ? 140 : 200}
           type="line"
           lines={[
             { key: 'activationsPerMin', name: 'Actual', color: '#1d1d1f' },
@@ -113,12 +116,19 @@ export function LaunchBusinessMetrics({
           ]}
         />
 
+      {!compact && (
         <div className="mt-4 p-3 rounded-2xl bg-[#f5f5f7] text-[12px] text-[#1d1d1f]">
           <strong>Next shift:</strong> {nextPhase.label} ({nextPhase.window}) ·{' '}
           {trendLabel(nextPhase.trend)} expected in ~{mlOutlook.hoursToNextTrend}h ·{' '}
           {(nextPhase.activationsPerMin / 1000).toFixed(1)}K activations/min ·{' '}
           ML confidence {(mlOutlook.confidence * 100).toFixed(0)}%
         </div>
+      )}
+      {compact && (
+        <p className="mt-3 text-[12px] text-[#86868b]">
+          {mlOutlook.summary}
+        </p>
+      )}
       </div>
 
       {!compact && (
@@ -158,10 +168,12 @@ export function LaunchBusinessMetrics({
         </div>
       )}
 
-      <p className="text-[11px] text-[#86868b]">
-        Illustrative launch model · {mlOutlook.model} · pre-orders {(m.preOrders24h / 1_000_000).toFixed(1)}M ·
-        trade-in conversion {business.tradeInConversionPct}%
-      </p>
+      {!compact && (
+        <p className="text-[11px] text-[#86868b]">
+          Illustrative launch model · {mlOutlook.model} · pre-orders {(m.preOrders24h / 1_000_000).toFixed(1)}M ·
+          trade-in conversion {business.tradeInConversionPct}%
+        </p>
+      )}
     </div>
   );
 }

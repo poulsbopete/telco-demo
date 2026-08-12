@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import {
-  AlertCircle, ArrowRight, Bot,
-  RefreshCw, Workflow, Zap, GitBranch, ChevronRight, Search,
+  Bot,
+  RefreshCw, Zap, ChevronRight,
 } from 'lucide-react';
 import {
   fetchHealth,
@@ -11,23 +11,18 @@ import {
   runWorkflow,
   kibanaDiscoverUrl,
   kibanaO11yDashboardUrl,
-  elasticWorkflowUrl,
   TELCO_DISCOVER_ESQL,
   buildTelcoLaunchDiscoverEsql,
   buildTelcoRegionsDiscoverEsql,
-  buildTelcoTracesDiscoverEsql,
   formatCount,
 } from '../lib/elastic-api';
-import { ModuleHeader, StatCard } from './shared/ModuleHeader';
+import { ModuleHeader } from './shared/ModuleHeader';
 import { ElasticDeepLinks, SectionElasticLink } from './shared/ElasticDeepLinks';
 import { RegionDetailPanel } from './RegionDetailPanel';
-import { A2AFederationPanel } from './A2AFederationPanel';
 import { ElasticWorkflowLink } from './ElasticWorkflowLink';
-import { LogDetailPanel, LogRowButton } from './LogDetailPanel';
-import { P1IncidentCounter } from './shared/P1IncidentCounter';
+import { LogDetailPanel } from './LogDetailPanel';
 import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
 import { LaunchBusinessMetrics } from './shared/LaunchEventStrip';
-import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 
 export function LiveElasticDemo() {
   const [health, setHealth] = useState(null);
@@ -143,31 +138,18 @@ export function LiveElasticDemo() {
   }
 
   const kibanaUrl = health?.kibanaUrl || import.meta.env.VITE_KIBANA_URL;
-  const trace = data?.traceDrilldown;
   const anomaly = selectedAnomaly || data?.primaryAnomaly;
   const pipelineDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
   const regionsDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, {
     query: buildTelcoRegionsDiscoverEsql(selectedRegionId || null),
   });
   const launchDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: buildTelcoLaunchDiscoverEsql() });
-  const tracesDiscoverUrl = kibanaDiscoverUrl(kibanaUrl, {
-    query: buildTelcoTracesDiscoverEsql({
-      traceId: anomaly?.traceId || trace?.trace_id,
-      regionId: selectedRegionId || anomaly?.regionId,
-    }),
-  });
   const o11yDashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
-  const workflowsUrl = elasticWorkflowUrl(kibanaUrl);
-  const anomalyRegion = anomaly
-    ? data?.regions?.find(r => r.regionId === anomaly.regionId)
-    : null;
-  const workflowResolved = workflowRun?.steps?.every(s => s.status === 'completed');
-
   return (
     <div>
       <ModuleHeader
         title="Network telemetry"
-        subtitle="OpenTelemetry with region context — see business impact, not just infrastructure signals."
+        subtitle="Live OpenTelemetry — regions, core services, and ML signals."
         badge={health?.connected ? 'Live · Elastic Serverless' : 'Offline'}
       >
         <button type="button" onClick={load} disabled={loading} className="btn-quiet flex items-center gap-1.5">
@@ -178,25 +160,16 @@ export function LiveElasticDemo() {
           links={[
             { href: pipelineDiscoverUrl, label: 'Discover', primary: true },
             { href: o11yDashboardUrl, label: 'Dashboard' },
-            { href: workflowsUrl, label: 'Workflows' },
           ]}
         />
       </ModuleHeader>
 
-      {health?.connected && (
-        <p className="text-[13px] text-[#86868b] -mt-6 mb-8">
-          {health.cluster?.name}
-          {lastRefresh && ` · Updated ${lastRefresh.toLocaleTimeString()}`}
-          {data?.queryTimeMs && ` · ${data.queryTimeMs}ms`}
-        </p>
-      )}
-
       {!health?.connected && (
-        <p className="text-[13px] text-[#cc0000] -mt-6 mb-8">Not connected to Elastic Serverless.</p>
+        <p className="text-[13px] text-[#cc0000] -mt-6 mb-6">Not connected to Elastic Serverless.</p>
       )}
 
       {error && !data && (
-        <p className="mt-4 text-sm text-danger">{error}</p>
+        <p className="mt-2 text-sm text-danger">{error}</p>
       )}
 
       {data && (
@@ -204,105 +177,69 @@ export function LiveElasticDemo() {
           {data.launchEvent && (
             <LaunchBusinessMetrics
               launchEvent={data.launchEvent}
-              className="mb-8"
+              compact
+              className="mb-6"
               kibanaDashboardUrl={o11yDashboardUrl}
               kibanaDiscoverUrl={launchDiscoverUrl}
             />
           )}
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard
-              label="Launch activations (6h)"
-              value={data.stats.iphoneActivations6h
-                ? `${(data.stats.iphoneActivations6h / 1_000_000).toFixed(2)}M`
-                : '847K'}
-              highlight
-              kibanaUrl={kibanaUrl}
-              kibanaSection="discover"
-            />
-            <StatCard
-              label="Pre-orders (24h)"
-              value={data.stats.iphonePreOrders24h
-                ? `${(data.stats.iphonePreOrders24h / 1_000_000).toFixed(1)}M`
-                : '2.4M'}
-              kibanaUrl={kibanaUrl}
-              kibanaSection="discover"
-            />
-            <StatCard label="Success rate" value={`${data.stats.networkSuccessRate}%`} kibanaUrl={kibanaUrl} kibanaSection="discover" />
-            <StatCard label="ML actionable" value={data.stats.mlAnomaliesOpen} trend={`${data.stats.mlWatching ?? 0} watching`} kibanaUrl={kibanaUrl} kibanaSection="discover" />
-          </div>
-
-          <div className="grid lg:grid-cols-3 gap-5 mt-8">
-            <div className="surface-card p-5">
-              <div className="flex items-center justify-between gap-3 mb-4">
-                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Regions</h3>
-                <SectionElasticLink href={regionsDiscoverUrl} label="Discover · regions" />
+          <div className="grid lg:grid-cols-3 gap-4">
+            <div className="surface-card p-4">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <h3 className="text-[15px] font-semibold text-[#1d1d1f]">Regions</h3>
+                <SectionElasticLink href={regionsDiscoverUrl} label="Discover" />
               </div>
-              <div className="space-y-2 max-h-[320px] overflow-y-auto">
+              <div className="space-y-2 max-h-[280px] overflow-y-auto">
                 {data.regions?.map(m => (
                   <button key={m.regionId} type="button" onClick={() => handleRegionClick(m.regionId)}
-                    className={`w-full text-left p-3 rounded-2xl transition-colors group ${
+                    className={`w-full text-left p-3 rounded-xl transition-colors ${
                       selectedRegionId === m.regionId ? 'bg-[#0071e3]/8 ring-1 ring-[#0071e3]/25' : 'bg-[#f5f5f7] hover:bg-[#ebebed]'
                     }`}>
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                      <p className="text-[14px] font-medium text-[#1d1d1f]">{m.name}</p>
-                      <p className="text-[11px] font-mono text-[#86868b] mt-0.5">{m.regionId}</p>
-                      {m.launchHotspot && (
-                        <p className="text-[11px] text-[#0071e3] mt-1">{m.launchRole || 'Launch hotspot'}</p>
-                      )}
+                    <div className="flex justify-between items-start gap-2">
+                      <div className="min-w-0">
+                        <p className="text-[14px] font-medium text-[#1d1d1f] truncate">{m.name}</p>
+                        <p className="text-[11px] text-[#86868b] mt-1">
+                          {formatCount(m.sessions24h)} sessions ·{' '}
+                          <span className={m.successRate < 99.7 ? 'text-warning' : 'text-success'}>{m.successRate}%</span>
+                          {' · '}{m.p99LatencyMs}ms
+                        </p>
                       </div>
-                      <ChevronRight className={`w-4 h-4 text-[#86868b] ${selectedRegionId === m.regionId ? 'text-[#0071e3]' : ''}`} />
-                    </div>
-                    <div className="flex gap-3 mt-2 text-[11px] text-[#86868b]">
-                      <span>{formatCount(m.sessions24h)} sessions</span>
-                      <span className={m.successRate < 99.7 ? 'text-warning' : 'text-success'}>{m.successRate}%</span>
-                      <span>{m.p99LatencyMs}ms p99</span>
+                      <ChevronRight className={`w-4 h-4 shrink-0 ${selectedRegionId === m.regionId ? 'text-[#0071e3]' : 'text-[#86868b]'}`} />
                     </div>
                   </button>
                 ))}
               </div>
-              <p className="text-[10px] text-elastic-gray mt-2 text-center">Click a region for full detail</p>
             </div>
 
-            {/* Network core pipeline */}
-            <div className="surface-card p-5">
-              <div className="flex items-center justify-between gap-3 mb-4">
-                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Core pipeline</h3>
-                <SectionElasticLink href={pipelineDiscoverUrl} label="Discover · services" />
+            <div className="surface-card p-4">
+              <div className="flex items-center justify-between gap-3 mb-3">
+                <h3 className="text-[15px] font-semibold text-[#1d1d1f]">Core pipeline</h3>
+                <SectionElasticLink href={pipelineDiscoverUrl} label="Discover" />
               </div>
-              <div className="space-y-3">
-                {data.networkPipeline?.map(p => (
+              <div className="space-y-2.5">
+                {data.networkPipeline?.slice(0, 6).map(p => (
                   <div key={p.service}>
                     <div className="flex justify-between text-xs mb-1">
-                      <span className="font-medium text-elastic-dark">{p.telcoService}</span>
-                      <span className="text-elastic-gray">{formatCount(p.sessionCount)}</span>
+                      <span className="font-medium text-[#1d1d1f]">{p.telcoService}</span>
+                      <span className="text-[#86868b]">{formatCount(p.sessionCount)}</span>
                     </div>
-                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                       <div className="h-full bg-elastic-teal rounded-full"
                         style={{ width: `${(p.sessionCount / (data.networkPipeline[0]?.sessionCount || 1)) * 100}%` }} />
                     </div>
                     {p.errors > 0 && (
-                      <p className="text-[10px] text-danger mt-0.5">{p.errors} errors ({p.errorRate}%)</p>
+                      <p className="text-[10px] text-danger mt-0.5">{p.errors} errors</p>
                     )}
                   </div>
                 ))}
               </div>
-              <div className="mt-4 pt-3 border-t border-gray-100 flex gap-1">
-                {['metrics', 'traces', 'logs'].map(v => (
-                  <button key={v} type="button" onClick={() => setDrillView(v)}
-                    className={`text-xs px-2 py-1 rounded capitalize ${
-                      drillView === v ? 'bg-telco-magenta text-white' : 'bg-gray-100 text-elastic-gray'
-                    }`}>{v}</button>
-                ))}
-              </div>
             </div>
 
-            {/* ML signal intelligence */}
-            <div className="surface-card p-5">
+            <div className="surface-card p-4">
               <div className="flex items-center justify-between gap-3 mb-2">
-                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">ML signals</h3>
-                <SectionElasticLink href={o11yDashboardUrl} label="Dashboard · ML" />
+                <h3 className="text-[15px] font-semibold text-[#1d1d1f]">ML signals</h3>
+                <SectionElasticLink href={o11yDashboardUrl} label="Dashboard" />
               </div>
               <MlSignalIntelligence
                 intelligence={data.mlSignalIntelligence}
@@ -312,10 +249,38 @@ export function LiveElasticDemo() {
                 compact
                 showSuppressed={false}
               />
+              {anomaly && !workflowRun && (
+                <button
+                  type="button"
+                  onClick={handleRunWorkflow}
+                  disabled={workflowLoading}
+                  className="mt-3 w-full py-2.5 btn-primary disabled:opacity-50 flex items-center justify-center gap-2 text-[13px]"
+                >
+                  <Bot className="w-4 h-4" />
+                  {workflowLoading ? 'Starting…' : 'Run workflow'}
+                </button>
+              )}
+              {workflowRun && (
+                <div className="mt-3 p-3 rounded-xl bg-[#f5f5f7]">
+                  <p className="text-[12px] font-medium text-success flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5" />
+                    {workflowRun.message}
+                  </p>
+                  {(workflowRun.kibanaExecutionUrl || workflowRun.kibanaWorkflowUrl) && (
+                    <ElasticWorkflowLink
+                      kibanaUrl={kibanaUrl}
+                      workflowId={workflowRun.kibanaWorkflowId || anomaly?.workflowId}
+                      executionId={workflowRun.kibanaExecutionId}
+                      href={workflowRun.kibanaExecutionUrl || workflowRun.kibanaWorkflowUrl}
+                      label="View in Kibana"
+                      className="mt-2 text-[12px] text-[#0071e3] hover:underline inline-flex"
+                    />
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Region detail drill-down */}
           {selectedRegionId && (
             <RegionDetailPanel
               detail={regionDetail?.error ? null : regionDetail}
@@ -333,233 +298,6 @@ export function LiveElasticDemo() {
           {regionDetail?.error && (
             <p className="mt-4 text-sm text-danger">{regionDetail.error}</p>
           )}
-
-          {/* Cross-project A2A federation */}
-          <div className="mt-4">
-            <A2AFederationPanel
-              regionId={selectedRegionId || anomaly?.regionId || 'REG-8847291'}
-              regionName={data.regions?.find(m => m.regionId === (selectedRegionId || anomaly?.regionId))?.name || 'Metro East 5G'}
-            />
-          </div>
-
-          {/* Drill-down + Workflow */}
-          <div className="grid lg:grid-cols-2 gap-5 mt-8">
-            <div className="surface-card p-5">
-              <h3 className="text-sm font-semibold text-elastic-dark flex items-center justify-between gap-2 mb-3">
-                <span className="flex items-center gap-2">
-                  <GitBranch className="w-4 h-4 text-elastic-teal" />
-                  Unified Troubleshooting — {anomaly?.regionId}
-                </span>
-                <SectionElasticLink href={tracesDiscoverUrl} label="Discover · traces" />
-              </h3>
-
-              {drillView === 'metrics' && anomaly && (
-                <div className="space-y-2 text-sm">
-                  <p className="text-xs text-elastic-gray">ML signal: {anomaly.signal}</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="p-2 bg-gray-50 rounded text-center">
-                      <p className="text-lg font-bold text-danger">420ms</p>
-                      <p className="text-[10px] text-elastic-gray">p99 latency</p>
-                    </div>
-                    <div className="p-2 bg-gray-50 rounded text-center">
-                      <p className="text-lg font-bold text-warning">2.1%</p>
-                      <p className="text-[10px] text-elastic-gray">error rate</p>
-                    </div>
-                    <div className="p-2 bg-gray-50 rounded text-center">
-                      <p className="text-lg font-bold text-elastic-dark">{formatCount(anomaly.correlatedTraces)}</p>
-                      <p className="text-[10px] text-elastic-gray">spans</p>
-                    </div>
-                  </div>
-                  <button type="button" onClick={() => setDrillView('traces')}
-                    className="text-xs text-elastic-teal flex items-center gap-1 mt-2">
-                    Drill into traces <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-
-              {drillView === 'traces' && trace && (
-                <div>
-                  <p className="text-xs font-mono text-elastic-gray mb-2">{trace.traceId}</p>
-                  <div className="space-y-1">
-                    {trace.spans.map((s, i) => (
-                      <div key={i} className={`flex items-center gap-2 p-2 rounded text-xs ${
-                        s.critical ? 'bg-danger/10 border border-danger/20' : 'bg-gray-50'
-                      }`}>
-                        <div className="h-2 rounded-full shrink-0" style={{
-                          width: `${Math.min(s.durationMs / 8, 120)}px`,
-                          backgroundColor: s.status === 'ERROR' ? '#bd271e' : '#00bfb3',
-                        }} />
-                        <span className="flex-1 truncate">{s.name}</span>
-                        <span className="text-elastic-gray">{s.durationMs}ms</span>
-                        {s.critical && <span className="text-[9px] bg-danger text-white px-1 rounded">CRITICAL</span>}
-                      </div>
-                    ))}
-                  </div>
-                  <button type="button" onClick={() => setDrillView('logs')}
-                    className="text-xs text-elastic-teal flex items-center gap-1 mt-2">
-                    View correlated logs <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-              )}
-
-              {drillView === 'logs' && trace && (
-                <div>
-                  <div className="p-2 bg-danger/5 border border-danger/20 rounded mb-2">
-                    <p className="text-xs font-semibold text-danger">Root Cause</p>
-                    <p className="text-xs text-elastic-dark mt-1">{trace.rootCause}</p>
-                  </div>
-                  {trace.logs.map((log, i) => (
-                    <div key={i} className="flex gap-2 p-2 bg-gray-50 rounded text-xs font-mono mb-1">
-                      <span className={`font-bold ${log.level === 'ERROR' ? 'text-danger' : log.level === 'WARN' ? 'text-warning' : 'text-elastic-gray'}`}>
-                        {log.level}
-                      </span>
-                      <span className="text-elastic-dark">{log.message}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Elastic Workflows */}
-            <div className="surface-card p-5">
-              <div className="flex items-center justify-between gap-2 mb-4">
-                <h3 className="text-[17px] font-semibold text-[#1d1d1f]">Workflow</h3>
-                {(workflowRun || anomaly) && (
-                  <ElasticWorkflowLink
-                    kibanaUrl={kibanaUrl}
-                    workflowId={workflowRun?.kibanaWorkflowId || anomaly?.workflowId}
-                    executionId={workflowRun?.kibanaExecutionId}
-                    href={workflowRun?.kibanaExecutionUrl || workflowRun?.kibanaWorkflowUrl}
-                  />
-                )}
-              </div>
-
-              {anomaly && !workflowRun && (
-                <div className="mb-4 p-4 rounded-2xl bg-[#f5f5f7]">
-                  <p className="text-[14px] font-medium text-[#1d1d1f]">{anomaly.title}</p>
-                  <button type="button" onClick={handleRunWorkflow} disabled={workflowLoading}
-                    className="mt-4 w-full py-3 btn-primary disabled:opacity-50 flex items-center justify-center gap-2">
-                    <Bot className="w-4 h-4" />
-                    {workflowLoading ? 'Starting workflow…' : 'Run Elastic Workflow + AI Agent'}
-                  </button>
-                </div>
-              )}
-
-              {workflowRun && (
-                <div>
-                  {workflowRun.kibanaExecutionId && (
-                    <div className="mb-3 p-3 bg-success/5 border border-success/20 rounded-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                      <p className="text-xs text-success font-medium">
-                        Live execution · {workflowRun.kibanaExecutionId.slice(0, 8)}…
-                      </p>
-                      <ElasticWorkflowLink
-                        kibanaUrl={kibanaUrl}
-                        workflowId={workflowRun.kibanaWorkflowId}
-                        executionId={workflowRun.kibanaExecutionId}
-                        href={workflowRun.kibanaExecutionUrl}
-                        label="View execution"
-                        className="text-xs px-2.5 py-1.5 bg-success text-white rounded-lg inline-flex items-center gap-1 hover:bg-success/90 shrink-0"
-                      />
-                    </div>
-                  )}
-                  <div className="flex items-center gap-2 mb-3">
-                    <Zap className="w-4 h-4 text-success" />
-                    <p className="text-sm font-medium text-success">{workflowRun.message}</p>
-                  </div>
-                  {workflowRun.aiSummary && (
-                    <div className="p-3 bg-elastic-teal/5 border border-elastic-teal/20 rounded-lg mb-3">
-                      <p className="text-[10px] font-semibold text-elastic-teal uppercase mb-1">AI Agent Analysis</p>
-                      <p className="text-xs text-elastic-dark">{workflowRun.aiSummary}</p>
-                    </div>
-                  )}
-                  {workflowRun.kibanaRunError && (
-                    <p className="text-xs text-warning mb-3">{workflowRun.kibanaRunError}</p>
-                  )}
-                  <div className="space-y-2">
-                    {workflowRun.steps?.map(step => (
-                      <div key={step.id} className="flex items-start gap-2 text-xs">
-                        <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold ${
-                          step.status === 'completed' ? 'bg-success text-white' :
-                          step.status === 'running' ? 'bg-telco-magenta text-white animate-pulse' : 'bg-gray-200 text-elastic-gray'
-                        }`}>{step.id}</span>
-                        <div>
-                          <p className="font-medium text-elastic-dark">{step.name}</p>
-                          <p className="text-elastic-gray">{step.detail}</p>
-                          <span className="text-[10px] text-elastic-teal">{step.tool}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-elastic-gray mt-3">
-                    Est. resolution: {workflowRun.estimatedResolutionMin} min · No human escalation required
-                  </p>
-                  {workflowResolved && (
-                    <P1IncidentCounter
-                      compact
-                      context={workflowRun.message || 'Elastic Workflow auto-remediation completed'}
-                      className="mt-3"
-                    />
-                  )}
-                </div>
-              )}
-
-              {!workflowRun && !anomaly && (
-                <p className="text-sm text-elastic-gray">Select an ML anomaly to trigger Elastic Workflow resolution.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Region logs + errors */}
-          <div className="grid lg:grid-cols-2 gap-5 mt-8">
-            <div className="surface-card p-5">
-              <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
-                <AlertCircle className="w-4 h-4 text-danger" /> Payment Errors (live logs)
-              </h3>
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-left text-elastic-gray border-b">
-                    <th className="pb-2">regionID</th>
-                    <th className="pb-2">Service</th>
-                    <th className="pb-2">Message</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.recentErrors?.slice(0, 5).map((row, i) => (
-                    <tr key={i}
-                      onClick={() => setSelectedLog(row)}
-                      className="border-b border-gray-50 cursor-pointer hover:bg-elastic-teal/5 group">
-                      <td className="py-2 font-mono">
-                        <button type="button"
-                          onClick={(e) => { e.stopPropagation(); handleRegionClick(row.regionId); }}
-                          className="text-telco-magenta hover:underline">
-                          {row.regionId}
-                        </button>
-                      </td>
-                      <td className="py-2">{row.telcoService}</td>
-                      <td className="py-2 truncate max-w-[200px] group-hover:text-elastic-dark">
-                        {row.message || '—'}
-                        <ChevronRight className="w-3 h-3 inline ml-1 text-elastic-gray group-hover:text-elastic-teal" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <h3 className="text-sm font-semibold text-elastic-dark flex items-center gap-2 mb-3">
-                <Search className="w-4 h-4 text-elastic-teal" /> Logs by regionID
-              </h3>
-              {regionFilter && (
-                <p className="text-xs text-elastic-gray mb-2">Filtering: <strong>{regionFilter}</strong></p>
-              )}
-              <div className="space-y-1 max-h-48 overflow-y-auto">
-                {(searchResults?.logs || data.recentErrors?.slice(0, 4))?.map((log, i) => (
-                  <LogRowButton key={`${log.timestamp}-${log.traceId}-${i}`} log={log} onClick={setSelectedLog} />
-                ))}
-              </div>
-            </div>
-          </div>
 
           {selectedLog && (
             <LogDetailPanel
