@@ -65,7 +65,7 @@ If the lab project has few ML jobs yet, inject a mild fault from **Chaos Control
 
 ## 2. Map to the Telco NOC story
 
-In the companion app’s **Response** tab, the **Proactive loop** is the customer talk track:
+In the companion app’s **Response** tab, the **Proactive loop** shows the end-to-end path:
 
 | Step | Elastic capability |
 |------|--------------------|
@@ -91,7 +91,7 @@ Compare before/after a chaos toggle if you used one.
 
 ---
 
-## Talk track
+## Key takeaway
 
 > “ML isn’t a science project bolted on later — it sits on the same OTel metrics you just queried. We score anomalies, suppress noise, and only promote actionable signals into the NOC workflow.”
 

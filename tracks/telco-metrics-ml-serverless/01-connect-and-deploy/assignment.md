@@ -85,8 +85,8 @@ Telco operators migrating Kubernetes clusters onto OpenTelemetry need one place 
 ✅ **Ready for Check** when the Demo App shows a running deployment and you can see recent data in Elastic.
 
 <details>
-<summary>Facilitator tip</summary>
+<summary>If Check fails</summary>
 
-If Check fails with “no deployments”, wait 60s for auto-launch, or use Skip / Solve after confirming `curl localhost:8090/health` on the host.
+Wait 60s for auto-launch, or use Skip / Solve after confirming `curl localhost:8090/health` on the host.
 
 </details>

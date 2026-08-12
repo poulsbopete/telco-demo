@@ -8,17 +8,10 @@ teaser: From ML / alert signal to Elastic Workflow remediation — the telco aut
 notes:
 - type: text
   contents: |
-    ## Lab 4 — Workflow remediation
-
-    **By the end of this challenge you will:**
-
-    - Open Elastic Workflows in the lab project
-    - Relate alert → investigate → remediate to the Telco NOC proactive loop
-    - Know how the public Telco NOC demo kicks off a live workflow on Search
-
-    Companion: **[Telco NOC → Response → Proactive → Run + Workflow](https://telco-demo-sage.vercel.app)**
-
-    *Note:* Lab sandbox is Observability; the public demo also kicks off Search-hosted `telco-core-latency-auto-remediation`.
+    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#4"
+      width="100%" height="1400" frameborder="0"
+      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
+    </iframe>
 tabs:
 - id: xcgzz1laakqc
   title: Demo App

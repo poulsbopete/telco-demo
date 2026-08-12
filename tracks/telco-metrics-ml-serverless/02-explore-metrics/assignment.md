@@ -84,7 +84,7 @@ Optional: open any auto-created **Dashboard** from the home list and filter to t
 
 ---
 
-## Talk track (telco)
+## Key takeaway
 
 > “We’re not asking you to rip Prometheus tomorrow. Start by landing OTel metrics next to traces and logs in Serverless — then layer ML on the same data. One store, one query language, one remediation path.”
 
