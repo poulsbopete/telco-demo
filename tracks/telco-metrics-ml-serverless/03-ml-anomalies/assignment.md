@@ -47,19 +47,19 @@ enhanced_loading: null
 
 # Investigate ML anomalies
 
-Open the **Elastic Serverless** tab (defaults toward Machine Learning).
+Open the **Elastic Serverless** tab — that is your **Serverless Observability** project (already logged in). It lands on Machine Learning.
 
 ---
 
-## 1. Find ML in the product
+## 1. Explore ML in Observability
 
-Navigate to **Machine Learning** (or **Observability → Anomaly detection** / AIOps, depending on the build):
+In the left navigation, open **Machine Learning**:
 
-1. List any anomaly detection jobs or results available in this lab project
-2. Open one job / anomaly explorer view if present
+1. List any anomaly detection jobs or results available in this project
+2. Open one job / Anomaly Explorer view if present
 3. Note score, time range, and influenced fields (service, host, region-like labels)
 
-If the lab project has few ML jobs yet, inject a mild fault from **Chaos Controller**, wait 1–2 minutes, then re-check **Alerts** and **Discover** for elevated error rates — that is the raw signal ML learns from.
+If few ML jobs are present yet, inject a mild fault from **Chaos Controller**, wait 1–2 minutes, then re-check **Alerts** and **Discover** for elevated error rates — that is the raw signal ML learns from.
 
 ---
 

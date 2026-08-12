@@ -42,13 +42,13 @@ enhanced_loading: null
 
 # Close the loop with Workflows
 
-Open **Elastic Serverless → Workflows** (tab should land on `/app/workflows`).
+Open the **Elastic Serverless** tab — your **Serverless Observability** project. It should land on **Workflows**.
 
 ---
 
-## 1. Inspect workflows in the lab
+## 1. Inspect workflows
 
-1. List available workflows (alert response / investigation / remediation if auto-provisioned)
+1. List available workflows (alert response / investigation / remediation if present)
 2. Open one workflow definition — note triggers (manual / alert) and steps
 3. If a **Run** / **Test** control is available, execute it and open the **Executions** tab
 
@@ -58,19 +58,19 @@ You are looking for the story: **detect → enrich → act**, not every YAML det
 
 ## 2. Tie back to Telco NOC
 
-In the companion Vercel app:
+In the companion app ([telco-demo-sage.vercel.app](https://telco-demo-sage.vercel.app)):
 
 1. Open **Response**
 2. Select **Proactive loop**
-3. Click **Run + Workflow** — that calls the Search-hosted remediation workflow used in customer demos
+3. Click **Run + Workflow** to see a live remediation kickoff from the demo
 
-That is the same closed-loop message for telco: metrics + ML detect early; Workflows execute the approved playbook.
+That is the closed-loop message: metrics + ML detect early; Workflows execute the approved playbook.
 
 ---
 
 ## 3. Optional — chaos to alert path
 
-From **Demo App / Chaos Controller**, inject a short fault, then in Elastic open **Alerts** and any linked workflow / case. Discuss how Serverless Observability replaces “page a human for every threshold.”
+From **Demo App / Chaos Controller**, inject a short fault, then in Observability open **Alerts** and any linked workflow / case.
 
 ---
 
@@ -78,12 +78,12 @@ From **Demo App / Chaos Controller**, inject a short fault, then in Elastic open
 
 You have walked:
 
-1. **Telemetry on** — OTel into Serverless
+1. **Telemetry on** — OTel into Serverless Observability
 2. **Metrics** — ES|QL + Observability apps
 3. **ML** — anomaly / proactive lead time
 4. **Workflows** — remediation without tool sprawl
 
-Invite customers to continue in the public demo: [telco-demo-sage.vercel.app](https://telco-demo-sage.vercel.app)
+Continue exploring in the public demo: [telco-demo-sage.vercel.app](https://telco-demo-sage.vercel.app)
 
 ---
 

@@ -63,16 +63,16 @@ Open **Chaos Controller** once — you will use it later when we talk about degr
 
 ---
 
-## 2. Elastic Serverless
+## 2. Serverless Observability
 
-Open the **Elastic Serverless** tab (already logged in). Set time range to **Last 15 minutes**, then spot-check:
+Open the **Elastic Serverless** tab — your **Serverless Observability** project (already logged in). Set time range to **Last 15 minutes**, then spot-check:
 
 | Area | What to look for |
 |------|------------------|
 | **Discover → ES\|QL** | Logs from telco services |
 | **Applications → Service inventory** | Distributed traces |
-| **Observability → Infrastructure** | Host / cloud metrics |
-| **Observability → SLOs** | Auto-created SLOs (if present) |
+| **Infrastructure** | Host / cloud metrics |
+| **SLOs** | Auto-created SLOs (if present) |
 
 ---
 

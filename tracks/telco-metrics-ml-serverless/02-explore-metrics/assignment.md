@@ -42,7 +42,7 @@ enhanced_loading: null
 
 # Explore telco metrics with ES|QL
 
-Use the **Elastic Serverless** tab. Prefer **Discover → ES|QL**. Set time to **Last 15 minutes**.
+Use the **Elastic Serverless** tab — your **Serverless Observability** project. Open **Discover → ES|QL**. Set time to **Last 15 minutes**.
 
 ---
 
