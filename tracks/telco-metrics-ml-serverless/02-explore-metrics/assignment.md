@@ -8,6 +8,12 @@ teaser: Query live OpenTelemetry metrics — latency, errors, and regional signa
 notes:
 - type: text
   contents: |
+    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#2"
+      width="100%" height="1400" frameborder="0"
+      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
+    </iframe>
+- type: text
+  contents: |
     ## Lab 2 — Explore metrics
 
     **By the end of this challenge you will:**
@@ -16,16 +22,7 @@ notes:
     - Locate latency / error patterns that matter to a CSP NOC
     - Connect metrics views to the service / host story in Observability
 
-    Companion demo: **[Telco NOC](https://telco-demo-sage.vercel.app)** (Telemetry tab)
-- type: text
-  contents: |
-    ## Metrics + OTel for telco
-
-    Elastic stores OTel metrics alongside logs and traces. For a T-Mobile / CSP conversation, lead with:
-
-    1. **Unified query** — ES|QL across signals (no PromQL-only silo)
-    2. **Cardinality-aware** — Streams and shaping for high-cardinality labels
-    3. **Same store for ML** — anomaly detection runs on the metrics you just queried
+    Companion: **[Telco NOC](https://telco-demo-sage.vercel.app)** (Telemetry tab)
 tabs:
 - id: 90wi8jilrwlr
   title: Demo App

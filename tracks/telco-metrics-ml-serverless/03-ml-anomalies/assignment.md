@@ -7,6 +7,12 @@ teaser: See how Elastic ML surfaces telco degradation before customer tickets sp
 notes:
 - type: text
   contents: |
+    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#3"
+      width="100%" height="1400" frameborder="0"
+      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
+    </iframe>
+- type: text
+  contents: |
     ## Lab 3 — ML anomalies
 
     **By the end of this challenge you will:**
@@ -16,11 +22,6 @@ notes:
     - Connect ML signal intelligence to the Telco NOC Response story
 
     Companion: **[Telco NOC → Response](https://telco-demo-sage.vercel.app)** (Proactive loop)
-- type: text
-  contents: |
-    ## Why ML for telco metrics
-
-    Threshold alerts create noise. Elastic ML learns baselines on your metrics/logs and scores unusual behavior — the same pattern used in Telco NOC for **proactive** loops (agent-detected anomalies → operations console / workflow).
 tabs:
 - id: bvvat0vdlsnh
   title: Demo App

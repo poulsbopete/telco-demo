@@ -68,6 +68,7 @@ export default function App() {
               ))}
               <a href="/presenter/" className="nav-link ml-2">Presenter</a>
               <a href="/slides/" className="nav-link">Slides</a>
+              <a href="/slides/workshop/" className="nav-link" title="Metrics + ML workshop deck">Workshop deck</a>
               <a
                 href={INSTRUQT_URL}
                 target="_blank"
@@ -106,6 +107,7 @@ export default function App() {
             ))}
             <a href="/presenter/" className="block py-2 text-[17px] text-[#86868b]">Presenter guides</a>
             <a href="/slides/" className="block py-2 text-[17px] text-[#86868b]">Slides</a>
+            <a href="/slides/workshop/" className="block py-2 text-[17px] text-[#86868b]">Workshop deck</a>
             <a
               href={INSTRUQT_URL}
               target="_blank"
@@ -156,6 +158,8 @@ export default function App() {
             <a href="/presenter/view.html?doc=landscape" className="text-[#0071e3] hover:underline">Telco landscape</a>
             {' · '}
             <a href="/slides/" className="text-[#0071e3] hover:underline">Slides</a>
+            {' · '}
+            <a href="/slides/workshop/" className="text-[#0071e3] hover:underline">Workshop deck</a>
             {' · '}
             <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">Workshop</a>
           </p>

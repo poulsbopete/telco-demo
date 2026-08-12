@@ -8,13 +8,10 @@ teaser: Confirm the Telco NOC demo is live and streaming OpenTelemetry into Elas
 notes:
 - type: text
   contents: |
-    ## Workshop companion
-
-    Follow along in the Telco NOC demo app while the lab provisions:
-
-    **[→ Open Telco NOC (Vercel)](https://telco-demo-sage.vercel.app)**
-
-    *(Opens in a new tab — come back here when setup completes.)*
+    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#1"
+      width="100%" height="1400" frameborder="0"
+      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
+    </iframe>
 - type: text
   contents: |
     ## Lab 1 — Connect & confirm telemetry
@@ -27,23 +24,12 @@ notes:
     - Open Elastic Serverless (pre-authenticated) and see live data
     - Know where metrics, logs, and traces live for later labs
 
-    *Setup usually takes 3–4 minutes.*
-- type: text
-  contents: |
-    ## Your lab environment
-
-    | Tab | What it is |
-    |-----|------------|
-    | **Demo App** | Control panel — scenario health, deployments, chaos |
-    | **Chaos Controller** | Fault injection channels (used later for degradation stories) |
-    | **Elastic Serverless** | Your Observability project — already logged in |
-
-    The Telco NOC scenario simulates multi-cloud telco microservices (mobile core, billing, SMS, portal, CDN, analytics, voice, IoT, NOC dashboard) emitting **real OpenTelemetry** — not recorded replay.
+    Companion: **[Telco NOC](https://telco-demo-sage.vercel.app)** · *Setup usually takes 3–4 minutes.*
 - type: text
   contents: |
     ## While you wait
 
-    Setup takes a few minutes. Survive the anomaly storm while Elastic provisions your environment:
+    Setup takes a few minutes. Survive the anomaly storm while Elastic provisions:
 
     <iframe src="https://poulsbopete.github.io/Vampire-Clone/" width="100%" height="800" frameborder="0" allowfullscreen style="border-radius:8px;display:block;"></iframe>
 tabs:

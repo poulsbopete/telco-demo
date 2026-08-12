@@ -8,6 +8,12 @@ teaser: From ML / alert signal to Elastic Workflow remediation — the CSP auto-
 notes:
 - type: text
   contents: |
+    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#4"
+      width="100%" height="1400" frameborder="0"
+      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
+    </iframe>
+- type: text
+  contents: |
     ## Lab 4 — Workflow remediation
 
     **By the end of this challenge you will:**
@@ -17,11 +23,8 @@ notes:
     - Know how the public Telco NOC demo kicks off a live workflow on Search
 
     Companion: **[Telco NOC → Response → Proactive → Run + Workflow](https://telco-demo-sage.vercel.app)**
-- type: text
-  contents: |
-    ## Architecture note
 
-    This lab’s sandbox is **Observability** (metrics + ML). The production Telco NOC demo also deep-links a remediation workflow on the **Search** project (`telco-core-latency-auto-remediation`). Same product family — different project types for O11y vs knowledge/runbooks.
+    *Note:* Lab sandbox is Observability; the public demo also kicks off Search-hosted `telco-core-latency-auto-remediation`.
 tabs:
 - id: xcgzz1laakqc
   title: Demo App
