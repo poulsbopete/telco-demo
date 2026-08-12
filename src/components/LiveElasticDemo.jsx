@@ -307,7 +307,11 @@ export function LiveElasticDemo() {
                   intelligence={data.mlSignalIntelligence}
                   anomalies={data.mlAnomalies}
                   selectedAnomalyId={selectedAnomaly?.id}
-                  onSelectAnomaly={(a) => { setSelectedAnomaly(a); setWorkflowRun(null); }}
+                  onSelectAnomaly={(a) => {
+                    clearWorkflowTimers();
+                    setSelectedAnomaly(a);
+                    setWorkflowRun(null);
+                  }}
                   compact
                   showSuppressed={false}
                 />
