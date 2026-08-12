@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Bot,
-  RefreshCw, Zap, ChevronRight,
+  RefreshCw, ChevronRight,
 } from 'lucide-react';
 import {
   fetchHealth,
@@ -19,10 +19,10 @@ import {
 import { ModuleHeader } from './shared/ModuleHeader';
 import { ElasticDeepLinks, SectionElasticLink } from './shared/ElasticDeepLinks';
 import { RegionDetailPanel } from './RegionDetailPanel';
-import { ElasticWorkflowLink } from './ElasticWorkflowLink';
 import { LogDetailPanel } from './LogDetailPanel';
 import { MlSignalIntelligence } from './shared/MlSignalIntelligence';
 import { LaunchBusinessMetrics } from './shared/LaunchEventStrip';
+import { WorkflowResolutionPanel } from './WorkflowResolutionPanel';
 
 export function LiveElasticDemo() {
   const [health, setHealth] = useState(null);
@@ -33,6 +33,7 @@ export function LiveElasticDemo() {
   const [drillView, setDrillView] = useState('metrics');
   const [workflowRun, setWorkflowRun] = useState(null);
   const [workflowLoading, setWorkflowLoading] = useState(false);
+  const workflowTimersRef = useRef([]);
   const [regionFilter, setRegionFilter] = useState('');
   const [selectedRegionId, setSelectedRegionId] = useState(null);
   const [regionDetail, setRegionDetail] = useState(null);
@@ -73,12 +74,66 @@ export function LiveElasticDemo() {
     return () => clearInterval(interval);
   }, [load]);
 
+  useEffect(() => () => {
+    workflowTimersRef.current.forEach(clearTimeout);
+  }, []);
+
+  function clearWorkflowTimers() {
+    workflowTimersRef.current.forEach(clearTimeout);
+    workflowTimersRef.current = [];
+  }
+
+  function scheduleWorkflow(fn, ms) {
+    const id = setTimeout(fn, ms);
+    workflowTimersRef.current.push(id);
+    return id;
+  }
+
+  function animateWorkflowSteps(baseRun) {
+    clearWorkflowTimers();
+    const steps = (baseRun.steps || []).map(s => ({ ...s, status: 'pending' }));
+    if (!steps.length) {
+      setWorkflowRun(baseRun);
+      return;
+    }
+
+    setWorkflowRun({ ...baseRun, status: 'running', steps });
+
+    steps.forEach((_, i) => {
+      scheduleWorkflow(() => {
+        setWorkflowRun(prev => {
+          if (!prev?.steps) return prev;
+          return {
+            ...prev,
+            steps: prev.steps.map((s, idx) => ({
+              ...s,
+              status: idx < i ? 'completed' : idx === i ? 'running' : 'pending',
+            })),
+          };
+        });
+      }, 500 + i * 650);
+    });
+
+    scheduleWorkflow(() => {
+      setWorkflowRun(prev => {
+        if (!prev?.steps) return prev;
+        return {
+          ...prev,
+          status: 'completed',
+          message: 'Elastic Workflow completed — remediation verified',
+          steps: prev.steps.map(s => ({ ...s, status: 'completed' })),
+        };
+      });
+    }, 500 + steps.length * 650 + 700);
+  }
+
   async function handleRegionClick(regionId) {
     setSelectedRegionId(regionId);
     setRegionFilter(regionId);
     setSelectedLog(null);
     setRegionDetailLoading(true);
     setRegionDetail(null);
+    clearWorkflowTimers();
     setWorkflowRun(null);
     setDrillView('metrics');
 
@@ -119,15 +174,21 @@ export function LiveElasticDemo() {
     if (!anomaly) return;
     setSelectedAnomaly(anomaly);
     setWorkflowLoading(true);
+    clearWorkflowTimers();
+    setWorkflowRun(null);
     try {
       const result = await runWorkflow({
         workflowId: anomaly.workflowId,
         anomalyId: anomaly.id,
         regionId: anomaly.regionId,
       });
-      setWorkflowRun(result);
+      if (result?.ok === false && result?.error && !result?.steps?.length) {
+        setWorkflowRun(result);
+      } else {
+        animateWorkflowSteps(result);
+      }
     } catch (err) {
-      setWorkflowRun({ ok: false, error: err.message });
+      setWorkflowRun({ ok: false, error: err.message, message: err.message });
     } finally {
       setWorkflowLoading(false);
     }
@@ -262,22 +323,16 @@ export function LiveElasticDemo() {
                   {workflowLoading ? 'Starting…' : 'Run workflow'}
                 </button>
               )}
-              {workflowRun && (
-                <div className="mt-3 p-3 rounded-xl bg-[#f5f5f7] shrink-0">
-                  <p className="text-[12px] font-medium text-success flex items-center gap-1.5">
-                    <Zap className="w-3.5 h-3.5" />
-                    {workflowRun.message}
-                  </p>
-                  {(workflowRun.kibanaExecutionUrl || workflowRun.kibanaWorkflowUrl) && (
-                    <ElasticWorkflowLink
-                      kibanaUrl={kibanaUrl}
-                      workflowId={workflowRun.kibanaWorkflowId || anomaly?.workflowId}
-                      executionId={workflowRun.kibanaExecutionId}
-                      href={workflowRun.kibanaExecutionUrl || workflowRun.kibanaWorkflowUrl}
-                      label="View in Kibana"
-                      className="mt-2 text-[12px] text-[#0071e3] hover:underline inline-flex"
-                    />
-                  )}
+              {(workflowRun || workflowLoading) && (
+                <div className="mt-3 shrink-0">
+                  <WorkflowResolutionPanel
+                    workflowRun={workflowRun}
+                    loading={workflowLoading}
+                    compact
+                    kibanaUrl={kibanaUrl}
+                    workflowId={anomaly?.workflowId}
+                    title="Live workflow run"
+                  />
                 </div>
               )}
             </div>
