@@ -3,7 +3,7 @@ slug: workflow-remediation
 id: iyh8sexczjid
 type: challenge
 title: Close the loop with Workflows
-teaser: From ML / alert signal to Elastic Workflow remediation — the CSP auto-heal
+teaser: From ML / alert signal to Elastic Workflow remediation — the telco auto-heal
   story.
 notes:
 - type: text
@@ -77,7 +77,7 @@ In the companion Vercel app:
 2. Select **Proactive loop**
 3. Click **Run + Workflow** — that calls the Search-hosted remediation workflow used in customer demos
 
-That is the same closed-loop message for T-Mobile: metrics + ML detect early; Workflows execute the approved playbook.
+That is the same closed-loop message for telco: metrics + ML detect early; Workflows execute the approved playbook.
 
 ---
 
@@ -100,4 +100,4 @@ Invite customers to continue in the public demo: [telco-demo-sage.vercel.app](ht
 
 ---
 
-✅ **Ready for Check** when you have opened Workflows and can describe detect → remediate for a CSP NOC.
+✅ **Ready for Check** when you have opened Workflows and can describe detect → remediate for a telco NOC.

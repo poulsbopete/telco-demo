@@ -1,7 +1,7 @@
 slug: telco-metrics-ml-serverless
 id: 7lo00znhzldf
 title: Telco Metrics + ML on Elastic Serverless
-teaser: Hands-on lab for CSPs — explore OpenTelemetry metrics, ML anomalies, and automated
+teaser: Hands-on lab for telco — explore OpenTelemetry metrics, ML anomalies, and automated
   remediation on Elastic Serverless.
 description: |
   Telecom operators live and die by service quality. When core signaling latency spikes or a metro link degrades,
@@ -14,7 +14,7 @@ description: |
   - Investigate **machine learning** anomalies that surface degradation before customer tickets spike
   - Follow the path from alert signal to **workflow** remediation
 
-  Built for pre-sales and enablement conversations with telco customers (metrics, ML, Kubernetes/OTel migration).
+  Built for pre-sales and enablement conversations with telco operators (metrics, ML, Kubernetes/OTel migration).
   No prior Elastic experience required. Each challenge builds on the last (~10–15 minutes).
 icon: ""
 tags:
@@ -39,5 +39,5 @@ lab_config:
     name: modern-dark
   override_challenge_layout: false
   hideStopButton: false
-checksum: "17231223759514363120"
+checksum: "14369540947127329420"
 enhanced_loading: false

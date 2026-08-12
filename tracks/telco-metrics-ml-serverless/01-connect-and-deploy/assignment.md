@@ -98,7 +98,7 @@ Open the **Elastic Serverless** tab (already logged in). Set time range to **Las
 
 ## 3. Why this matters for telco
 
-CSPs migrating Kubernetes clusters onto OpenTelemetry need one place where **metrics + logs + traces** land without a second silo. Elastic Serverless scales ingest independently of query — the same pattern you will use for ML and workflows next.
+Telco operators migrating Kubernetes clusters onto OpenTelemetry need one place where **metrics + logs + traces** land without a second silo. Elastic Serverless scales ingest independently of query — the same pattern you will use for ML and workflows next.
 
 ---
 

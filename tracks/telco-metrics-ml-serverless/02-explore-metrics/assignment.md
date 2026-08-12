@@ -19,7 +19,7 @@ notes:
     **By the end of this challenge you will:**
 
     - Run ES|QL against metrics and logs from the Telco NOC scenario
-    - Locate latency / error patterns that matter to a CSP NOC
+    - Locate latency / error patterns that matter to a telco NOC
     - Connect metrics views to the service / host story in Observability
 
     Companion: **[Telco NOC](https://telco-demo-sage.vercel.app)** (Telemetry tab)
@@ -95,7 +95,7 @@ Optional: open any auto-created **Dashboard** from the home list and filter to t
 
 ---
 
-## Talk track (for T-Mobile / CSP)
+## Talk track (telco)
 
 > “We’re not asking you to rip Prometheus tomorrow. Start by landing OTel metrics next to traces and logs in Serverless — then layer ML on the same data. One store, one query language, one remediation path.”
 
