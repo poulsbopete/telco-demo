@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Soft check — narrative ML lab; confirm demo still healthy.
+set -euo pipefail
+
+APP="http://localhost:8090"
+curl -sf "${APP}/health" >/dev/null 2>&1 || {
+  echo "❌ Demo app not responding. Try: systemctl restart elastic-demo"
+  exit 1
+}
+echo "✅ Demo app healthy — continue when you have explored ML / anomalies in Elastic."
+exit 0

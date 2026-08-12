@@ -1,0 +1,22 @@
+---
+description: Push Instruqt after track or assignment changes
+alwaysApply: true
+---
+
+# Instruqt push (required)
+
+When you change anything under `tracks/` that affects a lab (`assignment.md`, `track.yml`, `config.yml`, `track_scripts/*`, challenge checks), **push to Instruqt before you finish the task** — do not wait for the user to ask.
+
+From the track directory:
+
+```bash
+cd tracks/telco-metrics-ml-serverless && instruqt track push --force
+```
+
+Or from the repo root:
+
+```bash
+./scripts/instruqt-track-push.sh
+```
+
+Tell the user the manage URL and remind them to **start a new session** to pick up instruction changes. After the first publish, create an invite and set `VITE_INSTRUQT_URL` on Vercel.

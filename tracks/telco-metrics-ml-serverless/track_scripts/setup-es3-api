@@ -1,0 +1,1006 @@
+#!/bin/bash
+
+# Debug: Show what environment variables are available
+echo "=== Debug: Checking for API key ==="
+echo "PME_CLOUD_INSTRUQT_API_KEY: ${PME_CLOUD_INSTRUQT_API_KEY:-<not set>}"
+echo "ESS_CLOUD_API_KEY: ${ESS_CLOUD_API_KEY:-<not set>}"
+echo "All env vars containing 'API' or 'KEY':"
+env | grep -i -E "(API|KEY)" || echo "No API/KEY variables found"
+echo "===================================="
+
+# Try to get API key from multiple sources
+# First check PME_CLOUD_INSTRUQT_API_KEY (may be set via config.yml mapping)
+# Then check ESS_CLOUD_API_KEY (the actual secret name in Instruqt)
+if [ -z "${PME_CLOUD_INSTRUQT_API_KEY:-}" ]; then
+    # Try ESS_CLOUD_API_KEY (the actual secret name)
+    PME_CLOUD_INSTRUQT_API_KEY="${ESS_CLOUD_API_KEY:-}"
+fi
+
+if [ -z "${PME_CLOUD_INSTRUQT_API_KEY:-}" ]; then
+    # Try to get from agent variables as fallback
+    PME_CLOUD_INSTRUQT_API_KEY=$(agent variable get PME_CLOUD_INSTRUQT_API_KEY 2>/dev/null || echo "")
+fi
+
+if [ -z "${PME_CLOUD_INSTRUQT_API_KEY:-}" ]; then
+    # Try ESS_CLOUD_API_KEY from agent variables
+    ESS_KEY=$(agent variable get ESS_CLOUD_API_KEY 2>/dev/null || echo "")
+    if [ -n "$ESS_KEY" ]; then
+        PME_CLOUD_INSTRUQT_API_KEY="$ESS_KEY"
+    fi
+fi
+
+# Check for required environment variables BEFORE enabling strict mode
+if [ -z "${PME_CLOUD_INSTRUQT_API_KEY:-}" ]; then
+    echo "ERROR: API key is not set"
+    echo ""
+    echo "This variable is required to create serverless observability projects."
+    echo "Expected secret name in Instruqt: ESS_CLOUD_API_KEY"
+    echo ""
+    echo "Debug information:"
+    echo "  - Checked PME_CLOUD_INSTRUQT_API_KEY env var: ${PME_CLOUD_INSTRUQT_API_KEY:-not found}"
+    echo "  - Checked ESS_CLOUD_API_KEY env var: ${ESS_CLOUD_API_KEY:-not found}"
+    echo "  - Checked agent variables for both names: not found"
+    echo ""
+    echo "To fix this:"
+    echo "1. Go to your Instruqt track settings (Sandbox > Secrets)"
+    echo "2. Ensure ESS_CLOUD_API_KEY secret is configured with your Elastic Cloud API key"
+    echo "3. The secret should be automatically available to all VMs"
+    echo "4. If not auto-available, you may need to map it in the es3-api VM's environment variables"
+    echo ""
+    echo "The API key is used to create Elastic Cloud serverless projects via the es3-api."
+    exit 1
+fi
+
+# Export for use in the script
+export PME_CLOUD_INSTRUQT_API_KEY
+
+set -euxo pipefail
+
+echo "Running track setup script on host es3-api"
+
+# Wait for the Instruqt host bootstrap to finish
+until [ -f /opt/instruqt/bootstrap/host-bootstrap-completed ]
+do
+    sleep 1
+done
+
+echo "Project type: ${PROJECT_TYPE:-}"
+echo "Regions: ${REGIONS:-}"
+
+case "$PROJECT_TYPE" in
+    "observability")
+      PRODUCT_TIER="${PRODUCT_TIER:-complete}"
+      echo "Project Tier: $PRODUCT_TIER"
+      python3 bin/es3-api.py \
+        --operation create \
+        --project-type $PROJECT_TYPE \
+        --product-tier $PRODUCT_TIER \
+        --regions $REGIONS \
+        --project-name $INSTRUQT_TRACK_SLUG-$INSTRUQT_PARTICIPANT_ID-`date '+%s'` \
+        --api-key "${PME_CLOUD_INSTRUQT_API_KEY}" \
+        --wait-for-ready
+        ;;
+    "elasticsearch")
+      OPTIMIZED_FOR="${OPTIMIZED_FOR:-general_purpose}"
+      echo "Optimized for: $OPTIMIZED_FOR"
+      python3 bin/es3-api.py \
+        --operation create \
+        --project-type $PROJECT_TYPE \
+        --optimized-for $OPTIMIZED_FOR \
+        --regions $REGIONS \
+        --project-name $INSTRUQT_TRACK_SLUG-$INSTRUQT_PARTICIPANT_ID-`date '+%s'` \
+        --api-key "${PME_CLOUD_INSTRUQT_API_KEY}" \
+        --wait-for-ready
+        ;;
+    "security")
+      python3 bin/es3-api.py \
+        --operation create \
+        --project-type $PROJECT_TYPE \
+        --regions $REGIONS \
+        --project-name $INSTRUQT_TRACK_SLUG-$INSTRUQT_PARTICIPANT_ID-`date '+%s'` \
+        --api-key "${PME_CLOUD_INSTRUQT_API_KEY}" \
+        --wait-for-ready
+        ;;
+    *)
+        echo "Error: Unknown project type '$PROJECT_TYPE'"
+        exit 1
+        ;;
+esac
+
+timeout=20
+counter=0
+
+while [ $counter -lt $timeout ]; do
+    if [ -f "/tmp/project_results.json" ]; then
+        echo "File found, continuing..."
+        break
+    fi
+
+    echo "Waiting for file /tmp/project_results.json... ($((counter + 1))/$timeout seconds)"
+    sleep 1
+    counter=$((counter + 1))
+done
+
+# Check if we timed out
+if [ $counter -eq $timeout ]; then
+    echo "Timeout: File /tmp/project_results.json not found after $timeout seconds"
+    exit 1
+fi
+
+export KIBANA_URL=`jq -r --arg region "$REGIONS" '.[$region].endpoints.kibana' /tmp/project_results.json`
+export ELASTICSEARCH_PASSWORD=`jq -r --arg region "$REGIONS" '.[$region].credentials.password' /tmp/project_results.json`
+export ES_URL=`jq -r --arg region "$REGIONS" '.[$region].endpoints.elasticsearch' /tmp/project_results.json`
+
+agent variable set ES_KIBANA_URL `jq -r --arg region "$REGIONS" '.[$region].endpoints.kibana' /tmp/project_results.json`
+agent variable set ES_URL `jq -r --arg region "$REGIONS" '.[$region].endpoints.elasticsearch' /tmp/project_results.json`
+agent variable set ES_USERNAME `jq -r --arg region "$REGIONS" '.[$region].credentials.username'  /tmp/project_results.json`
+agent variable set ES_PASSWORD `jq -r --arg region "$REGIONS" '.[$region].credentials.password' /tmp/project_results.json`
+agent variable set ES_DEPLOYMENT_ID `jq -r --arg region "$REGIONS" '.[$region].id' /tmp/project_results.json`
+
+BASE64=$(echo -n "admin:${ELASTICSEARCH_PASSWORD}" | base64)
+KIBANA_URL_WITHOUT_PROTOCOL=$(echo $KIBANA_URL | sed -e 's#http[s]\?://##g')
+
+
+echo "Generating API Key"
+output=$(curl -X POST -s -u "admin:${ELASTICSEARCH_PASSWORD}" \
+  -w "\n%{http_code}" \
+  $ES_URL/_security/api_key \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "collector"}')
+
+# Extract HTTP status code and response body
+http_code=$(echo "$output" | tail -n1)
+response_body=$(echo "$output" | sed '$d')
+
+# Check if the API call was successful
+if [ "$http_code" != "200" ]; then
+  echo "Error: Failed to generate API key. HTTP status: $http_code"
+  echo "Response: $response_body"
+  #exit 1
+fi
+
+# Extract API key and validate it exists
+ELASTICSEARCH_API_KEY=$(echo "$response_body" | jq -r '.encoded // empty')
+if [ -z "$ELASTICSEARCH_API_KEY" ]; then
+  echo "Error: Failed to extract API key from response"
+  echo "Response: $response_body"
+  #exit 1
+fi
+
+echo "API Key generated successfully"
+
+# Set API key in agent variables for easy access
+agent variable set ES_API_KEY "$ELASTICSEARCH_API_KEY"
+agent variable set ELASTIC_API_KEY "$ELASTICSEARCH_API_KEY"
+
+# Update the JSON file with general api_key (with proper path creation)
+if ! jq --arg region "$REGIONS" --arg apikey "$ELASTICSEARCH_API_KEY" \
+  '.[$region] = (.[$region] // {}) |
+   .[$region].credentials = (.[$region].credentials // {}) |
+   .[$region].credentials.api_key = $apikey' \
+  /tmp/project_results.json > /tmp/project_results.json.tmp; then
+  echo "Error: Failed to update JSON with API key"
+  #exit 1
+fi
+mv /tmp/project_results.json.tmp /tmp/project_results.json
+
+# Fetch the Fleet Server URL(s)
+if [ "$PROJECT_TYPE" = 'observability' ]; then
+  echo "Fetching Fleet Server URL"
+
+  fleet_output=$(curl -s -u "admin:$ELASTICSEARCH_PASSWORD" \
+    -w "\n%{http_code}" \
+    -H "kbn-xsrf: true" \
+    "$KIBANA_URL/api/fleet/fleet_server_hosts")
+
+  # Extract HTTP status code and response body
+  fleet_http_code=$(echo "$fleet_output" | tail -n1)
+  fleet_response=$(echo "$fleet_output" | sed '$d')
+
+  # Check if the Fleet API call was successful
+  if [ "$fleet_http_code" != "200" ]; then
+    echo "Warning: Failed to fetch Fleet Server URL. HTTP status: $fleet_http_code"
+    echo "Response: $fleet_response"
+    # Continue without fleet URL rather than exiting
+  else
+    # Extract Fleet URL and validate
+    FLEET_URL=$(echo "$fleet_response" | jq -r '.items[0].host_urls[0] // empty')
+
+    if [ -z "$FLEET_URL" ]; then
+      echo "Warning: No Fleet Server URL found in response"
+    else
+      echo "Fleet URL: $FLEET_URL"
+
+      # Update the JSON file with the Fleet URL
+      if ! jq --arg region "$REGIONS" --arg fleet "$FLEET_URL" \
+        '.[$region].endpoints = (.[$region].endpoints // {}) |
+         .[$region].endpoints.fleet = $fleet' \
+        /tmp/project_results.json > /tmp/project_results.json.tmp; then
+        echo "Error: Failed to update JSON with Fleet URL"
+        #exit 1
+      fi
+      mv /tmp/project_results.json.tmp /tmp/project_results.json
+    fi
+  fi
+fi
+
+echo "Configuration saved successfully to /tmp/project_results.json"
+
+echo "Configure NGINX"
+# Create directory for static files
+mkdir -p /usr/share/nginx/html/loading
+
+# Create HTML file with iframe for interactive content during loading
+cat > /usr/share/nginx/html/loading/index.html <<'HTML_EOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Content</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; color: #ffffff; height: 100vh; overflow: hidden; }
+        .container { display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #2d2d2d; padding: 15px 20px; border-bottom: 1px solid #404040; }
+        .header h1 { font-size: 18px; font-weight: 600; color: #ffffff; }
+        .tabs { display: flex; gap: 10px; background: #2d2d2d; padding: 0 20px; border-bottom: 1px solid #404040; }
+        .tab { padding: 12px 20px; background: transparent; border: none; color: #a0a0a0; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; font-size: 14px; }
+        .tab:hover { color: #ffffff; }
+        .tab.active { color: #4CAF50; border-bottom-color: #4CAF50; }
+        .content { flex: 1; position: relative; overflow: hidden; }
+        .iframe-container { width: 100%; height: 100%; border: none; }
+        .iframe-container iframe { width: 100%; height: 100%; border: none; background: #ffffff; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header"><h1>Interactive Content</h1></div>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('dashboard')">Metrics Dashboard</button>
+        </div>
+        <div class="content">
+            <div id="dashboard-container" class="iframe-container">
+                <iframe src="https://clusterburger-metrics.vercel.app/" allow="microphone; camera"></iframe>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
+HTML_EOF
+
+# Chatbot/MCP proxy removed — do not embed shared API keys.
+# Use learner project + Instruqt secrets (e.g. LLM_PROXY_PROD) instead.
+
+
+# Configure nginx
+echo '
+server {
+  listen 8080 default_server;
+  server_name kibana;
+  location /nginx_status {
+    stub_status on;
+    allow 127.0.0.1;
+    deny all;
+  }
+  location /loading {
+    alias /usr/share/nginx/html/loading;
+    index index.html;
+    try_files $uri $uri/ /loading/index.html;
+    add_header X-Frame-Options "SAMEORIGIN";
+  }
+  location /metric-bot {
+    proxy_pass https://metric-bot.vercel.app/;
+    proxy_set_header Host metric-bot.vercel.app;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_ssl_verify off;
+    add_header Access-Control-Allow-Origin "*" always;
+    add_header Access-Control-Allow-Methods "GET, POST, OPTIONS" always;
+    add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
+    # Remove X-Frame-Options to allow embedding
+    proxy_hide_header X-Frame-Options;
+    
+    # Handle CORS preflight
+    if ($request_method = OPTIONS) {
+      add_header Access-Control-Allow-Origin "*";
+      add_header Access-Control-Allow-Methods "GET, POST, OPTIONS";
+      add_header Access-Control-Allow-Headers "Content-Type, Authorization";
+      add_header Content-Length 0;
+      add_header Content-Type text/plain;
+      return 204;
+    }
+  }
+  location / {
+    proxy_set_header Host '${KIBANA_URL_WITHOUT_PROTOCOL}';
+    proxy_pass '${KIBANA_URL}';
+    proxy_next_upstream error timeout invalid_header http_500 http_502 http_503 http_504;
+    proxy_set_header Connection "keep-alive";
+    proxy_hide_header Content-Security-Policy;
+    proxy_hide_header X-Frame-Options;
+    proxy_hide_header X-Content-Type-Options;
+    proxy_hide_header Strict-Transport-Security;
+    proxy_set_header X-Scheme $scheme;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header Authorization "Basic '${BASE64}'";
+    proxy_set_header Accept-Encoding "gzip, deflate, br";
+    proxy_set_header Accept "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8";
+    proxy_set_header Accept-Language "en-US,en;q=0.9";
+    # Set User-Agent to appear as modern Chrome browser (updated to latest version)
+    proxy_set_header User-Agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36";
+    proxy_set_header Sec-Fetch-Site "none";
+    proxy_set_header Sec-Fetch-Mode "navigate";
+    proxy_set_header Sec-Fetch-User "?1";
+    proxy_set_header Sec-Fetch-Dest "document";
+    proxy_set_header Upgrade-Insecure-Requests "1";
+    proxy_redirect off;
+    proxy_http_version 1.1;
+    client_max_body_size 20M;
+    proxy_read_timeout 600;
+    proxy_buffering off;
+    proxy_send_timeout          300;
+    send_timeout                300;
+    proxy_connect_timeout       300;
+ }
+}
+
+server {
+  listen 9200;
+  server_name elasticsearch;
+
+  location / {
+    proxy_pass '${ES_URL}';
+    proxy_connect_timeout       300;
+    proxy_send_timeout          300;
+    proxy_read_timeout          300;
+    send_timeout                300;
+  }
+}
+' > /etc/nginx/conf.d/default.conf
+
+echo "Restart NGINX"
+systemctl restart nginx
+
+# Verify NGINX is running and listening on port 8080
+sleep 2
+if systemctl is-active --quiet nginx; then
+    echo "✅ NGINX is running"
+    if netstat -tlnp 2>/dev/null | grep -q ":8080 " || ss -tlnp 2>/dev/null | grep -q ":8080 "; then
+        echo "✅ NGINX is listening on port 8080"
+    else
+        echo "⚠️  Warning: NGINX may not be listening on port 8080"
+    fi
+else
+    echo "❌ ERROR: NGINX failed to start"
+    systemctl status nginx || true
+    exit 1
+fi
+
+echo "Setting up JSON server on port 8081..."
+
+# Check if the JSON file exists
+if [ ! -f "/tmp/project_results.json" ]; then
+    echo "Warning: /tmp/project_results.json not found!"
+    echo "The server will return an error when accessed."
+fi
+
+# Assume nothing is running on port 8081
+echo "Starting JSON server on port 8081..."
+
+# Start the server in background
+echo "Starting JSON server in background..."
+python3 bin/serve_json.py > /tmp/server-serve-json.log 2>&1 &
+
+# Get the process ID
+SERVER_PID=$!
+
+# Wait a moment for the server to start
+sleep 2
+
+# Check if server started successfully
+sleep 2
+if kill -0 $SERVER_PID 2>/dev/null; then
+    echo ":white_check_mark: Server started successfully!"
+    echo ":bar_chart: Server PID: $SERVER_PID"
+    echo ":memo: Logs: /tmp/server-serve-json.log"
+    echo ":globe_with_meridians: Access URL: http://localhost:8081"
+    echo ""
+    echo ":clipboard: Useful commands:"
+    echo "  View logs: tail -f /tmp/server-serve-json.log"
+    echo "  Test server: curl http://localhost:8081"
+    echo "  Stop server: kill $SERVER_PID"
+    echo "  Check status: ps aux | grep serve_json"
+else
+    echo ":x: Failed to start server"
+    echo "Check /tmp/server-serve-json.log for details:"
+    if [ -f "/tmp/server-serve-json.log" ]; then
+        tail -5 /tmp/server-serve-json.log
+    else
+        echo "No log file found"
+    fi
+    exit 1
+fi
+
+echo "done"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Elastic Observability Demo Platform setup
+# Credentials (KIBANA_URL, ELASTICSEARCH_API_KEY) are already set above.
+# The demo app runs on port 8090 (nginx owns 8080).
+# ─────────────────────────────────────────────────────────────────────────────
+
+DEMO_REPO="https://github.com/poulsbopete/elastic-launch-demo.git"
+DEMO_BRANCH="feat/back-navigation-noc-chaos"
+DEMO_DIR="/opt/elastic-launch-demo"
+DEMO_PORT=8090
+
+echo "Cloning elastic-launch-demo..."
+if [[ -d "$DEMO_DIR" ]]; then
+  git -C "$DEMO_DIR" pull --ff-only 2>/dev/null || true
+else
+  git clone --branch "$DEMO_BRANCH" "$DEMO_REPO" "$DEMO_DIR"
+fi
+
+echo "Installing Python dependencies..."
+# Install into a dedicated target dir — avoids PEP 668 / EXTERNALLY-MANAGED entirely
+PKGS_DIR="$DEMO_DIR/packages"
+mkdir -p "$PKGS_DIR"
+# Bootstrap pip into the target dir using get-pip.py (no system pip needed)
+curl -fsSL https://bootstrap.pypa.io/get-pip.py | python3 - --target="$PKGS_DIR" --quiet 2>/dev/null || true
+# Install all requirements into the same target dir
+PYTHONPATH="$PKGS_DIR" python3 -m pip install \
+  --target="$PKGS_DIR" --prefer-binary --quiet \
+  -r "$DEMO_DIR/requirements.txt"
+mkdir -p "$DEMO_DIR/data"
+
+# Get Instruqt participant email to pre-fill the Chaos Controller operator field.
+# Falls back to a stub so OPERATOR_EMAIL is always set and nothing downstream fails.
+PARTICIPANT_EMAIL=""
+if command -v instruqt &>/dev/null; then
+  PARTICIPANT_EMAIL="$(instruqt participant get --format json 2>/dev/null \
+    | python3 -c "import sys,json; p=json.load(sys.stdin); print(p.get('email',''))" \
+    2>/dev/null || echo "")"
+fi
+if [[ -z "$PARTICIPANT_EMAIL" ]]; then
+  # Fallback: try the runtime socket
+  PARTICIPANT_EMAIL="$(curl -sf --unix-socket /var/run/instruqt/runtime.sock \
+    http://localhost/participant 2>/dev/null \
+    | python3 -c "import sys,json; p=json.load(sys.stdin); print(p.get('email',''))" \
+    2>/dev/null || echo "")"
+fi
+if [[ -z "$PARTICIPANT_EMAIL" ]]; then
+  PARTICIPANT_EMAIL="participant@instruqt.local"
+  echo "Participant email not available — using stub: $PARTICIPANT_EMAIL"
+else
+  echo "Participant email resolved: $PARTICIPANT_EMAIL"
+fi
+
+echo "Creating systemd service for demo app (port $DEMO_PORT)..."
+cat > /etc/systemd/system/elastic-demo.service <<EOF
+[Unit]
+Description=Elastic Observability Demo Platform
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=${DEMO_DIR}
+Environment=PATH=${DEMO_DIR}/packages/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PYTHONPATH=${DEMO_DIR}/packages
+Environment=OPERATOR_EMAIL=${PARTICIPANT_EMAIL}
+ExecStart=/usr/bin/python3 -m uvicorn app.main:app --host 0.0.0.0 --port ${DEMO_PORT}
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=elastic-demo
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable elastic-demo
+systemctl start  elastic-demo
+
+echo "Waiting for demo app to become healthy on port $DEMO_PORT..."
+for i in $(seq 1 60); do
+  if curl -sf "http://localhost:${DEMO_PORT}/health" >/dev/null 2>&1; then
+    echo "Demo app healthy after ${i}s ✓"
+    break
+  fi
+  if [[ $i -eq 60 ]]; then
+    echo "WARN: Demo app did not become healthy after 60s"
+  fi
+  sleep 1
+done
+
+# Credentials are already exported by the project-creation block above.
+# KIBANA_URL and ELASTICSEARCH_API_KEY are set as env vars in this script.
+DEMO_KIBANA_URL="${KIBANA_URL:-}"
+DEMO_API_KEY="${ELASTICSEARCH_API_KEY:-}"
+
+if [[ -n "$DEMO_KIBANA_URL" && -n "$DEMO_API_KEY" ]]; then
+  echo "Launching telco (claro) scenario against $DEMO_KIBANA_URL ..."
+
+  curl -sf -X POST "http://localhost:${DEMO_PORT}/api/setup/launch" \
+    -H 'Content-Type: application/json' \
+    -d "{\"scenario_id\":\"claro\",\"kibana_url\":\"${DEMO_KIBANA_URL}\",\"api_key\":\"${DEMO_API_KEY}\"}" \
+    >/dev/null 2>&1 || echo "WARN: Launch request failed — learners can launch manually via the Demo App tab."
+
+  echo "Waiting for deployment to register..."
+  for i in $(seq 1 120); do
+    RUNNING="$(curl -sf "http://localhost:${DEMO_PORT}/api/deployments" 2>/dev/null \
+      | python3 -c "import sys,json; deps=json.load(sys.stdin); print(sum(1 for d in deps if d.get('running')))" 2>/dev/null || echo 0)"
+    if [[ "$RUNNING" -ge 1 ]]; then
+      echo "Deployment active after ${i}s ✓"
+      break
+    fi
+    if [[ $i -eq 120 ]]; then
+      echo "WARN: Deployment did not register after 240s"
+    fi
+    sleep 2
+  done
+else
+  echo "WARN: Missing Kibana URL or API key — skipping auto-launch."
+fi
+
+# Convenience aliases
+cat >> /root/.bashrc <<'BASH'
+
+# Elastic Demo aliases
+alias demo-logs="journalctl -u elastic-demo -f --no-pager"
+alias demo-status="curl -sf http://localhost:8090/api/status | python3 -m json.tool"
+alias demo-deployments="curl -sf http://localhost:8090/api/deployments | python3 -m json.tool"
+alias demo-chaos="curl -sf http://localhost:8090/api/chaos/status | python3 -m json.tool"
+alias demo-restart="systemctl restart elastic-demo && sleep 3 && curl -sf http://localhost:8090/health"
+BASH
+
+echo "Creating SLOs directly via Kibana API..."
+
+create_slo() {
+  local name="$1"
+  local body="$2"
+  local http_code
+  http_code=$(curl -s -o /tmp/slo_response.json -w "%{http_code}" \
+    -X POST "${KIBANA_URL}/api/observability/slos" \
+    -u "admin:${ELASTICSEARCH_PASSWORD}" \
+    -H 'kbn-xsrf: true' \
+    -H 'Content-Type: application/json' \
+    -d "$body")
+  if [[ "$http_code" == "200" || "$http_code" == "201" ]]; then
+    echo "✅ Created: $name (HTTP $http_code)"
+  else
+    echo "⚠️  Failed to create '$name' (HTTP $http_code): $(cat /tmp/slo_response.json 2>/dev/null)"
+  fi
+}
+
+create_slo "Availability SLO" '{
+  "name": "Availability SLO",
+  "description": "Service availability - 70% target (relaxed), grouped by service name",
+  "indicator": {
+    "type": "sli.kql.custom",
+    "params": {
+      "index": "traces-apm*,traces-*.otel-*",
+      "good": "NOT event.outcome:failure",
+      "filter": "processor.event:transaction",
+      "total": "*",
+      "timestampField": "@timestamp"
+    }
+  },
+  "groupBy": "service.name",
+  "budgetingMethod": "occurrences",
+  "timeWindow": { "duration": "7d", "type": "rolling" },
+  "objective": { "target": 0.70 },
+  "tags": ["auto-created"]
+}'
+
+create_slo "Latency SLO" '{
+  "name": "Latency SLO",
+  "description": "Service latency - 60% of requests under 2s (relaxed), grouped by service name",
+  "indicator": {
+    "type": "sli.kql.custom",
+    "params": {
+      "index": "traces-apm*,traces-*.otel-*",
+      "filter": "processor.event:transaction AND transaction.duration.us:*",
+      "good": "transaction.duration.us <= 2000000",
+      "total": "transaction.duration.us:*",
+      "timestampField": "@timestamp"
+    }
+  },
+  "groupBy": "service.name",
+  "budgetingMethod": "occurrences",
+  "timeWindow": { "duration": "7d", "type": "rolling" },
+  "objective": { "target": 0.60 },
+  "tags": ["auto-created"]
+}'
+
+create_slo "Error Rate SLO" '{
+  "name": "Error Rate SLO",
+  "description": "Service error rate - 70% success rate (relaxed), grouped by service name",
+  "indicator": {
+    "type": "sli.kql.custom",
+    "params": {
+      "index": "traces-apm*,traces-*.otel-*",
+      "filter": "processor.event:transaction",
+      "good": "NOT event.outcome:failure",
+      "total": "*",
+      "timestampField": "@timestamp"
+    }
+  },
+  "groupBy": "service.name",
+  "budgetingMethod": "occurrences",
+  "timeWindow": { "duration": "7d", "type": "rolling" },
+  "objective": { "target": 0.70 },
+  "tags": ["auto-created"]
+}'
+
+echo "Creating SLO Management workflow in Kibana (YAML import)..."
+
+# Write workflow YAML to temp file
+cat > /tmp/slo_workflow.yaml <<'SLO_YAML_EOF'
+name: SLO Management and Service Evaluation Workflow
+enabled: true
+description: |
+  Automatically evaluates all services and creates SLOs with relaxed targets.
+  Runs every 24 hours. IDEMPOTENT: Deletes all existing SLOs matching the pattern,
+  then creates 3 standard SLOs (Availability, Latency, Error Rate).
+  SLO Targets: Availability 95%, Error Rate 95%, Latency 85% under 2s.
+triggers:
+  - type: scheduled
+    with:
+      every: "24h"
+  - type: manual
+steps:
+  - name: workflow-start
+    type: console
+    with:
+      message: "SLO Management Workflow starting. Execution: {{ execution.id }}. Timestamp: {{ now | date: '%Y-%m-%d %H:%M:%S UTC' }}."
+  - name: get-all-existing-slos
+    type: kibana.request
+    on-failure:
+      continue: true
+    with:
+      method: "GET"
+      path: "/api/observability/slos?perPage=500"
+      timeout: '60'
+      headers:
+        Content-Type: 'application/json'
+        Accept: 'application/json'
+        kbn-xsrf: 'true'
+  - name: loop_over_results
+    type: foreach
+    foreach: "{{steps.get-all-existing-slos.output.results}}"
+    on-failure:
+      continue: true
+    steps:
+      - name: check_SLOs
+        type: if
+        condition: "foreach.item.name : *Error Rate SLO* OR foreach.item.name : *Latency SLO* OR foreach.item.name : *Availability SLO*"
+        steps:
+          - name: print-results
+            type: console
+            with:
+              message: "Deleting {{foreach.item.name | uniq}}: {{foreach.item.id | uniq}}"
+          - name: delete-loop-slo
+            type: kibana.request
+            on-failure:
+              continue: true
+            with:
+              method: DELETE
+              path: /api/observability/slos/{{ foreach.item.id | uniq}}
+              headers:
+                kbn-xsrf: "true"
+        else:
+          - name: print-else-results
+            type: console
+            with:
+              message: "Skipping {{foreach.item.name | uniq}}"
+  - name: create-slo-availability
+    type: kibana.request
+    with:
+      method: POST
+      path: /api/observability/slos
+      body:
+        name: Availability SLO
+        description: Service availability - 95% target, grouped by service name
+        indicator:
+          type: sli.kql.custom
+          params:
+            index: traces-apm*,traces-*.otel-*
+            good: NOT event.outcome:failure
+            filter: processor.event:transaction
+            total: "*"
+            timestampField: "@timestamp"
+        groupBy:
+          - service.name
+        budgetingMethod: occurrences
+        timeWindow:
+          duration: 7d
+          type: rolling
+        objective:
+          target: 0.95
+        tags: []
+      headers:
+        Content-Type: application/json
+        Accept: application/json
+        kbn-xsrf: "true"
+  - name: create-slo-latency
+    type: kibana.request
+    with:
+      method: POST
+      path: /api/observability/slos
+      body:
+        name: Latency SLO
+        description: Service latency - 85% of requests under 2s, grouped by service name
+        indicator:
+          type: sli.kql.custom
+          params:
+            index: traces-apm*,traces-*.otel-*
+            filter: processor.event:transaction AND transaction.duration.us:*
+            good: transaction.duration.us <= 2000000
+            total: transaction.duration.us:*
+            timestampField: "@timestamp"
+        groupBy:
+          - service.name
+        budgetingMethod: occurrences
+        timeWindow:
+          duration: 7d
+          type: rolling
+        objective:
+          target: 0.85
+        tags: []
+      headers:
+        Content-Type: application/json
+        Accept: application/json
+        kbn-xsrf: "true"
+  - name: create-slo-error-rate
+    type: kibana.request
+    with:
+      method: POST
+      path: /api/observability/slos
+      body:
+        name: Error Rate SLO
+        description: Service error rate - less than 5% errors, grouped by service name
+        indicator:
+          type: sli.kql.custom
+          params:
+            index: traces-apm*,traces-*.otel-*
+            filter: processor.event:transaction
+            good: NOT event.outcome:failure
+            total: "*"
+            timestampField: "@timestamp"
+        groupBy:
+          - service.name
+        budgetingMethod: occurrences
+        timeWindow:
+          duration: 7d
+          type: rolling
+        objective:
+          target: 0.95
+        tags: []
+      headers:
+        Content-Type: application/json
+        Accept: application/json
+        kbn-xsrf: "true"
+SLO_YAML_EOF
+
+# Try YAML content-type first, then JSON fallback
+SLO_WORKFLOW_RESPONSE=$(curl -s -o /tmp/slo_workflow_response.json -w "%{http_code}" \
+  -X POST "${KIBANA_URL}/api/observability/workflows" \
+  -u "admin:${ELASTICSEARCH_PASSWORD}" \
+  -H 'kbn-xsrf: true' \
+  -H 'Content-Type: application/yaml' \
+  --data-binary @/tmp/slo_workflow.yaml)
+
+echo "Workflow API attempt 1 (YAML): HTTP $SLO_WORKFLOW_RESPONSE"
+echo "Response: $(cat /tmp/slo_workflow_response.json 2>/dev/null)"
+
+if [[ "$SLO_WORKFLOW_RESPONSE" != "200" && "$SLO_WORKFLOW_RESPONSE" != "201" ]]; then
+  echo "Workflow API attempt 2 (JSON body)..."
+  SLO_WORKFLOW_RESPONSE=$(curl -s -o /tmp/slo_workflow_response.json -w "%{http_code}" \
+    -X POST "${KIBANA_URL}/api/observability/workflows" \
+    -u "admin:${ELASTICSEARCH_PASSWORD}" \
+    -H 'kbn-xsrf: true' \
+    -H 'Content-Type: application/json' \
+  -d '{
+    "name": "SLO Management and Service Evaluation Workflow",
+    "enabled": true,
+    "description": "Automatically evaluates all services and creates SLOs with relaxed targets. Runs every 24 hours. IDEMPOTENT: Deletes all existing SLOs, then creates 3 standard SLOs (Availability, Latency, Error Rate). Each run leaves exactly 3 SLOs, no duplicates. SLO Targets: Availability 95%, Error Rate 95%, Latency 85% under 2s.",
+    "triggers": [
+      { "type": "scheduled", "with": { "every": "24h" } },
+      { "type": "manual" }
+    ],
+    "steps": [
+      {
+        "name": "workflow-start",
+        "type": "console",
+        "with": {
+          "message": "SLO Management Workflow starting. Execution ID: {{ execution.id }}. Timestamp: {{ now | date: \"%Y-%m-%d %H:%M:%S UTC\" }}. IDEMPOTENT: will delete and recreate 3 standard SLOs."
+        }
+      },
+      {
+        "name": "get-all-existing-slos",
+        "type": "kibana.request",
+        "on-failure": { "continue": true },
+        "with": {
+          "method": "GET",
+          "path": "/api/observability/slos?perPage=500",
+          "timeout": "60",
+          "headers": {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "kbn-xsrf": "true"
+          }
+        }
+      },
+      {
+        "name": "loop_over_results",
+        "type": "foreach",
+        "foreach": "{{steps.get-all-existing-slos.output.results}}",
+        "on-failure": { "continue": true },
+        "steps": [
+          {
+            "name": "check_SLOs",
+            "type": "if",
+            "condition": "foreach.item.name : *Error Rate SLO* OR foreach.item.name : *Latency SLO* OR foreach.item.name : *Availability SLO*",
+            "steps": [
+              {
+                "name": "print-results",
+                "type": "console",
+                "with": { "message": "{{foreach.item.name | uniq}}: {{foreach.item.id | uniq}}" }
+              },
+              {
+                "name": "delete-loop-slo",
+                "type": "kibana.request",
+                "on-failure": { "continue": true },
+                "with": {
+                  "method": "DELETE",
+                  "path": "/api/observability/slos/{{foreach.item.id | uniq}}",
+                  "headers": { "kbn-xsrf": "true" }
+                }
+              }
+            ],
+            "else": [
+              {
+                "name": "print-else-results",
+                "type": "console",
+                "with": { "message": "{{foreach.item.name | uniq}}: {{foreach.item.id | uniq}}" }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "create-slo-availability",
+        "type": "kibana.request",
+        "with": {
+          "method": "POST",
+          "path": "/api/observability/slos",
+          "body": {
+            "name": "Availability SLO",
+            "description": "Automatically created SLO for service availability - 95% target, grouped by service name",
+            "indicator": {
+              "type": "sli.kql.custom",
+              "params": {
+                "index": "traces-apm.rum-default*,traces-*.otel-*",
+                "good": "NOT event.outcome:failure",
+                "filter": "processor.event:transaction",
+                "total": "*",
+                "timestampField": "@timestamp"
+              }
+            },
+            "groupBy": ["service.name"],
+            "budgetingMethod": "occurrences",
+            "timeWindow": { "duration": "7d", "type": "rolling" },
+            "objective": { "target": 0.95 },
+            "tags": []
+          },
+          "headers": {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "kbn-xsrf": "true"
+          }
+        }
+      },
+      {
+        "name": "create-slo-latency",
+        "type": "kibana.request",
+        "with": {
+          "method": "POST",
+          "path": "/api/observability/slos",
+          "body": {
+            "name": "Latency SLO",
+            "description": "Automatically created SLO for service latency - 85% of requests < 2s target, grouped by service name",
+            "indicator": {
+              "type": "sli.kql.custom",
+              "params": {
+                "index": "traces-apm.rum-default*,traces-*.otel-*",
+                "filter": "processor.event:transaction AND transaction.duration.us:*",
+                "good": "transaction.duration.us <= 2000000",
+                "total": "transaction.duration.us:*",
+                "timestampField": "@timestamp"
+              }
+            },
+            "groupBy": ["service.name"],
+            "budgetingMethod": "occurrences",
+            "timeWindow": { "duration": "7d", "type": "rolling" },
+            "objective": { "target": 0.85 },
+            "tags": []
+          },
+          "headers": {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "kbn-xsrf": "true"
+          }
+        }
+      },
+      {
+        "name": "create-slo-error-rate",
+        "type": "kibana.request",
+        "with": {
+          "method": "POST",
+          "path": "/api/observability/slos",
+          "body": {
+            "name": "Error Rate SLO",
+            "description": "Automatically created SLO for service error rate - less than 5% error rate target, grouped by service name",
+            "indicator": {
+              "type": "sli.kql.custom",
+              "params": {
+                "index": "traces-apm.rum-default*,traces-*.otel-*",
+                "filter": "processor.event:transaction",
+                "good": "NOT event.outcome:failure",
+                "total": "*",
+                "timestampField": "@timestamp"
+              }
+            },
+            "groupBy": ["service.name"],
+            "budgetingMethod": "occurrences",
+            "timeWindow": { "duration": "7d", "type": "rolling" },
+            "objective": { "target": 0.95 },
+            "tags": []
+          },
+          "headers": {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "kbn-xsrf": "true"
+          }
+        }
+      }
+    ]
+  }')
+
+  echo "Workflow API attempt 2 (JSON): HTTP $SLO_WORKFLOW_RESPONSE"
+  echo "Response: $(cat /tmp/slo_workflow_response.json 2>/dev/null)"
+fi
+
+if [[ "$SLO_WORKFLOW_RESPONSE" == "200" || "$SLO_WORKFLOW_RESPONSE" == "201" ]]; then
+  echo "✅ SLO Management workflow created successfully (HTTP $SLO_WORKFLOW_RESPONSE)"
+else
+  echo "⚠️  All workflow API attempts failed (HTTP $SLO_WORKFLOW_RESPONSE)"
+  echo "Final response: $(cat /tmp/slo_workflow_response.json 2>/dev/null || echo 'no response body')"
+
+  # Attempt 3: Try demo app's internal workflow creation if available
+  echo "Workflow API attempt 3 (demo app relay)..."
+  DEMO_WF_RESPONSE=$(curl -s -o /tmp/slo_wf_demo.json -w "%{http_code}" \
+    -X POST "http://localhost:8090/api/workflows/create" \
+    -H 'Content-Type: application/yaml' \
+    --data-binary @/tmp/slo_workflow.yaml 2>/dev/null) || DEMO_WF_RESPONSE="000"
+  echo "Demo app relay: HTTP $DEMO_WF_RESPONSE — $(cat /tmp/slo_wf_demo.json 2>/dev/null)"
+
+  echo "SLOs are created directly and will refresh on the next 24h cycle."
+  echo "Workflow YAML is available at /tmp/slo_workflow.yaml for manual import via Observability → Workflows → Import"
+fi
+
+echo "Track setup complete."

@@ -1,0 +1,43 @@
+slug: telco-metrics-ml-serverless
+id: 7lo00znhzldf
+title: Telco Metrics + ML on Elastic Serverless
+teaser: Hands-on lab for CSPs — explore OpenTelemetry metrics, ML anomalies, and automated
+  remediation on Elastic Serverless.
+description: |
+  Telecom operators live and die by service quality. When core signaling latency spikes or a metro link degrades,
+  the difference between a quiet night and a P1 outage is how fast you detect, explain, and remediate.
+
+  In this workshop you will use **Elastic Serverless Observability** to:
+
+  - Connect a live Telco NOC demo that streams real OpenTelemetry logs, metrics, and traces
+  - Explore network and service **metrics** with ES|QL
+  - Investigate **machine learning** anomalies that surface degradation before customer tickets spike
+  - Follow the path from alert signal to **workflow** remediation
+
+  Built for pre-sales and enablement conversations with telco customers (metrics, ML, Kubernetes/OTel migration).
+  No prior Elastic experience required. Each challenge builds on the last (~10–15 minutes).
+icon: ""
+tags:
+- telco
+- metrics
+- ai
+- ml
+- opentelemetry
+- observability
+owner: elastic
+developers:
+- peter.simkins@elastic.co
+skipping_enabled: true
+idle_timeout: 3600
+timelimit: 10800
+lab_config:
+  sidebar_enabled: true
+  feedback_recap_enabled: true
+  feedback_tab_enabled: false
+  loadingMessages: true
+  theme:
+    name: modern-dark
+  override_challenge_layout: false
+  hideStopButton: false
+checksum: "13416783415235967037"
+enhanced_loading: false

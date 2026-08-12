@@ -26,6 +26,11 @@ const MODULE_COMPONENTS = {
   security: SecurityDashboard,
 };
 
+/** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */
+const INSTRUQT_URL =
+  import.meta.env.VITE_INSTRUQT_URL
+  || 'https://play.instruqt.com/elastic/tracks/telco-metrics-ml-serverless';
+
 export default function App() {
   const [activeModule, setActiveModule] = useState('live');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -63,6 +68,15 @@ export default function App() {
               ))}
               <a href="/presenter/" className="nav-link ml-2">Presenter</a>
               <a href="/slides/" className="nav-link">Slides</a>
+              <a
+                href={INSTRUQT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="nav-link"
+                title="Hands-on Instruqt lab — metrics, ML, workflows"
+              >
+                Workshop
+              </a>
             </nav>
 
             <button
@@ -92,6 +106,14 @@ export default function App() {
             ))}
             <a href="/presenter/" className="block py-2 text-[17px] text-[#86868b]">Presenter guides</a>
             <a href="/slides/" className="block py-2 text-[17px] text-[#86868b]">Slides</a>
+            <a
+              href={INSTRUQT_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block py-2 text-[17px] text-[#86868b]"
+            >
+              Workshop (Instruqt)
+            </a>
           </nav>
         )}
       </header>
@@ -122,11 +144,20 @@ export default function App() {
             {' '}Synthetic demo content only.
           </p>
           <p className="mt-2">
+            Hands-on lab — metrics, ML, and remediating telco incidents on Elastic Serverless.
+            {' '}
+            <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">
+              Try the workshop
+            </a>
+          </p>
+          <p className="mt-2">
             <a href="/presenter/view.html?doc=demo-walk" className="text-[#0071e3] hover:underline">Demo walk script</a>
             {' · '}
             <a href="/presenter/view.html?doc=landscape" className="text-[#0071e3] hover:underline">Telco landscape</a>
             {' · '}
             <a href="/slides/" className="text-[#0071e3] hover:underline">Slides</a>
+            {' · '}
+            <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">Workshop</a>
           </p>
         </div>
       </footer>

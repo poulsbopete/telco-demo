@@ -2,6 +2,7 @@
 
 **App:** https://telco-demo-sage.vercel.app  
 **Slides:** https://telco-demo-sage.vercel.app/slides/  
+**Workshop (Instruqt):** Nav → Workshop (or set `VITE_INSTRUQT_URL` to the invite) — metrics + ML + workflows lab  
 **Landscape reference:** [2026 telco landscape](/presenter/view.html?doc=landscape)  
 **Primary tab:** Telemetry
 

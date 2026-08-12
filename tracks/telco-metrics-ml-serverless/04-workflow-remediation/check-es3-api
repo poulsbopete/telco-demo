@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Soft check — narrative workflows lab.
+set -euo pipefail
+
+APP="http://localhost:8090"
+curl -sf "${APP}/health" >/dev/null 2>&1 || {
+  echo "❌ Demo app not responding. Try: systemctl restart elastic-demo"
+  exit 1
+}
+echo "✅ Demo app healthy — continue when you have opened Workflows and the Telco NOC proactive loop."
+exit 0
