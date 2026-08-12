@@ -77,7 +77,7 @@ FROM logs*
 
 In the left nav open:
 
-- **Observability → Infrastructure** — host / cloud metrics for the simulated providers
+- **Infrastructure** — host / cloud metrics for the simulated providers
 - **Applications → Service inventory** — latency and throughput for microservices
 
 Optional: open any auto-created **Dashboard** from the home list and filter to the last 30 minutes.
