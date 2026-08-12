@@ -532,11 +532,11 @@ DEMO_KIBANA_URL="${KIBANA_URL:-}"
 DEMO_API_KEY="${ELASTICSEARCH_API_KEY:-}"
 
 if [[ -n "$DEMO_KIBANA_URL" && -n "$DEMO_API_KEY" ]]; then
-  echo "Launching telco (claro) scenario against $DEMO_KIBANA_URL ..."
+  echo "Launching Telco NOC scenario against $DEMO_KIBANA_URL ..."
 
   curl -sf -X POST "http://localhost:${DEMO_PORT}/api/setup/launch" \
     -H 'Content-Type: application/json' \
-    -d "{\"scenario_id\":\"claro\",\"kibana_url\":\"${DEMO_KIBANA_URL}\",\"api_key\":\"${DEMO_API_KEY}\"}" \
+    -d "{\"scenario_id\":\"telco\",\"kibana_url\":\"${DEMO_KIBANA_URL}\",\"api_key\":\"${DEMO_API_KEY}\"}" \
     >/dev/null 2>&1 || echo "WARN: Launch request failed — learners can launch manually via the Demo App tab."
 
   echo "Waiting for deployment to register..."

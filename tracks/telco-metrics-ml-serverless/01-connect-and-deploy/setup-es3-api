@@ -27,7 +27,7 @@ for i in $(seq 1 30); do
   fi
 done
 
-# ── Ensure the claro deployment is registered ─────────────────────────────────
+# ── Ensure the telco deployment is registered ─────────────────────────────────
 # After a service restart the in-memory registry is rebuilt from SQLite.
 # If the track-level deployer hadn't saved to SQLite yet before the restart,
 # the deployment is lost. Re-launch to restore it.
@@ -36,7 +36,7 @@ RUNNING="$(curl -sf "${APP}/api/deployments" 2>/dev/null \
   2>/dev/null || echo 0)"
 
 if [[ "${RUNNING:-0}" -lt 1 ]]; then
-  log "No active deployment found — re-launching claro scenario..."
+  log "No active deployment found — re-launching telco scenario..."
 
   # Pull credentials from agent variables (set by track setup)
   KIBANA_URL="$(agent variable get ES_KIBANA_URL 2>/dev/null || echo "")"
@@ -45,7 +45,7 @@ if [[ "${RUNNING:-0}" -lt 1 ]]; then
   if [[ -n "$KIBANA_URL" && -n "$API_KEY" ]]; then
     curl -sf -X POST "${APP}/api/setup/launch" \
       -H 'Content-Type: application/json' \
-      -d "{\"scenario_id\":\"claro\",\"kibana_url\":\"${KIBANA_URL}\",\"api_key\":\"${API_KEY}\"}" \
+      -d "{\"scenario_id\":\"telco\",\"kibana_url\":\"${KIBANA_URL}\",\"api_key\":\"${API_KEY}\"}" \
       >/dev/null 2>&1 || log "WARN: Re-launch request failed"
 
     log "Waiting for deployment to register (up to 3 min)..."

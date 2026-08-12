@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Challenge 1 solve: programmatically launch the fanatics scenario.
+# Challenge 1 solve: programmatically launch the telco scenario.
 # Requires Instruqt track variables:
 #   ELASTIC_KIBANA_URL  — e.g. https://my-project.kb.us-east-1.aws.elastic.cloud
 #   ELASTIC_API_KEY     — just the key value (without "ApiKey " prefix)
@@ -32,10 +32,10 @@ if [[ "$CONN_OK" != "true" ]]; then
 fi
 log "Connection OK ✓"
 
-log "Launching claro scenario..."
+log "Launching telco scenario..."
 LAUNCH_RESULT="$(curl -sf -X POST "${APP}/api/setup/launch" \
   -H 'Content-Type: application/json' \
-  -d "{\"scenario_id\":\"claro\",\"kibana_url\":\"${KIBANA_URL}\",\"api_key\":\"${API_KEY}\"}" 2>/dev/null || echo '{}')"
+  -d "{\"scenario_id\":\"telco\",\"kibana_url\":\"${KIBANA_URL}\",\"api_key\":\"${API_KEY}\"}" 2>/dev/null || echo '{}')"
 
 log "Launch initiated. Waiting for deployment to register..."
 
