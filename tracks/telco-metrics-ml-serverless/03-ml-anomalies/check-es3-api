@@ -7,5 +7,5 @@ curl -sf "${APP}/health" >/dev/null 2>&1 || {
   echo "❌ Demo app not responding. Try: systemctl restart elastic-demo"
   exit 1
 }
-echo "✅ Demo app healthy — continue when you have explored ML / anomalies in Elastic."
+echo "✅ Demo app healthy — continue when you have run Log rate analysis (or another AIOps lab) on live logs."
 exit 0

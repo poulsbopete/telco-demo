@@ -3,7 +3,8 @@ slug: ml-anomalies
 id: 7ewidddbdgrt
 type: challenge
 title: Investigate ML anomalies
-teaser: See how Elastic ML surfaces telco degradation before customer tickets spike.
+teaser: See how Elastic ML and AIOps surface telco degradation before customer tickets
+  spike.
 notes:
 - type: text
   contents: |
@@ -28,7 +29,7 @@ tabs:
   title: Elastic Serverless
   type: service
   hostname: es3-api
-  path: /app/ml
+  path: /app/ml/aiops/log_rate_analysis
   port: 8080
   custom_request_headers:
   - key: Content-Security-Policy
@@ -47,34 +48,38 @@ enhanced_loading: null
 
 # Investigate ML anomalies
 
-Open the **Elastic Serverless** tab — your **Serverless Observability** project. It opens on the **Machine Learning** overview.
+Open the **Elastic Serverless** tab — your **Serverless Observability** project. It opens on **Machine Learning → AIOps Labs → Log rate analysis**.
 
-You should see three groups of cards: **Analyze your data**, **Surface insights**, and **Visualize your data**.
-
----
-
-## 1. Orient on the ML overview
-
-From this page:
-
-1. Under **Analyze your data → Anomaly detection**, click **Manage jobs** — note whether any jobs exist yet (a new lab project may be empty)
-2. Click **Open anomaly explorer** to see the explorer UI (even with no jobs, you learn where scores and influencers show up)
-3. Under **Surface insights**, open one AIOps path that works on live OTel data without a pre-built job:
-   - **Log rate analysis** → **Explain changes**, or
-   - **Log pattern analysis** → **Find patterns**, or
-   - **Change point detection** → **Find changes**
-
-These AIOps labs are the fastest way to surface unusual log/metric behavior on the telemetry already streaming into this project.
+> **Note:** Classic **Anomaly detection → Single metric viewer** may show empty service dropdowns in a fresh lab (APM rollup partitions take time to fill). Use **AIOps Labs** below — they run on the live OTel logs already in this project.
 
 ---
 
-## 2. Optional — create a signal to analyze
+## 1. Log rate analysis (primary)
 
-If the views look quiet, inject a mild fault from **Chaos Controller**, wait 1–2 minutes, then re-run **Log rate analysis** or check **Alerts** / **Discover** for elevated errors — that is the raw signal ML and AIOps learn from.
+On **Log rate analysis**:
+
+1. Select a **logs** data view (for example anything matching `logs*` / OTel logs)
+2. Set time to **Last 15 minutes** (or Last 1 hour if the chart is quiet)
+3. Click **Explain changes** / run the analysis when a spike or dip is visible on the histogram
+4. Review which fields and values explain the rate change (service name, severity, host, etc.)
+
+That is ML-assisted investigation on the same telemetry you queried with ES|QL — no pre-trained job required.
 
 ---
 
-## 3. Map to the Telco NOC story
+## 2. Optional — create a clearer spike
+
+From **Chaos Controller**, inject a mild fault, wait 1–2 minutes, then re-run **Log rate analysis** (or open **Log pattern analysis** / **Change point detection** from the ML left nav under **AIOps labs**).
+
+---
+
+## 3. Optional — glance at Anomaly detection
+
+From the ML left nav open **Anomaly detection → Manage jobs**. You may see an APM transaction job (for example `apm-telco-transaction-metrics`). If **Single metric viewer** still lists no services, skip it for now — AIOps is the reliable path in this lab.
+
+---
+
+## 4. Map to the Telco NOC story
 
 In the companion app’s **Response** tab, the **Proactive loop** shows the end-to-end path:
 
@@ -88,24 +93,10 @@ Key phrase: **proactive lead time** — minutes of warning before care tickets s
 
 ---
 
-## 4. Optional ES|QL signal check
-
-```esql
-FROM logs*
-| WHERE severity_text == "ERROR" OR log.level == "ERROR"
-| STATS errors = COUNT(*) BY service.name
-| SORT errors DESC
-| LIMIT 5
-```
-
-Compare before/after a chaos toggle if you used one.
-
----
-
 ## Key takeaway
 
-> “ML isn’t a science project bolted on later — it sits on the same OTel metrics you just queried. We score anomalies, suppress noise, and only promote actionable signals into the NOC workflow.”
+> “ML isn’t a science project bolted on later — it sits on the same OTel data you just queried. AIOps and anomaly detection promote unusual signals so the NOC can act before tickets spike.”
 
 ---
 
-✅ **Ready for Check** when you have opened the ML overview, tried Anomaly explorer or an AIOps lab, and can explain how that signal feeds a proactive NOC loop.
+✅ **Ready for Check** when you have run **Log rate analysis** (or another AIOps lab) on live logs and can explain how that signal feeds a proactive NOC loop.
