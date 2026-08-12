@@ -8,15 +8,10 @@ teaser: Query live OpenTelemetry metrics — latency, errors, and regional signa
 notes:
 - type: text
   contents: |
-    ## Lab 2 — Explore metrics
-
-    **By the end of this challenge you will:**
-
-    - Run ES|QL against metrics and logs from the Telco NOC scenario
-    - Locate latency / error patterns that matter to a telco NOC
-    - Connect metrics views to the service / host story in Observability
-
-    Companion: **[Telco NOC](https://telco-demo-sage.vercel.app)** (Telemetry tab)
+    <iframe src="https://telco-demo-sage.vercel.app/slides/workshop/#2"
+      width="100%" height="1400" frameborder="0"
+      style="border-radius:8px;display:block;width:100%;min-height:900px;aspect-ratio:16/9;border:0">
+    </iframe>
 tabs:
 - id: 90wi8jilrwlr
   title: Demo App
