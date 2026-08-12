@@ -7,6 +7,7 @@ import { ObservabilityDashboard } from './components/ObservabilityDashboard';
 import { SecurityDashboard } from './components/SecurityDashboard';
 import { IncidentResponseDemo } from './components/IncidentResponseDemo';
 import { WorkshopDeckEmbed } from './components/WorkshopDeckEmbed';
+import { WorkshopLabEmbed } from './components/WorkshopLabEmbed';
 import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
 
 const MODULES = [
@@ -26,6 +27,7 @@ const MODULE_COMPONENTS = {
   observability: ObservabilityDashboard,
   security: SecurityDashboard,
   'workshop-deck': WorkshopDeckEmbed,
+  workshop: () => <WorkshopLabEmbed instruqtUrl={INSTRUQT_URL} />,
 };
 
 /** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */
@@ -40,7 +42,7 @@ export default function App() {
 
   const ActiveComponent = MODULE_COMPONENTS[activeModule];
   const activeMeta = MODULES.find(m => m.id === activeModule);
-  const isWorkshopDeck = activeModule === 'workshop-deck';
+  const isImmersive = activeModule === 'workshop-deck' || activeModule === 'workshop';
 
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
@@ -74,20 +76,19 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => setActiveModule('workshop-deck')}
-                className={`nav-link ${isWorkshopDeck ? 'nav-link-active' : ''}`}
+                className={`nav-link ${activeModule === 'workshop-deck' ? 'nav-link-active' : ''}`}
                 title="Metrics + ML workshop deck"
               >
                 Workshop deck
               </button>
-              <a
-                href={INSTRUQT_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="nav-link"
+              <button
+                type="button"
+                onClick={() => setActiveModule('workshop')}
+                className={`nav-link ${activeModule === 'workshop' ? 'nav-link-active' : ''}`}
                 title="Hands-on Instruqt lab — metrics, ML, workflows"
               >
                 Workshop
-              </a>
+              </button>
             </nav>
 
             <button
@@ -121,28 +122,29 @@ export default function App() {
               type="button"
               onClick={() => { setActiveModule('workshop-deck'); setMobileMenuOpen(false); }}
               className={`block w-full text-left py-2 text-[17px] ${
-                isWorkshopDeck ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
+                activeModule === 'workshop-deck' ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
               }`}
             >
               Workshop deck
             </button>
-            <a
-              href={INSTRUQT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block py-2 text-[17px] text-[#86868b]"
+            <button
+              type="button"
+              onClick={() => { setActiveModule('workshop'); setMobileMenuOpen(false); }}
+              className={`block w-full text-left py-2 text-[17px] ${
+                activeModule === 'workshop' ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
+              }`}
             >
-              Workshop (Instruqt)
-            </a>
+              Workshop
+            </button>
           </nav>
         )}
       </header>
 
-      <main className={isWorkshopDeck ? 'w-full' : 'max-w-[980px] mx-auto px-6 py-10 md:py-14'}>
+      <main className={isImmersive ? 'w-full' : 'max-w-[980px] mx-auto px-6 py-10 md:py-14'}>
         <ActiveComponent />
       </main>
 
-      {!isWorkshopDeck && (
+      {!isImmersive && (
         <section className="max-w-[980px] mx-auto px-6 pb-8">
           <button
             type="button"
@@ -158,7 +160,7 @@ export default function App() {
         </section>
       )}
 
-      {!isWorkshopDeck && (
+      {!isImmersive && (
         <footer className="border-t border-[#d2d2d7]/60 mt-4">
           <div className="max-w-[980px] mx-auto px-6 py-6 text-[12px] text-[#86868b] leading-relaxed">
             <p>Telco NOC × Elastic Serverless</p>
@@ -169,9 +171,13 @@ export default function App() {
             <p className="mt-2">
               Hands-on lab — metrics, ML, and remediating telco incidents on Elastic Serverless.
               {' '}
-              <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">
+              <button
+                type="button"
+                onClick={() => setActiveModule('workshop')}
+                className="text-[#0071e3] hover:underline"
+              >
                 Try the workshop
-              </a>
+              </button>
             </p>
             <p className="mt-2">
               <a href="/presenter/view.html?doc=demo-walk" className="text-[#0071e3] hover:underline">Demo walk script</a>
@@ -188,7 +194,13 @@ export default function App() {
                 Workshop deck
               </button>
               {' · '}
-              <a href={INSTRUQT_URL} target="_blank" rel="noopener noreferrer" className="text-[#0071e3] hover:underline">Workshop</a>
+              <button
+                type="button"
+                onClick={() => setActiveModule('workshop')}
+                className="text-[#0071e3] hover:underline"
+              >
+                Workshop
+              </button>
             </p>
           </div>
         </footer>
