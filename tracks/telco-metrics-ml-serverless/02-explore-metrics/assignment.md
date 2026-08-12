@@ -67,8 +67,8 @@ Try a bucketed view (adjust field names if your data uses OTel conventions):
 ```esql
 FROM logs*
 | WHERE @timestamp > NOW() - 15 minutes
-| STATS count = COUNT(*) BY BUCKET(@timestamp, 1 minute), service.name
-| SORT @timestamp ASC
+| STATS count = COUNT(*) BY time_bucket = BUCKET(@timestamp, 1 minute), service.name
+| SORT time_bucket ASC
 ```
 
 ---
