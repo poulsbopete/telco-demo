@@ -6,7 +6,7 @@ import { ChatSimulator } from './components/ChatSimulator';
 import { ObservabilityDashboard } from './components/ObservabilityDashboard';
 import { SecurityDashboard } from './components/SecurityDashboard';
 import { IncidentResponseDemo } from './components/IncidentResponseDemo';
-import { WorkshopDeckEmbed } from './components/WorkshopDeckEmbed';
+import { SlidesEmbed, PresenterEmbed, WorkshopDeckEmbed } from './components/FrameEmbed';
 import { WorkshopLabEmbed } from './components/WorkshopLabEmbed';
 import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
 
@@ -31,9 +31,27 @@ const MODULE_COMPONENTS = {
   search: ChatSimulator,
   observability: ObservabilityDashboard,
   security: SecurityDashboard,
+  slides: SlidesEmbed,
+  presenter: PresenterEmbed,
   'workshop-deck': WorkshopDeckEmbed,
   workshop: () => <WorkshopLabEmbed instruqtUrl={INSTRUQT_URL} />,
 };
+
+const IMMERSIVE = new Set(['slides', 'presenter', 'workshop-deck', 'workshop']);
+
+function NavButton({ id, label, activeModule, setActiveModule, title }) {
+  return (
+    <button
+      type="button"
+      onClick={() => setActiveModule(id)}
+      className={`nav-link ${activeModule === id ? 'nav-link-active' : ''}`}
+      title={title}
+    >
+      {label}
+    </button>
+  );
+}
+
 export default function App() {
   const [activeModule, setActiveModule] = useState('live');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -41,7 +59,7 @@ export default function App() {
 
   const ActiveComponent = MODULE_COMPONENTS[activeModule];
   const activeMeta = MODULES.find(m => m.id === activeModule);
-  const isImmersive = activeModule === 'workshop-deck' || activeModule === 'workshop';
+  const isImmersive = IMMERSIVE.has(activeModule);
 
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
@@ -70,24 +88,22 @@ export default function App() {
                   )}
                 </button>
               ))}
-              <a href="/presenter/" className="nav-link ml-2">Presenter</a>
-              <a href="/slides/" className="nav-link">Slides</a>
-              <button
-                type="button"
-                onClick={() => setActiveModule('workshop-deck')}
-                className={`nav-link ${activeModule === 'workshop-deck' ? 'nav-link-active' : ''}`}
+              <NavButton id="presenter" label="Presenter" activeModule={activeModule} setActiveModule={setActiveModule} />
+              <NavButton id="slides" label="Slides" activeModule={activeModule} setActiveModule={setActiveModule} />
+              <NavButton
+                id="workshop-deck"
+                label="Workshop deck"
+                activeModule={activeModule}
+                setActiveModule={setActiveModule}
                 title="Metrics + ML workshop deck"
-              >
-                Workshop deck
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveModule('workshop')}
-                className={`nav-link ${activeModule === 'workshop' ? 'nav-link-active' : ''}`}
+              />
+              <NavButton
+                id="workshop"
+                label="Workshop"
+                activeModule={activeModule}
+                setActiveModule={setActiveModule}
                 title="Hands-on Instruqt lab — metrics, ML, workflows"
-              >
-                Workshop
-              </button>
+              />
             </nav>
 
             <button
@@ -103,38 +119,24 @@ export default function App() {
 
         {mobileMenuOpen && (
           <nav className="md:hidden border-t border-[#d2d2d7]/60 px-6 py-3 space-y-1 bg-[#fbfbfd]">
-            {MODULES.map(mod => (
+            {[
+              ...MODULES.map(m => ({ id: m.id, label: m.label })),
+              { id: 'presenter', label: 'Presenter guides' },
+              { id: 'slides', label: 'Slides' },
+              { id: 'workshop-deck', label: 'Workshop deck' },
+              { id: 'workshop', label: 'Workshop' },
+            ].map(item => (
               <button
-                key={mod.id}
+                key={item.id}
                 type="button"
-                onClick={() => { setActiveModule(mod.id); setMobileMenuOpen(false); }}
+                onClick={() => { setActiveModule(item.id); setMobileMenuOpen(false); }}
                 className={`block w-full text-left py-2 text-[17px] ${
-                  activeModule === mod.id ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
+                  activeModule === item.id ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
                 }`}
               >
-                {mod.label}
+                {item.label}
               </button>
             ))}
-            <a href="/presenter/" className="block py-2 text-[17px] text-[#86868b]">Presenter guides</a>
-            <a href="/slides/" className="block py-2 text-[17px] text-[#86868b]">Slides</a>
-            <button
-              type="button"
-              onClick={() => { setActiveModule('workshop-deck'); setMobileMenuOpen(false); }}
-              className={`block w-full text-left py-2 text-[17px] ${
-                activeModule === 'workshop-deck' ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
-              }`}
-            >
-              Workshop deck
-            </button>
-            <button
-              type="button"
-              onClick={() => { setActiveModule('workshop'); setMobileMenuOpen(false); }}
-              className={`block w-full text-left py-2 text-[17px] ${
-                activeModule === 'workshop' ? 'text-[#1d1d1f] font-semibold' : 'text-[#86868b]'
-              }`}
-            >
-              Workshop
-            </button>
           </nav>
         )}
       </header>
@@ -179,27 +181,13 @@ export default function App() {
               </button>
             </p>
             <p className="mt-2">
-              <a href="/presenter/view.html?doc=demo-walk" className="text-[#0071e3] hover:underline">Demo walk script</a>
+              <button type="button" onClick={() => setActiveModule('presenter')} className="text-[#0071e3] hover:underline">Presenter</button>
               {' · '}
-              <a href="/presenter/view.html?doc=landscape" className="text-[#0071e3] hover:underline">Telco landscape</a>
+              <button type="button" onClick={() => setActiveModule('slides')} className="text-[#0071e3] hover:underline">Slides</button>
               {' · '}
-              <a href="/slides/" className="text-[#0071e3] hover:underline">Slides</a>
+              <button type="button" onClick={() => setActiveModule('workshop-deck')} className="text-[#0071e3] hover:underline">Workshop deck</button>
               {' · '}
-              <button
-                type="button"
-                onClick={() => setActiveModule('workshop-deck')}
-                className="text-[#0071e3] hover:underline"
-              >
-                Workshop deck
-              </button>
-              {' · '}
-              <button
-                type="button"
-                onClick={() => setActiveModule('workshop')}
-                className="text-[#0071e3] hover:underline"
-              >
-                Workshop
-              </button>
+              <button type="button" onClick={() => setActiveModule('workshop')} className="text-[#0071e3] hover:underline">Workshop</button>
             </p>
           </div>
         </footer>
