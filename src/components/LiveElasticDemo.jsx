@@ -236,32 +236,34 @@ export function LiveElasticDemo() {
               </div>
             </div>
 
-            <div className="surface-card p-4">
-              <div className="flex items-center justify-between gap-3 mb-2">
+            <div className="surface-card p-4 flex flex-col">
+              <div className="flex items-center justify-between gap-3 mb-2 shrink-0">
                 <h3 className="text-[15px] font-semibold text-[#1d1d1f]">ML signals</h3>
                 <SectionElasticLink href={o11yDashboardUrl} label="Dashboard" />
               </div>
-              <MlSignalIntelligence
-                intelligence={data.mlSignalIntelligence}
-                anomalies={data.mlAnomalies}
-                selectedAnomalyId={selectedAnomaly?.id}
-                onSelectAnomaly={(a) => { setSelectedAnomaly(a); setWorkflowRun(null); }}
-                compact
-                showSuppressed={false}
-              />
+              <div className="max-h-[280px] overflow-y-auto pr-1">
+                <MlSignalIntelligence
+                  intelligence={data.mlSignalIntelligence}
+                  anomalies={data.mlAnomalies}
+                  selectedAnomalyId={selectedAnomaly?.id}
+                  onSelectAnomaly={(a) => { setSelectedAnomaly(a); setWorkflowRun(null); }}
+                  compact
+                  showSuppressed={false}
+                />
+              </div>
               {anomaly && !workflowRun && (
                 <button
                   type="button"
                   onClick={handleRunWorkflow}
                   disabled={workflowLoading}
-                  className="mt-3 w-full py-2.5 btn-primary disabled:opacity-50 flex items-center justify-center gap-2 text-[13px]"
+                  className="mt-3 w-full py-2.5 btn-primary disabled:opacity-50 flex items-center justify-center gap-2 text-[13px] shrink-0"
                 >
                   <Bot className="w-4 h-4" />
                   {workflowLoading ? 'Starting…' : 'Run workflow'}
                 </button>
               )}
               {workflowRun && (
-                <div className="mt-3 p-3 rounded-xl bg-[#f5f5f7]">
+                <div className="mt-3 p-3 rounded-xl bg-[#f5f5f7] shrink-0">
                   <p className="text-[12px] font-medium text-success flex items-center gap-1.5">
                     <Zap className="w-3.5 h-3.5" />
                     {workflowRun.message}
