@@ -19,6 +19,11 @@ const MODULES = [
   { id: 'security', label: 'Security' },
 ];
 
+/** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */
+const INSTRUQT_URL =
+  import.meta.env.VITE_INSTRUQT_URL
+  || 'https://play.instruqt.com/elastic/invite/0ehftwwsuadb';
+
 const MODULE_COMPONENTS = {
   live: LiveElasticDemo,
   'adaptive-networks': AdaptiveNetworksDemo,
@@ -29,12 +34,6 @@ const MODULE_COMPONENTS = {
   'workshop-deck': WorkshopDeckEmbed,
   workshop: () => <WorkshopLabEmbed instruqtUrl={INSTRUQT_URL} />,
 };
-
-/** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */
-const INSTRUQT_URL =
-  import.meta.env.VITE_INSTRUQT_URL
-  || 'https://play.instruqt.com/elastic/invite/0ehftwwsuadb';
-
 export default function App() {
   const [activeModule, setActiveModule] = useState('live');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
