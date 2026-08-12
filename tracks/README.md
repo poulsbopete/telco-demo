@@ -5,7 +5,7 @@ Track source for **Telco Metrics + ML on Elastic Serverless**.
 | | |
 |--|--|
 | **Manage** | https://play.instruqt.com/manage/elastic/tracks/telco-metrics-ml-serverless |
-| **Play** | https://play.instruqt.com/elastic/tracks/telco-metrics-ml-serverless |
+| **Play** | https://play.instruqt.com/elastic/invite/qsme5bol62ec |
 | **Push** | `./scripts/instruqt-track-push.sh` or `cd tracks/telco-metrics-ml-serverless && instruqt track push --force` |
 
 ## Challenges

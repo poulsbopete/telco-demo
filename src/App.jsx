@@ -29,7 +29,7 @@ const MODULE_COMPONENTS = {
 /** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */
 const INSTRUQT_URL =
   import.meta.env.VITE_INSTRUQT_URL
-  || 'https://play.instruqt.com/elastic/tracks/telco-metrics-ml-serverless';
+  || 'https://play.instruqt.com/elastic/invite/qsme5bol62ec';
 
 export default function App() {
   const [activeModule, setActiveModule] = useState('live');
