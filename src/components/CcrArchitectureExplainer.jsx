@@ -32,7 +32,7 @@ const RPO_OPTIONS = [
     summary: 'Near-zero loss; secondary already indexing',
     recommend: 'dual',
     detail:
-      'Prefer dual independent ingest into a write-capable secondary. Continuous CCR followers alone are a poor fit when transforms must run as part of ingest. Keep snapshots as the corruption backstop.',
+      'Choose dual independent ingest (with the required snapshot repository). CCR followers alone are a poor fit when transforms must write on the secondary. Snapshots remain the corruption undo under every path.',
   },
   {
     id: 'minutes',
@@ -40,15 +40,15 @@ const RPO_OPTIONS = [
     summary: 'Short lag is fine if the secondary stays complete',
     recommend: 'dual',
     detail:
-      'Dual ingest still leads: both sites hold the same logical view, catch up via the event bus when a site falls behind, and fail over by routing. Hybrid CCR + snapshots is a fallback when the secondary cannot run write-side transforms.',
+      'Dual ingest still leads: both sites hold the same logical view, catch up via the event bus, and fail over by routing. Real-time CCR is only competitive if the secondary does not need a write-capable transform path. Snapshot repository required either way.',
   },
   {
     id: 'hours',
     label: 'Hours',
-    summary: 'Snapshots first — they are not optional',
-    recommend: 'snapshot',
+    summary: 'Looser RPO · still needs a snapshot repository',
+    recommend: 'hybrid',
     detail:
-      'Snapshots are non-negotiable: there is no repository recovery path today. Stand up shared object storage and tested restore before (or with) any dual-ingest or CCR work. If hours of RPO is truly enough, snapshot-restore alone can be the active strategy — still after the repository exists.',
+      'Hybrid CCR for hot data plus the mandatory snapshot repository for cold windows and corruption recovery. Dual ingest remains valid if you want a fully warm secondary; snapshots are not optional in any case — they are missing today.',
   },
 ];
 
@@ -56,7 +56,7 @@ const STRATEGIES = [
   {
     id: 'dual',
     title: 'Dual independent ingest',
-    subtitle: 'Write-capable secondary · recommended',
+    subtitle: 'Write-capable secondary · + snapshot repo',
     featured: true,
     rpo: 'Seconds–minutes · bounded by ingest lag',
     rto: 'Minutes · routing change only',
@@ -65,15 +65,15 @@ const STRATEGIES = [
       'Confirm secondary is current enough (lag, transforms, rules)',
       'Suppress or keep notifications as designed on the active site',
       'Point the single user endpoint at the secondary',
-      'Replay or cross-copy gaps; restore from snapshots if corrupted',
+      'Replay, cross-copy, or restore from snapshots if corrupted',
     ],
     useCase:
-      'Platforms where transforms run during ingest, users need an identical complete view after failover, and an idle read-only standby will not unlock high-tier workloads. Still requires snapshots underneath.',
+      'Transforms run during ingest; users need an identical complete view after failover. Snapshot repository is mandatory underneath.',
   },
   {
     id: 'realtime',
     title: 'Real-time CCR',
-    subtitle: 'Follower indices',
+    subtitle: 'Follower indices · + snapshot repo',
     rpo: '< 1–30 s (typical lag)',
     rto: 'Minutes · promote follower / retarget clients',
     bandwidth: 'Continuous · roughly write rate × replica count',
@@ -81,45 +81,39 @@ const STRATEGIES = [
       'Pause auto-follow / follower indices on secondary',
       'Convert followers to regular indices (or promote cluster)',
       'Point traffic at secondary endpoint',
-      'Rebuild primary as new follower when healthy',
+      'Use snapshots for corruption undo and long-window recovery',
     ],
     useCase:
-      'Read-oriented secondaries for search/analytics when the standby does not need to run write-heavy ingest transforms. Snapshots remain mandatory for corruption undo.',
+      'Read-oriented secondary when write-heavy transforms are not required on DR. Still requires the shared snapshot repository.',
   },
   {
     id: 'hybrid',
-    title: 'Hybrid CCR + snapshots',
-    subtitle: 'Mixed approach',
+    title: 'Hybrid CCR',
+    subtitle: 'Hot followers · + snapshot repo',
     rpo: 'Seconds on hot data · minutes–hours on cold',
     rto: 'Minutes for hot · longer if snapshot restore needed',
     bandwidth: 'CCR for hot paths · burst traffic on snapshot windows',
     recovery: [
       'Fail over hot follower indices first',
-      'Restore cold / historical windows from shared repository if needed',
+      'Restore cold / historical windows from the snapshot repository',
       'Replay or re-seed gaps beyond retention',
       'Verify transforms, rules, and saved objects before opening users',
     ],
     useCase:
-      'When only part of the estate can follow in real time and snapshots cover retention, ML model state, and corruption rollback.',
-  },
-  {
-    id: 'snapshot',
-    title: 'Snapshots (required baseline)',
-    subtitle: 'Non-negotiable — not in place today',
-    required: true,
-    rpo: 'Equals snapshot interval (often 30–120 min) if used alone',
-    rto: 'Tens of minutes to hours · restore + warm-up',
-    bandwidth: 'Periodic · repository write/read only',
-    recovery: [
-      'Provision shared object storage + snapshot repository',
-      'Schedule consistent snapshots; prove restore in drills',
-      'On incident: restore latest consistent snapshot to target',
-      'Apply post-restore config and ILM; validate; cut over',
-    ],
-    useCase:
-      'Must exist under every other strategy. Today there is no snapshot recovery path — that gap is blocking, not optional. Snapshot-restore alone is only sufficient if hours of RPO is the accepted objective.',
+      'Only part of the estate needs near-real-time follow; snapshots cover cold data, ML model state, and corruption rollback.',
   },
 ];
+
+const SNAPSHOT_BASELINE = {
+  title: 'Shared snapshot repository',
+  subtitle: 'Required under all three choices — not in place today',
+  points: [
+    'Provision shared object storage and register the repository on both clusters',
+    'Schedule consistent snapshots; prove restore in drills before relying on dual ingest or CCR',
+    'Only reliable undo when a bad change was applied on both sides',
+    'Also backs ML model state restore and long-window catch-up',
+  ],
+};
 
 const RECOVERY_TIERS = [
   {
@@ -290,6 +284,7 @@ function DualIngestHero({ dark }) {
             }`}
             >
               Object storage
+              <span className={`block font-normal ${dark ? 'text-[#ff9f0a]' : 'text-[#bf4800]'}`}>required</span>
             </div>
           </div>
           <ElasticClusterCard title="DR" dark={dark} mlActive={false} alertActive={false} />
@@ -386,6 +381,22 @@ function FeaturedDesign({ dark }) {
         ))}
       </div>
 
+      <div
+        className={`mt-6 rounded-2xl border p-5 ${
+          dark ? 'border-[#ff9f0a]/40 bg-[#ff9f0a]/10' : 'border-[#bf4800]/30 bg-[#bf4800]/5'
+        }`}
+      >
+        <p className={`text-[12px] font-semibold uppercase tracking-wide ${dark ? 'text-[#ff9f0a]' : 'text-[#bf4800]'}`}>
+          Non-negotiable · gap today
+        </p>
+        <p className={`mt-2 text-[15px] leading-relaxed ${text}`}>
+          There is no snapshot repository recovery path in place today. Shared object storage and
+          proven restore drills are required under dual ingest, CCR, or any hybrid — replication
+          alone copies corruption faithfully. Snapshots are not a cost-optimized optional path;
+          they are the baseline that is missing.
+        </p>
+      </div>
+
       <div className={`mt-6 rounded-2xl border p-5 ${card}`}>
         <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>Machine learning warm-start</p>
         <div className="mt-3 grid md:grid-cols-3 gap-3">
@@ -477,20 +488,25 @@ function StrategyCards({ dark, highlightId }) {
         Architecture comparison
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
-        Dual ingest versus CCR followers, hybrid CCR + snapshots, and snapshot-restore only.
+        Dual ingest versus CCR followers and hybrids — all of them sit on a required snapshot baseline that does not exist today.
       </p>
 
       <div className="mt-8 grid md:grid-cols-2 gap-4">
         {STRATEGIES.map(s => {
           const highlighted = highlightId === s.id;
+          const emphasize = highlighted || s.featured || s.required;
           return (
             <article
               key={s.id}
               className={`rounded-2xl border p-5 flex flex-col ${
-                highlighted || s.featured
+                emphasize
                   ? dark
-                    ? 'border-[#64d2ff] ring-1 ring-[#64d2ff]/40 bg-[#1c1c1e]'
-                    : 'border-[#0071e3] ring-1 ring-[#0071e3]/25 bg-white'
+                    ? s.required
+                      ? 'border-[#ff9f0a] ring-1 ring-[#ff9f0a]/40 bg-[#1c1c1e]'
+                      : 'border-[#64d2ff] ring-1 ring-[#64d2ff]/40 bg-[#1c1c1e]'
+                    : s.required
+                      ? 'border-[#bf4800] ring-1 ring-[#bf4800]/25 bg-white'
+                      : 'border-[#0071e3] ring-1 ring-[#0071e3]/25 bg-white'
                   : dark
                     ? 'border-white/10 bg-[#1c1c1e]'
                     : 'border-[#d2d2d7] bg-white'
@@ -505,12 +521,18 @@ function StrategyCards({ dark, highlightId }) {
                     {s.subtitle}
                   </p>
                 </div>
-                {(highlighted || s.featured) && (
+                {(highlighted || s.featured || s.required) && (
                   <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ${
-                    dark ? 'bg-[#64d2ff]/15 text-[#64d2ff]' : 'bg-[#0071e3]/10 text-[#0071e3]'
+                    s.required
+                      ? dark
+                        ? 'bg-[#ff9f0a]/15 text-[#ff9f0a]'
+                        : 'bg-[#bf4800]/10 text-[#bf4800]'
+                      : dark
+                        ? 'bg-[#64d2ff]/15 text-[#64d2ff]'
+                        : 'bg-[#0071e3]/10 text-[#0071e3]'
                   }`}
                   >
-                    {s.featured ? 'Leading' : 'Match'}
+                    {s.required ? 'Required' : s.featured ? 'Leading' : 'Match'}
                   </span>
                 )}
               </div>
