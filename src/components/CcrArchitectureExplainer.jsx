@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import {
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Clock,
   Database,
   HardDrive,
@@ -178,8 +180,9 @@ function rtoFromRpo(rpoSeconds) {
 }
 
 function strategyForRpo(rpoSeconds) {
+  if (rpoSeconds <= 60) return 'dual';
   if (rpoSeconds <= 900) return 'dual';
-  return 'snapshot';
+  return 'hybrid';
 }
 
 function PipelineStep({ label, active, dark }) {
@@ -227,7 +230,136 @@ function ElasticClusterCard({ title, dark, mlActive, alertActive }) {
   );
 }
 
-function DualIngestHero({ dark }) {
+function DualIngestCostSection({ dark }) {
+  const [open, setOpen] = useState(false);
+  const card = dark ? 'border-white/10 bg-[#1c1c1e]' : 'border-[#d2d2d7] bg-white';
+  const text = dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]';
+  const muted = dark ? 'text-[#98989d]' : 'text-[#86868b]';
+
+  return (
+    <section className="mt-10">
+      <div className={`rounded-2xl border overflow-hidden ${card}`}>
+        <button
+          type="button"
+          onClick={() => setOpen(v => !v)}
+          className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left"
+          aria-expanded={open}
+        >
+          <div>
+            <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>
+              Cost implications
+            </p>
+            <p className={`mt-1 text-[15px] font-semibold ${text}`}>
+              Does dual ingest increase the cost?
+            </p>
+            <p className={`mt-1 text-[13px] ${muted}`}>
+              Yes vs today’s single site — here’s what rises, what you buy, and how it compares.
+            </p>
+          </div>
+          {open
+            ? <ChevronUp className={`w-5 h-5 shrink-0 ${muted}`} />
+            : <ChevronDown className={`w-5 h-5 shrink-0 ${muted}`} />}
+        </button>
+
+        {open && (
+          <div className={`px-5 pb-5 border-t space-y-5 ${dark ? 'border-white/10' : 'border-[#d2d2d7]/80'}`}>
+            <p className={`pt-4 text-[14px] leading-relaxed ${text}`}>
+              <strong>Yes — vs today’s single-site setup, dual ingest costs more.</strong>
+              {' '}That’s the trade for a warm, write-capable secondary.
+            </p>
+
+            <div>
+              <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>What goes up</p>
+              <ul className={`mt-2 space-y-1.5 text-[13px] ${text}`}>
+                {[
+                  'Second Elastic cluster — compute + roughly the same data volume if retention matches production',
+                  'Second Logstash tier (e.g. ×4) — another consumer group, continuous ingest',
+                  'Cross-site network — DR reading Kafka topics from the primary site',
+                  'Ops — two live estates (config drift, transforms, suppressed alerts, failover drills)',
+                  'Optional ML on DR — if jobs stay warm instead of snapshot restore / cold start',
+                ].map(item => (
+                  <li key={item} className="flex gap-2">
+                    <span className={dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}>•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className={`mt-2 text-[12px] ${muted}`}>
+                Kafka staying primary-only avoids a second event bus, but it does not erase the Elastic + Logstash bill.
+              </p>
+            </div>
+
+            <div>
+              <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>What you’re buying</p>
+              <ul className={`mt-2 space-y-1.5 text-[13px] ${text}`}>
+                {[
+                  'Failover ≈ routing, not restore-then-hope',
+                  'Secondary already writing transforms (CCR followers don’t give you that)',
+                  'A standby that does real work, not an idle museum piece',
+                ].map(item => (
+                  <li key={item} className="flex gap-2">
+                    <span className={dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}>•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className={`overflow-x-auto rounded-xl border ${dark ? 'border-white/10' : 'border-[#d2d2d7]/80'}`}>
+              <table className="w-full text-left text-[13px] min-w-[480px]">
+                <thead>
+                  <tr className={dark ? 'border-b border-white/10' : 'border-b border-[#d2d2d7]'}>
+                    <th className={`px-3 py-2 font-semibold ${muted}`}>Path</th>
+                    <th className={`px-3 py-2 font-semibold ${muted}`}>Day-2 cost shape</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    ['Dual ingest', 'Highest steady ingest/compute; less “replication tax”'],
+                    ['Real-time CCR', 'Second cluster storage + continuous CCR bandwidth; weaker if DR must write'],
+                    ['Hybrid CCR', 'Between the two; snapshots still mandatory'],
+                  ].map(([path, shape]) => (
+                    <tr key={path} className={dark ? 'border-t border-white/5' : 'border-t border-[#f0f0f2]'}>
+                      <td className={`px-3 py-2 font-medium ${text}`}>{path}</td>
+                      <td className={`px-3 py-2 ${muted}`}>{shape}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <p className={`text-[13px] leading-relaxed ${muted}`}>
+              Snapshots are a must on all three — an added cost vs today either way (repo + storage + restore drills).
+              Dual ingest doesn’t replace that; it sits on top.
+            </p>
+
+            <div>
+              <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>Practical cost levers</p>
+              <ul className={`mt-2 space-y-1.5 text-[13px] ${text}`}>
+                {[
+                  'Same retention on DR is expensive but safer than a quietly shorter window',
+                  'Cut bill with compression / index mode / ILM, not silent data amputation',
+                  'Keep DR alerting actions off and choose ML warm-start deliberately',
+                ].map(item => (
+                  <li key={item} className="flex gap-2">
+                    <span className={dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}>•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <p className={`text-[14px] leading-relaxed ${text}`}>
+              <strong>Bottom line:</strong> Dual ingest is the more expensive operating model than a skinny CCR standby —
+              and usually the right premium if the goal is unlocking high-tier workloads with a complete, writable DR site.
+            </p>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
   const card = dark
     ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
     : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
@@ -387,14 +519,17 @@ function FeaturedDesign({ dark }) {
         }`}
       >
         <p className={`text-[12px] font-semibold uppercase tracking-wide ${dark ? 'text-[#ff9f0a]' : 'text-[#bf4800]'}`}>
-          Non-negotiable · gap today
+          Must · {SNAPSHOT_BASELINE.title}
         </p>
-        <p className={`mt-2 text-[15px] leading-relaxed ${text}`}>
-          There is no snapshot repository recovery path in place today. Shared object storage and
-          proven restore drills are required under dual ingest, CCR, or any hybrid — replication
-          alone copies corruption faithfully. Snapshots are not a cost-optimized optional path;
-          they are the baseline that is missing.
-        </p>
+        <p className={`mt-1 text-[13px] font-medium ${text}`}>{SNAPSHOT_BASELINE.subtitle}</p>
+        <ul className={`mt-3 space-y-1.5 text-[13px] ${muted}`}>
+          {SNAPSHOT_BASELINE.points.map(point => (
+            <li key={point} className="flex gap-2">
+              <span className={dark ? 'text-[#ff9f0a]' : 'text-[#bf4800]'}>•</span>
+              <span className={text}>{point}</span>
+            </li>
+          ))}
+        </ul>
       </div>
 
       <div className={`mt-6 rounded-2xl border p-5 ${card}`}>
@@ -485,28 +620,24 @@ function StrategyCards({ dark, highlightId }) {
     <section className="mt-16">
       <p className={`section-eyebrow ${dark ? '!text-[#98989d]' : ''}`}>Section 2</p>
       <h2 className={`section-title mt-2 ${dark ? '!text-[#f5f5f7]' : ''}`}>
-        Architecture comparison
+        Three choices
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
-        Dual ingest versus CCR followers and hybrids — all of them sit on a required snapshot baseline that does not exist today.
+        Pick one path. Every path includes the shared snapshot repository as a must — that capability does not exist today.
       </p>
 
-      <div className="mt-8 grid md:grid-cols-2 gap-4">
+      <div className="mt-8 grid lg:grid-cols-3 gap-4">
         {STRATEGIES.map(s => {
           const highlighted = highlightId === s.id;
-          const emphasize = highlighted || s.featured || s.required;
+          const emphasize = highlighted || s.featured;
           return (
             <article
               key={s.id}
               className={`rounded-2xl border p-5 flex flex-col ${
                 emphasize
                   ? dark
-                    ? s.required
-                      ? 'border-[#ff9f0a] ring-1 ring-[#ff9f0a]/40 bg-[#1c1c1e]'
-                      : 'border-[#64d2ff] ring-1 ring-[#64d2ff]/40 bg-[#1c1c1e]'
-                    : s.required
-                      ? 'border-[#bf4800] ring-1 ring-[#bf4800]/25 bg-white'
-                      : 'border-[#0071e3] ring-1 ring-[#0071e3]/25 bg-white'
+                    ? 'border-[#64d2ff] ring-1 ring-[#64d2ff]/40 bg-[#1c1c1e]'
+                    : 'border-[#0071e3] ring-1 ring-[#0071e3]/25 bg-white'
                   : dark
                     ? 'border-white/10 bg-[#1c1c1e]'
                     : 'border-[#d2d2d7] bg-white'
@@ -521,18 +652,12 @@ function StrategyCards({ dark, highlightId }) {
                     {s.subtitle}
                   </p>
                 </div>
-                {(highlighted || s.featured || s.required) && (
+                {emphasize && (
                   <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ${
-                    s.required
-                      ? dark
-                        ? 'bg-[#ff9f0a]/15 text-[#ff9f0a]'
-                        : 'bg-[#bf4800]/10 text-[#bf4800]'
-                      : dark
-                        ? 'bg-[#64d2ff]/15 text-[#64d2ff]'
-                        : 'bg-[#0071e3]/10 text-[#0071e3]'
+                    dark ? 'bg-[#64d2ff]/15 text-[#64d2ff]' : 'bg-[#0071e3]/10 text-[#0071e3]'
                   }`}
                   >
-                    {s.required ? 'Required' : s.featured ? 'Leading' : 'Match'}
+                    {s.featured ? 'Leading' : 'Match'}
                   </span>
                 )}
               </div>
@@ -811,8 +936,7 @@ export function CcrArchitectureExplainer() {
             Dual-site recovery architecture
           </h1>
           <p className={`mt-3 text-[17px] leading-relaxed max-w-2xl ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-            Interactive walkthrough of the draft design: Kafka → dual Logstash → production and DR
-            Elastic clusters, with CCR and snapshot alternatives for comparison.
+            Interactive walkthrough of the draft design: three paths, one mandatory snapshot repository.
           </p>
         </div>
         <button
