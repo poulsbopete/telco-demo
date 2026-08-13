@@ -15,13 +15,13 @@ import {
 } from 'lucide-react';
 
 const SITE_MATRIX = [
-  { component: 'Event bus', primary: 'Yes — source of truth for both sites', secondary: 'None in initial scope' },
-  { component: 'Ingest tier', primary: 'Yes · own consumer group', secondary: 'Yes · own consumer group, same topics' },
-  { component: 'Search cluster', primary: 'Complete dataset', secondary: 'Complete dataset' },
-  { component: 'Transforms', primary: 'All of them (part of ingest)', secondary: 'All of them — secondary must write' },
-  { component: 'Machine learning', primary: 'Jobs running', secondary: 'Model state kept current (see options)' },
-  { component: 'Alerting', primary: 'Running · notifications on', secondary: 'Running · notifications suppressed' },
-  { component: 'Analytics UI', primary: 'User-facing', secondary: 'Ready and configured' },
+  { component: 'Kafka (event bus)', primary: 'Yes — source of truth for both sites', secondary: 'None in initial scope' },
+  { component: 'Logstash', primary: '×4 · own consumer group', secondary: '×4 · own consumer group, same topics' },
+  { component: 'Elasticsearch', primary: 'Complete dataset', secondary: 'Complete dataset' },
+  { component: 'Ingest + transforms', primary: 'Active (write path)', secondary: 'Active (write path)' },
+  { component: 'Machine learning', primary: 'Jobs running', secondary: 'Standby · model state via snapshots (option)' },
+  { component: 'Alerting framework', primary: 'Active · actions enabled', secondary: 'Standby · actions suppressed' },
+  { component: 'Object storage', primary: 'Shared snapshot repository', secondary: 'Shared snapshot repository' },
   { component: 'Users', primary: 'Routed here normally', secondary: 'Routed here on deliberate failover' },
 ];
 
@@ -187,11 +187,26 @@ function strategyForRpo(rpoSeconds) {
   return 'snapshot';
 }
 
-function tone(dark, on, off = '') {
-  return dark ? on : off;
+function PipelineStep({ label, active, dark }) {
+  return (
+    <div
+      className={`rounded-lg px-2.5 py-1.5 text-[11px] sm:text-[12px] font-medium text-center ${
+        active
+          ? dark
+            ? 'border border-[#64d2ff]/40 bg-[#64d2ff]/10 text-[#f5f5f7]'
+            : 'border border-[#0071e3]/25 bg-[#0071e3]/8 text-[#1d1d1f]'
+          : dark
+            ? 'border border-dashed border-white/25 bg-transparent text-[#98989d]'
+            : 'border border-dashed border-[#d2d2d7] bg-transparent text-[#86868b]'
+      }`}
+    >
+      {label}
+      {!active && <span className="block text-[10px] font-normal opacity-80 mt-0.5">standby</span>}
+    </div>
+  );
 }
 
-function DualIngestHero({ dark }) {
+function ElasticClusterCard({ title, dark, mlActive, alertActive }) {
   const card = dark
     ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
     : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
@@ -199,66 +214,109 @@ function DualIngestHero({ dark }) {
   const accent = dark ? 'text-[#64d2ff]' : 'text-[#0071e3]';
 
   return (
+    <div className={`rounded-2xl border p-3 sm:p-4 ${card}`}>
+      <div className="flex items-center gap-2 mb-3">
+        <Database className={`w-4 h-4 ${accent}`} />
+        <div>
+          <p className="text-[13px] font-semibold">{title}</p>
+          <p className={`text-[11px] ${muted}`}>Elastic cluster</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-1.5">
+        <PipelineStep label="Ingest" active dark={dark} />
+        <PipelineStep label="Transform" active dark={dark} />
+        <PipelineStep label="ML" active={mlActive} dark={dark} />
+        <PipelineStep label="Alerting" active={alertActive} dark={dark} />
+      </div>
+    </div>
+  );
+}
+
+function DualIngestHero({ dark }) {
+  const card = dark
+    ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
+    : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
+  const muted = dark ? 'text-[#98989d]' : 'text-[#86868b]';
+  const line = dark ? 'bg-white/20' : 'bg-[#d2d2d7]';
+  const accentBg = dark ? 'bg-[#64d2ff]' : 'bg-[#0071e3]';
+
+  return (
     <div
-      className={`mt-10 rounded-3xl border p-5 sm:p-8 ${
+      className={`mt-10 rounded-3xl border p-4 sm:p-8 overflow-x-auto ${
         dark ? 'border-white/10 bg-[#111113]' : 'border-[#d2d2d7]/80 bg-[#f5f5f7]'
       }`}
     >
       <div className="flex items-center justify-center gap-2 mb-6">
         <span className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
+          dark ? 'bg-white/10 text-[#98989d]' : 'bg-black/5 text-[#86868b]'
+        }`}
+        >
+          Draft
+        </span>
+        <span className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
           dark ? 'bg-[#64d2ff]/15 text-[#64d2ff]' : 'bg-[#0071e3]/10 text-[#0071e3]'
         }`}
         >
-          Leading design
+          Dual Logstash ingest
         </span>
       </div>
 
-      <div className={`mx-auto max-w-xs rounded-2xl border p-4 text-center mb-4 ${card}`}>
-        <Radio className={`w-6 h-6 mx-auto ${accent}`} />
-        <p className="mt-2 text-[14px] font-semibold">Event bus (primary site)</p>
-        <p className={`text-[12px] mt-1 ${muted}`}>Single source of truth · both consumer groups</p>
-      </div>
+      <div className="min-w-[640px] grid grid-cols-[88px_72px_1fr_100px] gap-3 items-stretch">
+        <div className={`rounded-xl border p-3 flex flex-col items-center justify-center text-center ${
+          dark ? 'border-[#64d2ff]/30 bg-[#0a84ff]/15' : 'border-[#0071e3]/30 bg-[#0071e3]/10'
+        }`}
+        >
+          <Radio className={`w-5 h-5 ${dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}`} />
+          <p className={`mt-2 text-[13px] font-semibold ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>Kafka</p>
+          <p className={`text-[10px] mt-1 ${muted}`}>source of truth</p>
+        </div>
 
-      <div className="relative flex justify-center gap-8 sm:gap-24 mb-2">
-        <div className={`hidden sm:block absolute top-0 w-px h-6 ${dark ? 'bg-white/20' : 'bg-[#d2d2d7]'}`} style={{ left: '35%' }} />
-        <div className={`hidden sm:block absolute top-0 w-px h-6 ${dark ? 'bg-white/20' : 'bg-[#d2d2d7]'}`} style={{ right: '35%' }} />
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
-        {[
-          {
-            title: 'Primary site',
-            items: ['Ingest tier · consumer group A', 'Complete search cluster', 'Transforms writing locally', 'Alerts · notifications on', 'Users routed here'],
-          },
-          {
-            title: 'Secondary site',
-            items: ['Ingest tier · consumer group B', 'Complete search cluster', 'Transforms writing locally', 'Alerts · notifications off', 'Ready for cutover'],
-          },
-        ].map(site => (
-          <div key={site.title} className={`rounded-2xl border p-4 ${card}`}>
-            <div className="flex items-center gap-2 mb-3">
-              <Database className={`w-5 h-5 ${accent}`} />
-              <p className="text-[15px] font-semibold">{site.title}</p>
+        <div className="flex flex-col justify-between py-2 gap-4">
+          {['Production', 'DR'].map(label => (
+            <div key={label} className={`rounded-xl border p-2 text-center ${card}`}>
+              <HardDrive className={`w-4 h-4 mx-auto ${dark ? 'text-[#c4a484]' : 'text-[#8b6914]'}`} />
+              <p className="text-[11px] font-semibold mt-1">{label}</p>
+              <p className={`text-[10px] ${muted}`}>Logstash ×4</p>
             </div>
-            <ul className={`space-y-1.5 text-[12px] ${muted}`}>
-              {site.items.map(item => (
-                <li key={item} className="flex gap-2">
-                  <span className={`${accent} shrink-0`}>→</span>
-                  <span className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>{item}</span>
-                </li>
-              ))}
-            </ul>
-            <div className={`mt-3 h-0.5 overflow-hidden rounded ${dark ? 'bg-white/10' : 'bg-[#e8e8ed]'}`}>
-              <div className={`h-full w-1/3 ccr-flow-pulse ${dark ? 'bg-[#64d2ff]' : 'bg-[#0071e3]'}`} />
+          ))}
+        </div>
+
+        <div className="relative flex flex-col gap-3">
+          <ElasticClusterCard title="Production" dark={dark} mlActive alertActive />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+            <div className={`rounded-md border px-2 py-1 text-[10px] font-semibold shadow-sm ${
+              dark ? 'border-white/20 bg-[#2c2c2e] text-[#f5f5f7]' : 'border-[#d2d2d7] bg-white text-[#1d1d1f]'
+            }`}
+            >
+              Object storage
             </div>
           </div>
-        ))}
+          <ElasticClusterCard title="DR" dark={dark} mlActive={false} alertActive={false} />
+          <div className={`pointer-events-none absolute -left-3 top-[22%] w-3 h-0.5 ${line}`}>
+            <div className={`h-full w-full ${accentBg} ccr-flow-pulse opacity-70`} />
+          </div>
+          <div className={`pointer-events-none absolute -left-3 bottom-[22%] w-3 h-0.5 ${line}`}>
+            <div className={`h-full w-full ${accentBg} ccr-flow-pulse opacity-70`} />
+          </div>
+        </div>
+
+        <div className={`rounded-xl border p-3 flex flex-col justify-center ${card}`}>
+          <p className="text-[12px] font-semibold">Alert actions</p>
+          <ul className={`mt-2 text-[11px] space-y-1 ${muted}`}>
+            <li>Email</li>
+            <li>API</li>
+            <li>etc.</li>
+          </ul>
+          <p className={`mt-3 text-[10px] leading-snug ${muted}`}>
+            Solid from production · dashed from DR until cutover
+          </p>
+        </div>
       </div>
 
       <p className={`mt-6 text-center text-[13px] max-w-2xl mx-auto ${muted}`}>
-        Neither site depends on the other for ingest. Failover is a deliberate routing change to a
-        secondary that is already indexing, transforming, and evaluating rules — not a promote of
-        read-only follower indices.
+        Kafka fans out to two Logstash tiers (separate consumer groups). Both Elastic clusters ingest and
+        transform. On DR, ML and alerting stay standby so actions do not double — until a deliberate
+        failover enables them. Shared object storage holds snapshots for corruption and catch-up.
       </p>
     </div>
   );
