@@ -45,10 +45,10 @@ const RPO_OPTIONS = [
   {
     id: 'hours',
     label: 'Hours',
-    summary: 'Cost and simplicity outweigh immediacy',
+    summary: 'Snapshots first — they are not optional',
     recommend: 'snapshot',
     detail:
-      'Snapshot-restore is usually enough. Invest in repository durability, restore drills, and a clear RTO playbook — but do not shorten secondary retention quietly if users expect a full lookback.',
+      'Snapshots are non-negotiable: there is no repository recovery path today. Stand up shared object storage and tested restore before (or with) any dual-ingest or CCR work. If hours of RPO is truly enough, snapshot-restore alone can be the active strategy — still after the repository exists.',
   },
 ];
 
@@ -68,7 +68,7 @@ const STRATEGIES = [
       'Replay or cross-copy gaps; restore from snapshots if corrupted',
     ],
     useCase:
-      'Platforms where transforms run during ingest, users need an identical complete view after failover, and an idle read-only standby will not unlock high-tier workloads.',
+      'Platforms where transforms run during ingest, users need an identical complete view after failover, and an idle read-only standby will not unlock high-tier workloads. Still requires snapshots underneath.',
   },
   {
     id: 'realtime',
@@ -84,7 +84,7 @@ const STRATEGIES = [
       'Rebuild primary as new follower when healthy',
     ],
     useCase:
-      'Read-oriented secondaries for search/analytics when the standby does not need to run write-heavy ingest transforms.',
+      'Read-oriented secondaries for search/analytics when the standby does not need to run write-heavy ingest transforms. Snapshots remain mandatory for corruption undo.',
   },
   {
     id: 'hybrid',
@@ -104,19 +104,20 @@ const STRATEGIES = [
   },
   {
     id: 'snapshot',
-    title: 'Snapshot-restore only',
-    subtitle: 'Cost-optimized',
-    rpo: 'Equals snapshot interval (often 30–120 min)',
+    title: 'Snapshots (required baseline)',
+    subtitle: 'Non-negotiable — not in place today',
+    required: true,
+    rpo: 'Equals snapshot interval (often 30–120 min) if used alone',
     rto: 'Tens of minutes to hours · restore + warm-up',
     bandwidth: 'Periodic · repository write/read only',
     recovery: [
-      'Stand up secondary cluster (or clear target)',
-      'Restore latest consistent snapshot',
-      'Apply post-restore config and ILM',
-      'Validate dashboards and SLOs, then cut over',
+      'Provision shared object storage + snapshot repository',
+      'Schedule consistent snapshots; prove restore in drills',
+      'On incident: restore latest consistent snapshot to target',
+      'Apply post-restore config and ILM; validate; cut over',
     ],
     useCase:
-      'Non-critical or cost-sensitive estates where planned RPO in hours is acceptable and continuous dual ingest is hard to justify.',
+      'Must exist under every other strategy. Today there is no snapshot recovery path — that gap is blocking, not optional. Snapshot-restore alone is only sufficient if hours of RPO is the accepted objective.',
   },
 ];
 
@@ -331,11 +332,11 @@ function FeaturedDesign({ dark }) {
     <section className="mt-16">
       <p className={`section-eyebrow ${dark ? '!text-[#98989d]' : ''}`}>Proposed architecture</p>
       <h2 className={`section-title mt-2 ${dark ? '!text-[#f5f5f7]' : ''}`}>
-        Dual ingest · identical logical estate
+        Dual Logstash · identical Elastic estate
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
-        Scope search/analytics components first. Keep the event bus on the primary site initially.
-        Give the secondary its own ingest path so both clusters stay complete and write-capable.
+        Kafka stays on the production site. Separate Logstash consumer groups feed complete Elastic
+        clusters on both sides. Transforms stay active on DR; ML and alert actions stay standby until cutover.
       </p>
 
       <div className={`mt-8 overflow-x-auto rounded-2xl border ${card}`}>
@@ -788,8 +789,8 @@ export function CcrArchitectureExplainer() {
             Dual-site recovery architecture
           </h1>
           <p className={`mt-3 text-[17px] leading-relaxed max-w-2xl ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-            A write-capable secondary fed by its own ingest path — compared with CCR followers,
-            hybrid CCR + snapshots, and snapshot-restore only.
+            Interactive walkthrough of the draft design: Kafka → dual Logstash → production and DR
+            Elastic clusters, with CCR and snapshot alternatives for comparison.
           </p>
         </div>
         <button
