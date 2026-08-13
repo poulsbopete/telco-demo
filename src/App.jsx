@@ -9,6 +9,7 @@ import { IncidentResponseDemo } from './components/IncidentResponseDemo';
 import { SlidesEmbed, PresenterEmbed, WorkshopDeckEmbed } from './components/FrameEmbed';
 import { WorkshopLabEmbed } from './components/WorkshopLabEmbed';
 import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
+import { CcrArchitectureExplainer } from './components/CcrArchitectureExplainer';
 
 const MODULES = [
   { id: 'live', label: 'Telemetry', live: true },
@@ -17,6 +18,7 @@ const MODULES = [
   { id: 'search', label: 'Search' },
   { id: 'observability', label: 'Scale' },
   { id: 'security', label: 'Security' },
+  { id: 'ccr', label: 'CCR' },
 ];
 
 /** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */
@@ -31,6 +33,7 @@ const MODULE_COMPONENTS = {
   search: ChatSimulator,
   observability: ObservabilityDashboard,
   security: SecurityDashboard,
+  ccr: CcrArchitectureExplainer,
   slides: SlidesEmbed,
   presenter: PresenterEmbed,
   'workshop-deck': WorkshopDeckEmbed,
