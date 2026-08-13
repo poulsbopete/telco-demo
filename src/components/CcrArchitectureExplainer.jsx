@@ -360,6 +360,7 @@ function DualIngestCostSection({ dark }) {
   );
 }
 
+function DualIngestHero({ dark }) {
   const card = dark
     ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
     : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
@@ -955,6 +956,7 @@ export function CcrArchitectureExplainer() {
       </div>
 
       <DualIngestHero dark={dark} />
+      <DualIngestCostSection dark={dark} />
       <FeaturedDesign dark={dark} />
       <DecisionTree dark={dark} rpoChoice={rpoChoice} setRpoChoice={setRpoChoice} />
       <StrategyCards dark={dark} highlightId={highlightId} />
