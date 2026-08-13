@@ -19,7 +19,8 @@ import {
 const SITE_MATRIX = [
   { component: 'Kafka (event bus)', primary: 'Yes — source of truth for both sites', secondary: 'None in initial scope' },
   { component: 'Logstash', primary: '×4 · own consumer group', secondary: '×4 · own consumer group, same topics' },
-  { component: 'Elasticsearch', primary: 'Complete dataset', secondary: 'Complete dataset' },
+  { component: 'Elasticsearch', primary: 'Complete dataset', secondary: 'Complete dataset (cheaper tiers)' },
+  { component: 'Data tiers', primary: 'Production hot / warm / cold as today', secondary: '1 day hot · remainder frozen' },
   { component: 'Ingest + transforms', primary: 'Active (write path)', secondary: 'Active (write path)' },
   { component: 'Machine learning', primary: 'Jobs running', secondary: 'Standby · model state via snapshots (option)' },
   { component: 'Alerting framework', primary: 'Active · actions enabled', secondary: 'Standby · actions suppressed' },
@@ -70,7 +71,7 @@ const STRATEGIES = [
       'Replay, cross-copy, or restore from snapshots if corrupted',
     ],
     useCase:
-      'Transforms run during ingest; users need an identical complete view after failover. Snapshot repository is mandatory underneath.',
+      'Transforms run during ingest; users need an identical complete view after failover. DR storage stays complete but cheaper: 1 day hot, remainder frozen. Snapshot repository is mandatory underneath.',
   },
   {
     id: 'realtime',
@@ -204,7 +205,7 @@ function PipelineStep({ label, active, dark }) {
   );
 }
 
-function ElasticClusterCard({ title, dark, mlActive, alertActive }) {
+function ElasticClusterCard({ title, dark, mlActive, alertActive, storageNote }) {
   const card = dark
     ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
     : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
@@ -226,6 +227,14 @@ function ElasticClusterCard({ title, dark, mlActive, alertActive }) {
         <PipelineStep label="ML" active={mlActive} dark={dark} />
         <PipelineStep label="Alerting" active={alertActive} dark={dark} />
       </div>
+      {storageNote && (
+        <p className={`mt-2 text-[10px] leading-snug rounded-lg px-2 py-1.5 ${
+          dark ? 'bg-[#64d2ff]/10 text-[#64d2ff]' : 'bg-[#0071e3]/8 text-[#0071e3]'
+        }`}
+        >
+          {storageNote}
+        </p>
+      )}
     </div>
   );
 }
@@ -272,7 +281,7 @@ function DualIngestCostSection({ dark }) {
               <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>What goes up</p>
               <ul className={`mt-2 space-y-1.5 text-[13px] ${text}`}>
                 {[
-                  'Second Elastic cluster — compute + roughly the same data volume if retention matches production',
+                  'Second Elastic cluster — compute + storage (mitigated on DR: 1 day hot, rest frozen)',
                   'Second Logstash tier (e.g. ×4) — another consumer group, continuous ingest',
                   'Cross-site network — DR reading Kafka topics from the primary site',
                   'Ops — two live estates (config drift, transforms, suppressed alerts, failover drills)',
@@ -285,7 +294,7 @@ function DualIngestCostSection({ dark }) {
                 ))}
               </ul>
               <p className={`mt-2 text-[12px] ${muted}`}>
-                Kafka staying primary-only avoids a second event bus, but it does not erase the Elastic + Logstash bill.
+                Kafka staying primary-only avoids a second event bus. Frozen-tier ILM on DR cuts storage vs a full hot mirror without shortening retention.
               </p>
             </div>
 
@@ -315,7 +324,7 @@ function DualIngestCostSection({ dark }) {
                 </thead>
                 <tbody>
                   {[
-                    ['Dual ingest', 'Highest steady ingest/compute; less “replication tax”'],
+                    ['Dual ingest', 'Highest steady ingest/compute; DR storage reduced with 1d hot + frozen'],
                     ['Real-time CCR', 'Second cluster storage + continuous CCR bandwidth; weaker if DR must write'],
                     ['Hybrid CCR', 'Between the two; snapshots still mandatory'],
                   ].map(([path, shape]) => (
@@ -337,8 +346,9 @@ function DualIngestCostSection({ dark }) {
               <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>Practical cost levers</p>
               <ul className={`mt-2 space-y-1.5 text-[13px] ${text}`}>
                 {[
-                  'Same retention on DR is expensive but safer than a quietly shorter window',
-                  'Cut bill with compression / index mode / ILM, not silent data amputation',
+                  'Keep full DR retention — move older data to frozen instead of deleting lookback',
+                  'ILM on DR: 1 day hot, remainder frozen (searchable, much cheaper than hot)',
+                  'Also apply compression / index mode on both sites where safe',
                   'Keep DR alerting actions off and choose ML warm-start deliberately',
                 ].map(item => (
                   <li key={item} className="flex gap-2">
@@ -350,8 +360,9 @@ function DualIngestCostSection({ dark }) {
             </div>
 
             <p className={`text-[14px] leading-relaxed ${text}`}>
-              <strong>Bottom line:</strong> Dual ingest is the more expensive operating model than a skinny CCR standby —
-              and usually the right premium if the goal is unlocking high-tier workloads with a complete, writable DR site.
+              <strong>Bottom line:</strong> Dual ingest still costs more than a single site, but DR does not need a
+              full hot-tier mirror — <strong>1 day hot + frozen for the rest</strong> preserves the complete view
+              while cutting the largest storage line item.
             </p>
           </div>
         )}
@@ -410,7 +421,7 @@ function DualIngestHero({ dark }) {
         </div>
 
         <div className="relative flex flex-col gap-3">
-          <ElasticClusterCard title="Production" dark={dark} mlActive alertActive />
+          <ElasticClusterCard title="Production" dark={dark} mlActive alertActive storageNote="Hot / warm / cold as today" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
             <div className={`rounded-md border px-2 py-1 text-[10px] font-semibold shadow-sm ${
               dark ? 'border-white/20 bg-[#2c2c2e] text-[#f5f5f7]' : 'border-[#d2d2d7] bg-white text-[#1d1d1f]'
@@ -420,7 +431,13 @@ function DualIngestHero({ dark }) {
               <span className={`block font-normal ${dark ? 'text-[#ff9f0a]' : 'text-[#bf4800]'}`}>required</span>
             </div>
           </div>
-          <ElasticClusterCard title="DR" dark={dark} mlActive={false} alertActive={false} />
+          <ElasticClusterCard
+            title="DR"
+            dark={dark}
+            mlActive={false}
+            alertActive={false}
+            storageNote="1 day hot · rest frozen (cost)"
+          />
           <div className={`pointer-events-none absolute -left-3 top-[22%] w-3 h-0.5 ${line}`}>
             <div className={`h-full w-full ${accentBg} ccr-flow-pulse opacity-70`} />
           </div>
@@ -444,8 +461,10 @@ function DualIngestHero({ dark }) {
 
       <p className={`mt-6 text-center text-[13px] max-w-2xl mx-auto ${muted}`}>
         Kafka fans out to two Logstash tiers (separate consumer groups). Both Elastic clusters ingest and
-        transform. On DR, ML and alerting stay standby so actions do not double — until a deliberate
-        failover enables them. Shared object storage holds snapshots for corruption and catch-up.
+        transform. DR keeps the full lookback but lands data as{' '}
+        <strong className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>1 day hot, remainder frozen</strong>
+        {' '}to cut storage cost. ML and alerting stay standby on DR until cutover. Shared object storage
+        holds snapshots for corruption and catch-up.
       </p>
     </div>
   );
@@ -464,7 +483,10 @@ function FeaturedDesign({ dark }) {
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
         Kafka stays on the production site. Separate Logstash consumer groups feed complete Elastic
-        clusters on both sides. Transforms stay active on DR; ML and alert actions stay standby until cutover.
+        clusters on both sides. DR uses{' '}
+        <strong className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>1 day hot + frozen for the rest</strong>
+        {' '}so the logical dataset stays complete without mirroring production hot-tier spend. Transforms
+        stay active on DR; ML and alert actions stay standby until cutover.
       </p>
 
       <div className={`mt-8 overflow-x-auto rounded-2xl border ${card}`}>
