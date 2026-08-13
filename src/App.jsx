@@ -18,7 +18,7 @@ const MODULES = [
   { id: 'search', label: 'Search' },
   { id: 'observability', label: 'Scale' },
   { id: 'security', label: 'Security' },
-  { id: 'ccr', label: 'CCR' },
+  { id: 'ccr', label: 'Site DR' },
 ];
 
 /** Instruqt invite — set VITE_INSTRUQT_URL after publishing the track invite */

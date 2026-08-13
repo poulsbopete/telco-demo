@@ -1,33 +1,46 @@
 import { useMemo, useState } from 'react';
 import {
-  ArrowRight,
   CheckCircle2,
   Clock,
   Database,
   HardDrive,
+  Layers,
   Moon,
   Network,
+  Radio,
   Shield,
   Sun,
+  Workflow,
   Zap,
 } from 'lucide-react';
+
+const SITE_MATRIX = [
+  { component: 'Event bus', primary: 'Yes — source of truth for both sites', secondary: 'None in initial scope' },
+  { component: 'Ingest tier', primary: 'Yes · own consumer group', secondary: 'Yes · own consumer group, same topics' },
+  { component: 'Search cluster', primary: 'Complete dataset', secondary: 'Complete dataset' },
+  { component: 'Transforms', primary: 'All of them (part of ingest)', secondary: 'All of them — secondary must write' },
+  { component: 'Machine learning', primary: 'Jobs running', secondary: 'Model state kept current (see options)' },
+  { component: 'Alerting', primary: 'Running · notifications on', secondary: 'Running · notifications suppressed' },
+  { component: 'Analytics UI', primary: 'User-facing', secondary: 'Ready and configured' },
+  { component: 'Users', primary: 'Routed here normally', secondary: 'Routed here on deliberate failover' },
+];
 
 const RPO_OPTIONS = [
   {
     id: 'seconds',
     label: 'Seconds',
-    summary: 'Near-zero data loss under site failure',
-    recommend: 'realtime',
+    summary: 'Near-zero loss; secondary already indexing',
+    recommend: 'dual',
     detail:
-      'Choose real-time cross-cluster replication with follower indices. Keep snapshots as a corruption backstop — replication alone cannot undo a bad write that was faithfully copied.',
+      'Prefer dual independent ingest into a write-capable secondary. Continuous CCR followers alone are a poor fit when transforms must run as part of ingest. Keep snapshots as the corruption backstop.',
   },
   {
     id: 'minutes',
     label: 'Minutes',
-    summary: 'Short lag is acceptable for most analytics',
-    recommend: 'hybrid',
+    summary: 'Short lag is fine if the secondary stays complete',
+    recommend: 'dual',
     detail:
-      'A hybrid of CCR for hot indices plus scheduled snapshots balances lag, bandwidth, and recovery from logical corruption. Pair with deliberate failover routing.',
+      'Dual ingest still leads: both sites hold the same logical view, catch up via the event bus when a site falls behind, and fail over by routing. Hybrid CCR + snapshots is a fallback when the secondary cannot run write-side transforms.',
   },
   {
     id: 'hours',
@@ -35,16 +48,32 @@ const RPO_OPTIONS = [
     summary: 'Cost and simplicity outweigh immediacy',
     recommend: 'snapshot',
     detail:
-      'Snapshot-restore is usually enough. Invest in repository durability, restore drills, and a clear RTO playbook rather than continuous replication traffic.',
+      'Snapshot-restore is usually enough. Invest in repository durability, restore drills, and a clear RTO playbook — but do not shorten secondary retention quietly if users expect a full lookback.',
   },
 ];
 
 const STRATEGIES = [
   {
+    id: 'dual',
+    title: 'Dual independent ingest',
+    subtitle: 'Write-capable secondary · recommended',
+    featured: true,
+    rpo: 'Seconds–minutes · bounded by ingest lag',
+    rto: 'Minutes · routing change only',
+    bandwidth: 'Event-bus fan-out to two consumer groups · no CCR amplify',
+    recovery: [
+      'Confirm secondary is current enough (lag, transforms, rules)',
+      'Suppress or keep notifications as designed on the active site',
+      'Point the single user endpoint at the secondary',
+      'Replay or cross-copy gaps; restore from snapshots if corrupted',
+    ],
+    useCase:
+      'Platforms where transforms run during ingest, users need an identical complete view after failover, and an idle read-only standby will not unlock high-tier workloads.',
+  },
+  {
     id: 'realtime',
     title: 'Real-time CCR',
     subtitle: 'Follower indices',
-    accent: 'teal',
     rpo: '< 1–30 s (typical lag)',
     rto: 'Minutes · promote follower / retarget clients',
     bandwidth: 'Continuous · roughly write rate × replica count',
@@ -55,13 +84,12 @@ const STRATEGIES = [
       'Rebuild primary as new follower when healthy',
     ],
     useCase:
-      'Mission-critical search and observability where losing more than a few seconds of events blocks high-tier workloads.',
+      'Read-oriented secondaries for search/analytics when the standby does not need to run write-heavy ingest transforms.',
   },
   {
     id: 'hybrid',
     title: 'Hybrid CCR + snapshots',
     subtitle: 'Mixed approach',
-    accent: 'blue',
     rpo: 'Seconds on hot data · minutes–hours on cold',
     rto: 'Minutes for hot · longer if snapshot restore needed',
     bandwidth: 'CCR for hot paths · burst traffic on snapshot windows',
@@ -72,13 +100,12 @@ const STRATEGIES = [
       'Verify transforms, rules, and saved objects before opening users',
     ],
     useCase:
-      'Platforms that need a warm secondary for recent data while using snapshots for retention, ML model state, and corruption rollback.',
+      'When only part of the estate can follow in real time and snapshots cover retention, ML model state, and corruption rollback.',
   },
   {
     id: 'snapshot',
     title: 'Snapshot-restore only',
     subtitle: 'Cost-optimized',
-    accent: 'slate',
     rpo: 'Equals snapshot interval (often 30–120 min)',
     rto: 'Tens of minutes to hours · restore + warm-up',
     bandwidth: 'Periodic · repository write/read only',
@@ -89,7 +116,40 @@ const STRATEGIES = [
       'Validate dashboards and SLOs, then cut over',
     ],
     useCase:
-      'Non-critical or cost-sensitive estates where planned RPO in hours is acceptable and continuous WAN replication is hard to justify.',
+      'Non-critical or cost-sensitive estates where planned RPO in hours is acceptable and continuous dual ingest is hard to justify.',
+  },
+];
+
+const RECOVERY_TIERS = [
+  {
+    title: 'Within event-bus retention',
+    body: 'The affected site replays from the bus and catches up. Fast and largely self-service.',
+  },
+  {
+    title: 'Beyond bus retention',
+    body: 'The healthy site is the source of truth; the missing window is copied across directly. Works in either direction.',
+  },
+  {
+    title: 'Beyond both · or after corruption',
+    body: 'Restore from the snapshot repository — the only reliable undo when a bad change was faithfully applied on both sides.',
+  },
+];
+
+const ML_OPTIONS = [
+  {
+    title: 'Run jobs on secondary continuously',
+    ongoing: 'Modest if ML capacity is underused',
+    failover: 'None — models already warm',
+  },
+  {
+    title: 'Restore model state from snapshots',
+    ongoing: 'Low · more moving parts',
+    failover: 'Bounded catch-up set by restore frequency',
+  },
+  {
+    title: 'Start cold from secondary history',
+    ongoing: 'None',
+    failover: 'Longer warm-up · competes with everything else at cutover',
   },
 ];
 
@@ -98,13 +158,13 @@ const LINK_TYPES = [
     id: 'vpn',
     label: 'VPN',
     latency: 'Variable · depends on path',
-    notes: 'Encrypted overlay; simplest to stand up; watch MTU and jitter under peak ingest.',
+    notes: 'Encrypted overlay; simplest to stand up for secondary ingest reading the primary event bus.',
   },
   {
     id: 'direct',
     label: 'Direct link',
     latency: 'Lowest · dedicated circuit',
-    notes: 'Private fiber or wave between sites; best for sustained CCR write amplification.',
+    notes: 'Private circuit between sites; best when secondary continuously consumes high-volume topics.',
   },
   {
     id: 'interconnect',
@@ -115,78 +175,177 @@ const LINK_TYPES = [
 ];
 
 function rtoFromRpo(rpoSeconds) {
-  // Illustrative model: recovery overhead grows as replication lag allowance shrinks
-  // (more orchestration) and as lag grows (more catch-up / restore).
-  const basePromoteMin = 8;
-  const orchestration = Math.max(0, (30 - Math.min(rpoSeconds, 30)) * 0.15);
-  const catchUp = Math.sqrt(Math.max(rpoSeconds, 1)) * 0.35;
-  const snapshotPenalty = rpoSeconds > 900 ? (rpoSeconds - 900) / 180 : 0;
+  const basePromoteMin = 6;
+  const orchestration = Math.max(0, (30 - Math.min(rpoSeconds, 30)) * 0.12);
+  const catchUp = Math.sqrt(Math.max(rpoSeconds, 1)) * 0.28;
+  const snapshotPenalty = rpoSeconds > 900 ? (rpoSeconds - 900) / 160 : 0;
   return Math.round(basePromoteMin + orchestration + catchUp + snapshotPenalty);
 }
 
 function strategyForRpo(rpoSeconds) {
-  if (rpoSeconds <= 30) return 'realtime';
-  if (rpoSeconds <= 900) return 'hybrid';
+  if (rpoSeconds <= 900) return 'dual';
   return 'snapshot';
 }
 
-function ClusterNode({ title, role, dark }) {
-  return (
-    <div
-      className={`relative rounded-2xl border px-5 py-4 min-w-[140px] sm:min-w-[160px] text-center shadow-sm ${
-        dark
-          ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
-          : 'border-[#d2d2d7] bg-white text-[#1d1d1f]'
-      }`}
-    >
-      <Database className={`w-7 h-7 mx-auto mb-2 ${dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}`} />
-      <p className="text-[15px] font-semibold tracking-tight">{title}</p>
-      <p className={`text-[12px] mt-1 ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>{role}</p>
-    </div>
-  );
+function tone(dark, on, off = '') {
+  return dark ? on : off;
 }
 
-function FlowArrow({ dark }) {
-  return (
-    <div className="flex flex-col items-center gap-1 px-2 sm:px-4">
-      <div className="relative w-16 sm:w-24 h-8 flex items-center">
-        <div
-          className={`absolute inset-x-0 h-0.5 overflow-hidden ${
-            dark ? 'bg-white/20' : 'bg-[#d2d2d7]'
-          }`}
-        >
-          <div
-            className={`h-full w-1/3 ${dark ? 'bg-[#64d2ff]' : 'bg-[#0071e3]'} ccr-flow-pulse`}
-          />
-        </div>
-        <ArrowRight
-          className={`absolute right-0 w-4 h-4 ${dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}`}
-        />
-      </div>
-      <span className={`text-[11px] ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-        replicate
-      </span>
-    </div>
-  );
-}
+function DualIngestHero({ dark }) {
+  const card = dark
+    ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
+    : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
+  const muted = dark ? 'text-[#98989d]' : 'text-[#86868b]';
+  const accent = dark ? 'text-[#64d2ff]' : 'text-[#0071e3]';
 
-function HeroDiagram({ dark }) {
   return (
     <div
-      className={`mt-10 rounded-3xl border p-6 sm:p-10 ${
+      className={`mt-10 rounded-3xl border p-5 sm:p-8 ${
         dark ? 'border-white/10 bg-[#111113]' : 'border-[#d2d2d7]/80 bg-[#f5f5f7]'
       }`}
     >
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-2">
-        <ClusterNode title="Primary cluster" role="Leader indices · writes" dark={dark} />
-        <FlowArrow dark={dark} />
-        <ClusterNode title="Secondary cluster" role="Follower indices · read-ready" dark={dark} />
+      <div className="flex items-center justify-center gap-2 mb-6">
+        <span className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
+          dark ? 'bg-[#64d2ff]/15 text-[#64d2ff]' : 'bg-[#0071e3]/10 text-[#0071e3]'
+        }`}
+        >
+          Leading design
+        </span>
       </div>
-      <p className={`mt-6 text-center text-[13px] max-w-xl mx-auto ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-        Changes on the primary are shipped continuously to follower indices on the secondary.
-        Snapshots remain the backstop for corruption and long-window recovery.
+
+      <div className={`mx-auto max-w-xs rounded-2xl border p-4 text-center mb-4 ${card}`}>
+        <Radio className={`w-6 h-6 mx-auto ${accent}`} />
+        <p className="mt-2 text-[14px] font-semibold">Event bus (primary site)</p>
+        <p className={`text-[12px] mt-1 ${muted}`}>Single source of truth · both consumer groups</p>
+      </div>
+
+      <div className="relative flex justify-center gap-8 sm:gap-24 mb-2">
+        <div className={`hidden sm:block absolute top-0 w-px h-6 ${dark ? 'bg-white/20' : 'bg-[#d2d2d7]'}`} style={{ left: '35%' }} />
+        <div className={`hidden sm:block absolute top-0 w-px h-6 ${dark ? 'bg-white/20' : 'bg-[#d2d2d7]'}`} style={{ right: '35%' }} />
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
+        {[
+          {
+            title: 'Primary site',
+            items: ['Ingest tier · consumer group A', 'Complete search cluster', 'Transforms writing locally', 'Alerts · notifications on', 'Users routed here'],
+          },
+          {
+            title: 'Secondary site',
+            items: ['Ingest tier · consumer group B', 'Complete search cluster', 'Transforms writing locally', 'Alerts · notifications off', 'Ready for cutover'],
+          },
+        ].map(site => (
+          <div key={site.title} className={`rounded-2xl border p-4 ${card}`}>
+            <div className="flex items-center gap-2 mb-3">
+              <Database className={`w-5 h-5 ${accent}`} />
+              <p className="text-[15px] font-semibold">{site.title}</p>
+            </div>
+            <ul className={`space-y-1.5 text-[12px] ${muted}`}>
+              {site.items.map(item => (
+                <li key={item} className="flex gap-2">
+                  <span className={`${accent} shrink-0`}>→</span>
+                  <span className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>{item}</span>
+                </li>
+              ))}
+            </ul>
+            <div className={`mt-3 h-0.5 overflow-hidden rounded ${dark ? 'bg-white/10' : 'bg-[#e8e8ed]'}`}>
+              <div className={`h-full w-1/3 ccr-flow-pulse ${dark ? 'bg-[#64d2ff]' : 'bg-[#0071e3]'}`} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className={`mt-6 text-center text-[13px] max-w-2xl mx-auto ${muted}`}>
+        Neither site depends on the other for ingest. Failover is a deliberate routing change to a
+        secondary that is already indexing, transforming, and evaluating rules — not a promote of
+        read-only follower indices.
       </p>
     </div>
+  );
+}
+
+function FeaturedDesign({ dark }) {
+  const card = dark ? 'border-white/10 bg-[#1c1c1e]' : 'border-[#d2d2d7] bg-white';
+  const text = dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]';
+  const muted = dark ? 'text-[#98989d]' : 'text-[#86868b]';
+
+  return (
+    <section className="mt-16">
+      <p className={`section-eyebrow ${dark ? '!text-[#98989d]' : ''}`}>Proposed architecture</p>
+      <h2 className={`section-title mt-2 ${dark ? '!text-[#f5f5f7]' : ''}`}>
+        Dual ingest · identical logical estate
+      </h2>
+      <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
+        Scope search/analytics components first. Keep the event bus on the primary site initially.
+        Give the secondary its own ingest path so both clusters stay complete and write-capable.
+      </p>
+
+      <div className={`mt-8 overflow-x-auto rounded-2xl border ${card}`}>
+        <table className="w-full text-left text-[13px] min-w-[560px]">
+          <thead>
+            <tr className={dark ? 'border-b border-white/10' : 'border-b border-[#d2d2d7]'}>
+              <th className={`px-4 py-3 font-semibold ${muted}`}>Component</th>
+              <th className={`px-4 py-3 font-semibold ${text}`}>Primary site</th>
+              <th className={`px-4 py-3 font-semibold ${text}`}>Secondary site</th>
+            </tr>
+          </thead>
+          <tbody>
+            {SITE_MATRIX.map(row => (
+              <tr key={row.component} className={dark ? 'border-t border-white/5' : 'border-t border-[#f0f0f2]'}>
+                <td className={`px-4 py-3 font-medium ${text}`}>{row.component}</td>
+                <td className={`px-4 py-3 ${muted}`}>{row.primary}</td>
+                <td className={`px-4 py-3 ${muted}`}>{row.secondary}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-6 grid sm:grid-cols-3 gap-3">
+        {[
+          { icon: Workflow, title: 'Transforms decide it', body: 'If transforms write during ingest, the secondary cannot be a read-only replica.' },
+          { icon: Layers, title: 'Independence', body: 'If the secondary falls behind, its consumer group catches up later. The primary does not notice.' },
+          { icon: Shield, title: 'One address', body: 'A single endpoint follows the active site. Cutover stays deliberate — reachable is not the same as current.' },
+        ].map(item => (
+          <div key={item.title} className={`rounded-2xl border p-4 ${card}`}>
+            <item.icon className={`w-5 h-5 ${dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}`} />
+            <p className={`mt-2 text-[14px] font-semibold ${text}`}>{item.title}</p>
+            <p className={`mt-1 text-[12px] leading-relaxed ${muted}`}>{item.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-6 grid lg:grid-cols-3 gap-3">
+        {RECOVERY_TIERS.map((tier, i) => (
+          <div key={tier.title} className={`rounded-2xl border p-4 ${card}`}>
+            <p className={`text-[11px] font-semibold uppercase tracking-wide ${dark ? 'text-[#64d2ff]' : 'text-[#0071e3]'}`}>
+              Tier {i + 1}
+            </p>
+            <p className={`mt-1 text-[14px] font-semibold ${text}`}>{tier.title}</p>
+            <p className={`mt-1 text-[12px] leading-relaxed ${muted}`}>{tier.body}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className={`mt-6 rounded-2xl border p-5 ${card}`}>
+        <p className={`text-[12px] font-semibold uppercase tracking-wide ${muted}`}>Machine learning warm-start</p>
+        <div className="mt-3 grid md:grid-cols-3 gap-3">
+          {ML_OPTIONS.map(opt => (
+            <div key={opt.title}>
+              <p className={`text-[13px] font-medium ${text}`}>{opt.title}</p>
+              <p className={`text-[12px] mt-1 ${muted}`}>Ongoing: {opt.ongoing}</p>
+              <p className={`text-[12px] ${muted}`}>At failover: {opt.failover}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <p className={`mt-4 text-[12px] ${muted}`}>
+        Covered: loss or corruption of search/ingest/UI on the primary. Not covered by initial scope:
+        loss of the whole primary site including the event bus — events stop at source until the bus
+        is recovered. Align requirements language with that boundary.
+      </p>
+    </section>
   );
 }
 
@@ -201,8 +360,7 @@ function DecisionTree({ dark, rpoChoice, setRpoChoice }) {
         What&apos;s your RPO requirement?
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
-        Recovery Point Objective drives whether you need continuous replication, a hybrid, or
-        snapshot-only.
+        Start from recovery point objective, then check whether the secondary must write.
       </p>
 
       <div className="mt-8 grid sm:grid-cols-3 gap-3">
@@ -260,17 +418,17 @@ function StrategyCards({ dark, highlightId }) {
         Architecture comparison
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
-        Three common strategies for keeping a secondary site useful when the primary fails.
+        Dual ingest versus CCR followers, hybrid CCR + snapshots, and snapshot-restore only.
       </p>
 
-      <div className="mt-8 grid lg:grid-cols-3 gap-4">
+      <div className="mt-8 grid md:grid-cols-2 gap-4">
         {STRATEGIES.map(s => {
           const highlighted = highlightId === s.id;
           return (
             <article
               key={s.id}
               className={`rounded-2xl border p-5 flex flex-col ${
-                highlighted
+                highlighted || s.featured
                   ? dark
                     ? 'border-[#64d2ff] ring-1 ring-[#64d2ff]/40 bg-[#1c1c1e]'
                     : 'border-[#0071e3] ring-1 ring-[#0071e3]/25 bg-white'
@@ -288,12 +446,12 @@ function StrategyCards({ dark, highlightId }) {
                     {s.subtitle}
                   </p>
                 </div>
-                {highlighted && (
-                  <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full ${
+                {(highlighted || s.featured) && (
+                  <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full shrink-0 ${
                     dark ? 'bg-[#64d2ff]/15 text-[#64d2ff]' : 'bg-[#0071e3]/10 text-[#0071e3]'
                   }`}
                   >
-                    Match
+                    {s.featured ? 'Leading' : 'Match'}
                   </span>
                 )}
               </div>
@@ -363,8 +521,7 @@ function RecoveryTimeline({ dark, rpoSeconds, setRpoSeconds }) {
         Recovery time scenarios
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
-        Adjust the RPO target to see how recovery time and strategy tend to shift. Figures are
-        illustrative for planning conversations, not SLAs.
+        Adjust the RPO target to see how recovery time and strategy tend to shift. Illustrative only.
       </p>
 
       <div
@@ -415,7 +572,7 @@ function RecoveryTimeline({ dark, rpoSeconds, setRpoSeconds }) {
               Preferred strategy: <strong>{strategy?.title}</strong>
             </span>
             <span className={dark ? 'text-[#98989d]' : 'text-[#86868b]'}>
-              Tighter RPO usually means more orchestration at cutover; looser RPO shifts work into restore and catch-up.
+              Under ~15 minutes RPO, dual ingest keeps cutover as routing. Looser RPO shifts work into restore.
             </span>
           </div>
         </div>
@@ -444,7 +601,7 @@ function NetworkTopology({ dark }) {
         Network topology
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
-        Toggle inter-site links to compare how traffic between primary and secondary usually rides.
+        Toggle how the secondary reaches the primary event bus and shared snapshot repository.
       </p>
 
       <div className="mt-6 flex flex-wrap gap-2">
@@ -472,7 +629,7 @@ function NetworkTopology({ dark }) {
       </div>
 
       <div
-        className={`mt-6 rounded-2xl border p-6 sm:p-8 relative overflow-hidden ${
+        className={`mt-6 rounded-2xl border p-6 sm:p-8 ${
           dark ? 'border-white/10 bg-[#111113]' : 'border-[#d2d2d7] bg-[#f5f5f7]'
         }`}
       >
@@ -482,7 +639,9 @@ function NetworkTopology({ dark }) {
             <p className={`mt-2 text-[14px] font-semibold ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>
               Primary site
             </p>
-            <p className={`text-[12px] ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>Ingest · leader shards</p>
+            <p className={`text-[12px] ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
+              Event bus · ingest · complete cluster
+            </p>
           </div>
 
           <div className="flex flex-col items-center gap-2 min-w-[120px]">
@@ -510,7 +669,9 @@ function NetworkTopology({ dark }) {
             <p className={`mt-2 text-[14px] font-semibold ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>
               Secondary site
             </p>
-            <p className={`text-[12px] ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>Followers · restore target</p>
+            <p className={`text-[12px] ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
+              Ingest · complete cluster · warm standby
+            </p>
           </div>
         </div>
 
@@ -535,23 +696,6 @@ function NetworkTopology({ dark }) {
           ))}
         </ul>
       </div>
-
-      <aside
-        className={`mt-8 rounded-2xl border p-5 ${
-          dark ? 'border-white/10 bg-[#1c1c1e]' : 'border-[#d2d2d7] bg-white'
-        }`}
-      >
-        <p className={`text-[12px] font-semibold uppercase tracking-wide ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-          Design note
-        </p>
-        <p className={`mt-2 text-[14px] leading-relaxed ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>
-          Follower indices are read-oriented. If the secondary must run write-heavy ingest transforms
-          or identical operational workloads, teams often pair CCR with dual independent ingest, or
-          choose an active-active write pattern instead of followers alone. Snapshots remain essential
-          in every model — they are the only reliable undo for corruption that replication would
-          otherwise copy faithfully.
-        </p>
-      </aside>
     </section>
   );
 }
@@ -578,16 +722,16 @@ export function CcrArchitectureExplainer() {
 
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <p className={`section-eyebrow ${dark ? '!text-[#98989d]' : ''}`}>Distributed databases</p>
+          <p className={`section-eyebrow ${dark ? '!text-[#98989d]' : ''}`}>Site disaster recovery</p>
           <h1 className={`mt-2 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold tracking-tight leading-[1.1] ${
             dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'
           }`}
           >
-            Cross-Cluster Replication Explained
+            Dual-site recovery architecture
           </h1>
           <p className={`mt-3 text-[17px] leading-relaxed max-w-2xl ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-            How primary and secondary clusters stay aligned — and how to choose between real-time
-            followers, hybrid CCR plus snapshots, and snapshot-restore only.
+            A write-capable secondary fed by its own ingest path — compared with CCR followers,
+            hybrid CCR + snapshots, and snapshot-restore only.
           </p>
         </div>
         <button
@@ -596,7 +740,7 @@ export function CcrArchitectureExplainer() {
           className={`inline-flex items-center gap-2 text-[13px] px-3 py-2 rounded-full border ${
             dark
               ? 'border-white/20 text-[#f5f5f7] hover:bg-white/5'
-              : 'border-[#d2d2d7] text-[#1d1d1f] hover:bg-black/4'
+              : 'border-[#d2d2d7] text-[#1d1d1f] hover:bg-black/[0.04]'
           }`}
           aria-pressed={dark}
         >
@@ -605,7 +749,8 @@ export function CcrArchitectureExplainer() {
         </button>
       </div>
 
-      <HeroDiagram dark={dark} />
+      <DualIngestHero dark={dark} />
+      <FeaturedDesign dark={dark} />
       <DecisionTree dark={dark} rpoChoice={rpoChoice} setRpoChoice={setRpoChoice} />
       <StrategyCards dark={dark} highlightId={highlightId} />
       <RecoveryTimeline dark={dark} rpoSeconds={rpoSeconds} setRpoSeconds={setRpoSeconds} />
