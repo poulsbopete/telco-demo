@@ -97,13 +97,6 @@ export default function App() {
               <NavButton id="presenter" label="Presenter" activeModule={activeModule} setActiveModule={setActiveModule} />
               <NavButton id="slides" label="Slides" activeModule={activeModule} setActiveModule={setActiveModule} />
               <NavButton
-                id="workshop-deck"
-                label="Workshop deck"
-                activeModule={activeModule}
-                setActiveModule={setActiveModule}
-                title="Metrics + ML workshop deck"
-              />
-              <NavButton
                 id="workshop"
                 label="Workshop"
                 activeModule={activeModule}
@@ -129,7 +122,6 @@ export default function App() {
               ...MODULES.map(m => ({ id: m.id, label: m.label })),
               { id: 'presenter', label: 'Presenter guides' },
               { id: 'slides', label: 'Slides' },
-              { id: 'workshop-deck', label: 'Workshop deck' },
               { id: 'workshop', label: 'Workshop' },
             ].map(item => (
               <button
