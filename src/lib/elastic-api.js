@@ -446,7 +446,18 @@ export function kibanaMetricsExplorerUrl(kibanaBase) {
 
 export function kibanaMlAnomaliesUrl(kibanaBase) {
   const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
-  return `${base}/app/ml/anomaly_detection`;
+  // Serverless ML — classic /anomaly_detection 404s; AIOps log rate analysis works on live OTel logs
+  return `${base}/app/ml/aiops/log_rate_analysis`;
+}
+
+export function kibanaMlOverviewUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  return `${base}/app/ml/overview`;
+}
+
+export function kibanaMlJobsUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  return `${base}/app/ml/jobs`;
 }
 
 export function kibanaO11yOverviewUrl(kibanaBase) {
