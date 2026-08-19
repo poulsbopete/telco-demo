@@ -22,7 +22,9 @@ function gatewayIcon(status, selected) {
   const svg = `
     <svg width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
       <circle cx="14" cy="14" r="11" fill="${fill}" stroke="${ring}" stroke-width="${selected ? 3 : 2}"/>
-      <path d="M9 15h10M14 10v10" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+      <path d="M8.5 15.8h11c.4 0 .7-.3.7-.7v-.8l-1.1-3.1c-.1-.4-.5-.7-.9-.7h-1l-.8-1.2c-.2-.2-.4-.3-.7-.3h-3.6c-.3 0-.5.1-.7.3l-.8 1.2H9.7c-.4 0-.8.3-.9.7l-1.1 3.1v.8c0 .4.3.7.7.7z" fill="#fff"/>
+      <circle cx="10.5" cy="16.2" r="1.15" fill="#fff"/>
+      <circle cx="17.5" cy="16.2" r="1.15" fill="#fff"/>
     </svg>`;
   return L.icon({
     iconUrl: `data:image/svg+xml;base64,${btoa(svg)}`,
