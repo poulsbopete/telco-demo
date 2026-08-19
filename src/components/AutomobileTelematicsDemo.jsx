@@ -15,6 +15,7 @@ import {
   OTEL_DEMO_KIBANA_URL,
   buildTelematicsPipelineDiscoverEsql,
 } from '../lib/elastic-api';
+import { TELEMATICS_TELEMETRY_SOURCES, TELEMATICS_TELEMETRY_SUMMARY } from '../lib/telematics-telemetry';
 
 const TelematicsWorldMap = lazy(() => import('./telematics/TelematicsWorldMap'));
 
@@ -63,8 +64,8 @@ export function AutomobileTelematicsDemo() {
     <div>
       <ModuleHeader
         title="Automobile telematics & IoT"
-        subtitle="Worldwide connected-vehicle gateways — live ingest, latency, and fleet health on Elastic Serverless (otel-demo)."
-        badge="Live · otel-demo"
+        subtitle="Worldwide connected-vehicle gateways — live ingest, latency, and fleet health from OpenTelemetry logs/traces and Prometheus metrics on Elastic Serverless (otel-demo)."
+        badge="Live · OpenTelemetry + Prometheus · otel-demo"
       >
         <button type="button" onClick={refresh} disabled={loading} className="btn-quiet flex items-center gap-1.5">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -73,24 +74,41 @@ export function AutomobileTelematicsDemo() {
         <ElasticDeepLinks links={kibanaLinks} />
       </ModuleHeader>
 
-      <div className="surface-card p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <p className="text-[12px] text-[#86868b]">Elastic Serverless · Observability</p>
-          <p className="text-[14px] font-medium text-[#1d1d1f] mt-0.5">
-            {kibanaUrl.replace('https://', '')}
-          </p>
-          <p className="text-[12px] text-[#86868b] mt-1">
-            Fleet map in-app · dashboards and drill-downs open in otel-demo Kibana
-          </p>
+      <div className="surface-card p-4 mb-6 flex flex-col gap-4">
+        <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[12px] text-[#86868b]">Elastic Serverless · Observability</p>
+            <p className="text-[14px] font-medium text-[#1d1d1f] mt-0.5">
+              {kibanaUrl.replace('https://', '')}
+            </p>
+            <p className="text-[13px] text-[#86868b] mt-2 leading-relaxed max-w-2xl">
+              {TELEMATICS_TELEMETRY_SUMMARY}
+            </p>
+          </div>
+          <a
+            href={dashboardUrl || OTEL_DEMO_KIBANA_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary text-center text-[13px] shrink-0 self-start"
+          >
+            Open telematics dashboard
+          </a>
         </div>
-        <a
-          href={dashboardUrl || OTEL_DEMO_KIBANA_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-primary text-center text-[13px] shrink-0"
-        >
-          Open telematics dashboard
-        </a>
+
+        <div className="flex flex-wrap gap-2 pt-1 border-t border-[#e8e8ed]">
+          {TELEMATICS_TELEMETRY_SOURCES.map(source => (
+            <span
+              key={source.id}
+              title={`${source.detail} → ${source.destination}`}
+              className="inline-flex items-center rounded-full border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-1 text-[11px] font-medium text-[#1d1d1f]"
+            >
+              {source.label}
+            </span>
+          ))}
+        </div>
+        <p className="text-[11px] text-[#86868b] leading-relaxed -mt-1">
+          Fleet map in-app · Kibana drill-downs use the same otel-demo indices (OTLP + Prometheus scrape)
+        </p>
       </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -104,7 +122,7 @@ export function AutomobileTelematicsDemo() {
         <StatCard
           label="Telemetry messages / min"
           value={formatCount(summary.messagesPerMin)}
-          trend="OBD · CAN · GPS · diagnostics"
+          trend="OpenTelemetry logs · Prometheus metrics"
           highlight
           kibanaUrl={kibanaUrl}
           kibanaSection="discover"
