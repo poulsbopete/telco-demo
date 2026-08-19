@@ -53,7 +53,8 @@ export function TelematicsDeviceDetail({ gateway, onClose, kibanaUrl }) {
         </p>
         <p>
           Ingest path: vehicle OBD / telematics unit → {gateway.networkType} → regional gateway →
-          Kafka → Logstash → Elasticsearch. ML jobs watch message-rate and latency anomalies per region.
+          Kafka → OpenTelemetry Collector → Elasticsearch (logs + traces) and Prometheus scrape (metrics).
+          ML jobs watch message-rate and latency anomalies per region.
         </p>
       </div>
 
