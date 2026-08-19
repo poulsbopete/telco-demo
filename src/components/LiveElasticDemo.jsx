@@ -209,8 +209,8 @@ export function LiveElasticDemo() {
   return (
     <div>
       <ModuleHeader
-        title="Network telemetry"
-        subtitle="Live OpenTelemetry — regions, core services, and ML signals."
+        title="iPhone Launch"
+        subtitle="Live OpenTelemetry — launch weekend regions, core services, and ML signals."
         badge={health?.connected ? 'Live · Elastic Serverless' : 'Offline'}
       >
         <button type="button" onClick={load} disabled={loading} className="btn-quiet flex items-center gap-1.5">

@@ -13,7 +13,7 @@ import { CcrArchitectureExplainer } from './components/CcrArchitectureExplainer'
 import { AutomobileTelematicsDemo } from './components/AutomobileTelematicsDemo';
 
 const MODULES = [
-  { id: 'live', label: 'Telemetry', live: true },
+  { id: 'live', label: 'iPhone Launch', live: true },
   { id: 'telematics', label: 'Telematics', live: true },
   { id: 'adaptive-networks', label: 'Networks', live: true },
   { id: 'incident-response', label: 'Response' },
