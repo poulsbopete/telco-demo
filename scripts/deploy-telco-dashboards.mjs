@@ -4,6 +4,7 @@
  *
  * Usage:
  *   npm run deploy:dashboard:observability
+ *   npm run deploy:dashboard:telematics
  *   npm run deploy:dashboard:search
  *   npm run deploy:dashboard:security
  *
@@ -35,6 +36,13 @@ const TARGET_DEFAULTS = {
     kibanaUrl: process.env.VITE_KIBANA_URL || process.env.KIBANA_URL,
     apiKey: process.env.KIBANA_API_KEY || process.env.ES_API_KEY,
   },
+  telematics: {
+    kibanaUrl:
+      process.env.VITE_KIBANA_URL
+      || process.env.KIBANA_URL
+      || 'https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud',
+    apiKey: process.env.KIBANA_API_KEY || process.env.ES_API_KEY,
+  },
   search: {
     kibanaUrl: process.env.KIBANA_BASE_URL || process.env.VITE_SEARCH_KIBANA_URL || process.env.SEARCH_KIBANA_URL,
     apiKey: process.env.KIBANA_API_KEY || process.env.SEARCH_KIBANA_API_KEY,
@@ -49,8 +57,8 @@ const defaults = TARGET_DEFAULTS[TARGET] || {};
 const KIBANA_URL = (defaults.kibanaUrl || '').replace(/\/$/, '');
 const API_KEY = defaults.apiKey || '';
 
-if (!TARGET || !['observability', 'search', 'security'].includes(TARGET)) {
-  console.error('Usage: KIBANA_URL=... KIBANA_API_KEY=... node scripts/deploy-telco-dashboards.mjs <observability|search|security>');
+if (!TARGET || !['observability', 'telematics', 'search', 'security'].includes(TARGET)) {
+  console.error('Usage: KIBANA_URL=... KIBANA_API_KEY=... node scripts/deploy-telco-dashboards.mjs <observability|telematics|search|security>');
   process.exit(1);
 }
 
@@ -163,6 +171,26 @@ const TELCO_CORE_COLORS = {
   'Customer Self-Care Portal': '#54b399',
   'Network Event Bus': '#9170b8',
 };
+
+const TELEMATICS_IOT_COLORS = {
+  'Vehicle Gateway (OBD/CAN)': '#6092C0',
+  'Subscription & Billing': '#00bfb3',
+  'Fleet Provisioning': '#e20074',
+  'Anomaly Detection': '#f5a700',
+  'Driver Portal': '#54b399',
+  'Telematics Event Bus': '#9170b8',
+};
+
+const TELEMATICS_SERVICE_EVAL = [
+  '| EVAL iot_subsystem = CASE(',
+  'service.name == "checkout" OR service.name == "checkoutservice", "Vehicle Gateway (OBD/CAN)",',
+  'service.name == "payment" OR service.name == "paymentservice", "Subscription & Billing",',
+  'service.name == "cart", "Fleet Provisioning",',
+  'service.name == "frauddetectionservice", "Anomaly Detection",',
+  'service.name == "frontend-web", "Driver Portal",',
+  'service.name == "kafka", "Telematics Event Bus",',
+  'COALESCE(service.name, "Unknown"))',
+].join(' ');
 
 const TARGETS = {
   observability: {
@@ -416,6 +444,220 @@ ${TELCO_SERVICE_EVAL}
           },
         },
         layout: { x: 24, y: 34, w: 24, h: 10 },
+      },
+    ],
+  },
+  telematics: {
+    dashboardId: 'telco-demo-automotive-telematics',
+    title: 'Automotive Telematics & IoT',
+    description:
+      'Connected-vehicle telemetry remapped from otel-demo microservices — ingest volume, subsystem errors, event bus, and edge network faults.',
+    timeFrom: O11Y_DASHBOARD_TIME_FROM,
+    visualizations: [
+      {
+        id: 'telco-telematics-volume',
+        title: 'Telemetry Message Volume Over Time',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Telemetry Message Volume Over Time',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+| STATS count = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend)
+| SORT bucket ASC`,
+            },
+          },
+          mark: { type: 'area', line: true, opacity: 0.35, color: '#6092C0' },
+          encoding: {
+            x: { field: 'bucket', type: 'temporal', title: 'Time' },
+            y: { field: 'count', type: 'quantitative', title: 'Messages' },
+            tooltip: [
+              { field: 'bucket', type: 'temporal', title: 'Time' },
+              { field: 'count', type: 'quantitative', title: 'Messages', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 0, y: 0, w: 48, h: 10 },
+      },
+      {
+        id: 'telco-telematics-by-subsystem',
+        title: 'Messages by Vehicle Subsystem',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Messages by Vehicle Subsystem',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+${ES_QL_TIME_WHERE}
+| WHERE ${TELCO_OTEL_SERVICE_FILTER}
+${TELEMATICS_SERVICE_EVAL}
+| STATS volume = COUNT(*) BY iot_subsystem
+| SORT volume DESC
+| LIMIT 10`,
+            },
+          },
+          mark: 'bar',
+          encoding: {
+            y: { field: 'iot_subsystem', type: 'nominal', sort: '-x', title: 'Subsystem' },
+            x: { field: 'volume', type: 'quantitative', title: 'Messages', axis: { format: '~s' } },
+            color: {
+              field: 'iot_subsystem',
+              type: 'nominal',
+              legend: null,
+              scale: {
+                domain: Object.keys(TELEMATICS_IOT_COLORS),
+                range: Object.values(TELEMATICS_IOT_COLORS),
+              },
+            },
+            tooltip: [
+              { field: 'iot_subsystem', type: 'nominal', title: 'Subsystem' },
+              { field: 'volume', type: 'quantitative', title: 'Messages', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 0, y: 10, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-telematics-error-rate',
+        title: 'Gateway Error Rate by Subsystem',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Gateway Error Rate by Subsystem',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+${ES_QL_TIME_WHERE}
+| WHERE ${TELCO_OTEL_SERVICE_FILTER}
+${TELEMATICS_SERVICE_EVAL}
+| STATS volume = COUNT(*), errors = COUNT(*) WHERE log.level IN ("ERROR", "Error") BY iot_subsystem
+| EVAL error_rate_pct = ROUND(errors * 100.0 / volume, 3)
+| SORT error_rate_pct DESC
+| LIMIT 10`,
+            },
+          },
+          mark: 'bar',
+          encoding: {
+            y: { field: 'iot_subsystem', type: 'nominal', sort: '-x', title: 'Subsystem' },
+            x: { field: 'error_rate_pct', type: 'quantitative', title: 'Error rate (%)' },
+            color: {
+              field: 'error_rate_pct',
+              type: 'quantitative',
+              legend: null,
+              scale: { scheme: 'reds' },
+            },
+            tooltip: [
+              { field: 'iot_subsystem', type: 'nominal', title: 'Subsystem' },
+              { field: 'errors', type: 'quantitative', title: 'Errors', format: ',.0f' },
+              { field: 'volume', type: 'quantitative', title: 'Messages', format: ',.0f' },
+              { field: 'error_rate_pct', type: 'quantitative', title: 'Error rate %', format: '.3f' },
+            ],
+          },
+        },
+        layout: { x: 24, y: 10, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-telematics-event-bus',
+        title: 'Telematics Event Bus — Volume Over Time',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Telematics Event Bus — Volume Over Time',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+| WHERE service.name == "kafka"
+| STATS events = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend)
+| SORT bucket ASC`,
+            },
+          },
+          mark: { type: 'line', point: { filled: true, size: 40 }, interpolate: 'monotone', color: '#9170b8' },
+          encoding: {
+            x: { field: 'bucket', type: 'temporal', title: 'Time' },
+            y: { field: 'events', type: 'quantitative', title: 'Events' },
+            tooltip: [
+              { field: 'bucket', type: 'temporal', title: 'Time' },
+              { field: 'events', type: 'quantitative', title: 'Events', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 0, y: 22, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-telematics-fleet-provisioning',
+        title: 'Fleet Provisioning — Activation Volume',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Fleet Provisioning — Activation Volume',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM ${TELCO_OTEL_INDEX}
+| WHERE service.name == "cart"
+| STATS events = COUNT(*) BY bucket = BUCKET(@timestamp, 75, ?_tstart, ?_tend)
+| SORT bucket ASC`,
+            },
+          },
+          mark: { type: 'line', point: { filled: true, size: 40 }, interpolate: 'monotone', color: '#e20074' },
+          encoding: {
+            x: { field: 'bucket', type: 'temporal', title: 'Time' },
+            y: { field: 'events', type: 'quantitative', title: 'Provisioning events' },
+            tooltip: [
+              { field: 'bucket', type: 'temporal', title: 'Time' },
+              { field: 'events', type: 'quantitative', title: 'Events', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 24, y: 22, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-telematics-edge-faults',
+        title: 'Edge Network Fault Types (IoT Gateways)',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Edge Network Fault Types (IoT Gateways)',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              ...ES_QL,
+              query: `FROM logs.otel.adaptive-networks*
+| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND severity_text == "ERROR"
+| EVAL fault = CASE(
+    body.text LIKE "*SW_MATM*", "MAC Flap",
+    body.text LIKE "*SPANTREE*", "STP",
+    body.text LIKE "*BGP-3*", "BGP",
+    body.text LIKE "*INTF-4*", "Interface",
+    "Other")
+| STATS errors = COUNT(*) BY fault
+| SORT errors DESC
+| LIMIT 10`,
+            },
+          },
+          mark: 'bar',
+          encoding: {
+            y: { field: 'fault', type: 'nominal', sort: '-x', title: 'Fault type' },
+            x: { field: 'errors', type: 'quantitative', title: 'Events' },
+            color: { value: '#00bfb3' },
+            tooltip: [
+              { field: 'fault', type: 'nominal', title: 'Fault' },
+              { field: 'errors', type: 'quantitative', title: 'Events', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 0, y: 34, w: 48, h: 10 },
       },
     ],
   },

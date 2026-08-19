@@ -14,6 +14,7 @@
     "preview": "vite preview",
     "bootstrap:workflow": "node scripts/bootstrap-kibana-workflow.mjs",
     "deploy:dashboard:observability": "node scripts/deploy-telco-dashboards.mjs observability",
+    "deploy:dashboard:telematics": "node scripts/deploy-telco-dashboards.mjs telematics",
     "deploy:dashboard:search": "node scripts/deploy-telco-dashboards.mjs search",
     "deploy:dashboard:security": "node scripts/deploy-telco-dashboards.mjs security"
   },

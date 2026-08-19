@@ -4,7 +4,17 @@ import { ModuleHeader, StatCard } from './shared/ModuleHeader';
 import { ElasticDeepLinks } from './shared/ElasticDeepLinks';
 import { TelematicsDeviceDetail } from './telematics/TelematicsDeviceDetail';
 import { buildFleetSnapshot, formatCount } from '../lib/telematics-fleet';
-import { kibanaDiscoverUrl, kibanaO11yDashboardUrl } from '../lib/elastic-api';
+import {
+  kibanaDiscoverUrl,
+  kibanaTelematicsDashboardUrl,
+  kibanaApmServicesUrl,
+  kibanaMetricsExplorerUrl,
+  kibanaMlAnomaliesUrl,
+  kibanaO11yOverviewUrl,
+  getOtelDemoKibanaUrl,
+  OTEL_DEMO_KIBANA_URL,
+  TELCO_DISCOVER_ESQL,
+} from '../lib/elastic-api';
 
 const TelematicsWorldMap = lazy(() => import('./telematics/TelematicsWorldMap'));
 
@@ -19,11 +29,22 @@ export function AutomobileTelematicsDemo() {
   const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const kibanaUrl = import.meta.env.VITE_KIBANA_URL;
-  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, {
-    query: 'FROM logs-* | WHERE service.name == "automotive-telematics"',
-  });
-  const dashboardUrl = kibanaO11yDashboardUrl(kibanaUrl);
+  const kibanaUrl = getOtelDemoKibanaUrl();
+  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const dashboardUrl = kibanaTelematicsDashboardUrl(kibanaUrl);
+  const apmUrl = kibanaApmServicesUrl(kibanaUrl);
+  const metricsUrl = kibanaMetricsExplorerUrl(kibanaUrl);
+  const mlUrl = kibanaMlAnomaliesUrl(kibanaUrl);
+  const o11yUrl = kibanaO11yOverviewUrl(kibanaUrl);
+
+  const kibanaLinks = [
+    { href: dashboardUrl, label: 'Dashboard', primary: true, title: 'Automotive telematics dashboard on otel-demo' },
+    { href: discoverUrl, label: 'Discover' },
+    { href: apmUrl, label: 'APM' },
+    { href: metricsUrl, label: 'Metrics' },
+    { href: mlUrl, label: 'ML' },
+    { href: o11yUrl, label: 'Overview' },
+  ];
 
   function refresh() {
     setLoading(true);
@@ -42,20 +63,35 @@ export function AutomobileTelematicsDemo() {
     <div>
       <ModuleHeader
         title="Automobile telematics & IoT"
-        subtitle="Worldwide connected-vehicle gateways — live ingest, latency, and fleet health on Elastic Serverless."
-        badge="Live · Elastic Serverless"
+        subtitle="Worldwide connected-vehicle gateways — live ingest, latency, and fleet health on Elastic Serverless (otel-demo)."
+        badge="Live · otel-demo"
       >
         <button type="button" onClick={refresh} disabled={loading} className="btn-quiet flex items-center gap-1.5">
           <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </button>
-        <ElasticDeepLinks
-          links={[
-            { href: discoverUrl, label: 'Discover', primary: true },
-            { href: dashboardUrl, label: 'Dashboard' },
-          ]}
-        />
+        <ElasticDeepLinks links={kibanaLinks} />
       </ModuleHeader>
+
+      <div className="surface-card p-4 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <p className="text-[12px] text-[#86868b]">Elastic Serverless · Observability</p>
+          <p className="text-[14px] font-medium text-[#1d1d1f] mt-0.5">
+            {kibanaUrl.replace('https://', '')}
+          </p>
+          <p className="text-[12px] text-[#86868b] mt-1">
+            Fleet map in-app · dashboards and drill-downs open in otel-demo Kibana
+          </p>
+        </div>
+        <a
+          href={dashboardUrl || OTEL_DEMO_KIBANA_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="btn-primary text-center text-[13px] shrink-0"
+        >
+          Open telematics dashboard
+        </a>
+      </div>
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard
@@ -63,6 +99,7 @@ export function AutomobileTelematicsDemo() {
           value={formatCount(summary.totalVehicles)}
           trend={`${summary.gatewayCount} regional gateways`}
           kibanaUrl={kibanaUrl}
+          kibanaSection="telematics-dashboard"
         />
         <StatCard
           label="Telemetry messages / min"
@@ -70,6 +107,7 @@ export function AutomobileTelematicsDemo() {
           trend="OBD · CAN · GPS · diagnostics"
           highlight
           kibanaUrl={kibanaUrl}
+          kibanaSection="discover"
         />
         <StatCard
           label="Avg gateway latency"

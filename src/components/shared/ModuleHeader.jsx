@@ -2,6 +2,7 @@ import { ExternalLink } from 'lucide-react';
 import {
   kibanaDiscoverUrl, kibanaSecurityUrl, elasticWorkflowUrl,
   kibanaSearchHomeUrl, kibanaSearchAppUrl, kibanaAgentBuilderUrl,
+  kibanaTelematicsDashboardUrl, kibanaO11yDashboardUrl,
 } from '../../lib/elastic-api';
 
 export function ModuleHeader({ title, subtitle, badge, children }) {
@@ -34,6 +35,8 @@ function resolveKibanaLink(kibanaUrl, section) {
   if (section === 'attack-discovery') return kibanaSecurityUrl(kibanaUrl, 'attackDiscovery');
   if (section === 'security-overview') return kibanaSecurityUrl(kibanaUrl, 'overview');
   if (section === 'workflows') return elasticWorkflowUrl(kibanaUrl);
+  if (section === 'telematics-dashboard') return kibanaTelematicsDashboardUrl(kibanaUrl);
+  if (section === 'dashboard') return kibanaO11yDashboardUrl(kibanaUrl);
   if (section === 'search') return kibanaSearchHomeUrl(kibanaUrl);
   if (section === 'search-app') return kibanaSearchAppUrl(kibanaUrl);
   if (section === 'agent-builder') return kibanaAgentBuilderUrl(kibanaUrl);

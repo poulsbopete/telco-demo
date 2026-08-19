@@ -1,5 +1,6 @@
 import { X } from 'lucide-react';
 import { formatCount } from '../../lib/telematics-fleet';
+import { kibanaDiscoverUrl, kibanaTelematicsDashboardUrl, TELCO_DISCOVER_ESQL } from '../../lib/elastic-api';
 
 const STATUS_STYLE = {
   healthy: 'text-success',
@@ -10,9 +11,8 @@ const STATUS_STYLE = {
 export function TelematicsDeviceDetail({ gateway, onClose, kibanaUrl }) {
   if (!gateway) return null;
 
-  const discoverUrl = kibanaUrl
-    ? `${kibanaUrl.replace(/\/$/, '')}/app/discover#/?_g=(filters:!(),refreshInterval:(pause:!t,value:60000),time:(from:now-24h,to:now))&_a=(columns:!(),filters:!(),index:'logs-*',query:(language:kuery,query:'gateway.id:${encodeURIComponent(gateway.id)}'))`
-    : null;
+  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const dashboardUrl = kibanaTelematicsDashboardUrl(kibanaUrl);
 
   return (
     <div className="surface-card p-5 h-full flex flex-col">
@@ -57,16 +57,28 @@ export function TelematicsDeviceDetail({ gateway, onClose, kibanaUrl }) {
         </p>
       </div>
 
-      {discoverUrl && (
-        <a
-          href={discoverUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 text-[13px] text-[#0071e3] hover:underline"
-        >
-          Open gateway logs in Discover
-        </a>
-      )}
+      <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-[#e8e8ed]">
+        {discoverUrl && (
+          <a
+            href={discoverUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] text-[#0071e3] hover:underline"
+          >
+            Open telemetry in Discover
+          </a>
+        )}
+        {dashboardUrl && (
+          <a
+            href={dashboardUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[13px] text-[#0071e3] hover:underline"
+          >
+            Telematics dashboard
+          </a>
+        )}
+      </div>
     </div>
   );
 }

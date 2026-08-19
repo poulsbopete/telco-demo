@@ -428,8 +428,16 @@ export function kibanaSearchDocumentUrl(kibanaBase, { engine, documentId, query,
   return kibanaSearchAppUrl(kibanaBase, engine);
 }
 
+/** otel-demo observability cluster (default for live demo links) */
+export const OTEL_DEMO_KIBANA_URL = 'https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud';
+
+export function getOtelDemoKibanaUrl() {
+  return (import.meta.env.VITE_KIBANA_URL || OTEL_DEMO_KIBANA_URL).replace(/\/$/, '');
+}
+
 /** Telco demo dashboard IDs (created via scripts/deploy-telco-dashboards.mjs) */
 export const TELCO_O11Y_DASHBOARD_ID = 'telco-demo-network-telemetry';
+export const TELCO_TELEMATICS_DASHBOARD_ID = 'telco-demo-automotive-telematics';
 export const TELCO_SEARCH_DASHBOARD_ID = 'telco-demo-enterprise-search';
 export const TELCO_SECURITY_DASHBOARD_ID = 'telco-demo-elastic-security';
 
@@ -441,9 +449,36 @@ export function kibanaDashboardUrl(kibanaBase, dashboardId) {
 
 export function kibanaO11yDashboardUrl(kibanaBase) {
   return kibanaDashboardUrl(
-    kibanaBase || import.meta.env.VITE_KIBANA_URL || '',
+    kibanaBase || getOtelDemoKibanaUrl(),
     TELCO_O11Y_DASHBOARD_ID,
   );
+}
+
+export function kibanaTelematicsDashboardUrl(kibanaBase) {
+  return kibanaDashboardUrl(
+    kibanaBase || getOtelDemoKibanaUrl(),
+    TELCO_TELEMATICS_DASHBOARD_ID,
+  );
+}
+
+export function kibanaApmServicesUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  return `${base}/app/apm/services?rangeFrom=now-24h&rangeTo=now`;
+}
+
+export function kibanaMetricsExplorerUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  return `${base}/app/metrics/explorer?rangeFrom=now-24h&rangeTo=now`;
+}
+
+export function kibanaMlAnomaliesUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  return `${base}/app/ml/anomaly_detection`;
+}
+
+export function kibanaO11yOverviewUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  return `${base}/app/observability/overview?rangeFrom=now-24h&rangeTo=now`;
 }
 
 export function kibanaSearchDashboardUrl(kibanaBase) {

@@ -899,7 +899,7 @@ function NetworkTopology({ dark }) {
               Secondary site
             </p>
             <p className={`text-[12px] ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-              Ingest · complete cluster · warm standby
+              Ingest · 1d hot + frozen · warm standby
             </p>
           </div>
         </div>
