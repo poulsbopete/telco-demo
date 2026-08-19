@@ -13,7 +13,7 @@ import { CcrArchitectureExplainer } from './components/CcrArchitectureExplainer'
 import { AutomobileTelematicsDemo } from './components/AutomobileTelematicsDemo';
 
 const MODULES = [
-  { id: 'live', label: 'iPhone Launch', live: true },
+  { id: 'live', label: 'iPhone Launch', navLabel: 'Launch', live: true },
   { id: 'telematics', label: 'Telematics', live: true },
   { id: 'adaptive-networks', label: 'Networks', live: true },
   { id: 'incident-response', label: 'Response' },
@@ -50,7 +50,7 @@ function NavButton({ id, label, activeModule, setActiveModule, title }) {
     <button
       type="button"
       onClick={() => setActiveModule(id)}
-      className={`nav-link ${activeModule === id ? 'nav-link-active' : ''}`}
+      className={`nav-link whitespace-nowrap shrink-0 ${activeModule === id ? 'nav-link-active' : ''}`}
       title={title}
     >
       {label}
@@ -70,30 +70,32 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#fbfbfd]">
       <header className="sticky top-0 z-50 bg-[#fbfbfd]/80 backdrop-blur-xl border-b border-[#d2d2d7]/60">
-        <div className="max-w-[980px] mx-auto px-6">
-          <div className="flex items-center justify-between h-11">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1280px]">
+          <div className="flex items-center gap-3 sm:gap-4 h-12">
             <button
               type="button"
               onClick={() => setActiveModule('live')}
-              className="text-[21px] font-semibold tracking-tight text-[#1d1d1f]"
+              className="shrink-0 text-[17px] sm:text-[19px] font-semibold tracking-tight text-[#1d1d1f] whitespace-nowrap"
             >
               Telco NOC
             </button>
 
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden lg:flex flex-1 min-w-0 items-center justify-end gap-0.5 overflow-x-auto nav-scroll">
               {MODULES.map(mod => (
                 <button
                   key={mod.id}
                   type="button"
                   onClick={() => setActiveModule(mod.id)}
-                  className={`nav-link ${activeModule === mod.id ? 'nav-link-active' : ''}`}
+                  title={mod.label}
+                  className={`nav-link whitespace-nowrap ${activeModule === mod.id ? 'nav-link-active' : ''}`}
                 >
-                  {mod.label}
+                  {mod.navLabel || mod.label}
                   {mod.live && activeModule !== mod.id && (
-                    <span className="ml-1 text-[10px] text-[#008009]">●</span>
+                    <span className="ml-1 text-[9px] text-[#008009] align-middle">●</span>
                   )}
                 </button>
               ))}
+              <span className="mx-1 h-4 w-px bg-[#d2d2d7]/80 shrink-0" aria-hidden />
               <NavButton id="presenter" label="Presenter" activeModule={activeModule} setActiveModule={setActiveModule} />
               <NavButton id="slides" label="Slides" activeModule={activeModule} setActiveModule={setActiveModule} />
               <NavButton
@@ -107,7 +109,7 @@ export default function App() {
 
             <button
               type="button"
-              className="md:hidden p-2 -mr-2 text-[#1d1d1f]"
+              className="lg:hidden ml-auto p-2 -mr-2 text-[#1d1d1f] shrink-0"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Menu"
             >
@@ -117,7 +119,7 @@ export default function App() {
         </div>
 
         {mobileMenuOpen && (
-          <nav className="md:hidden border-t border-[#d2d2d7]/60 px-6 py-3 space-y-1 bg-[#fbfbfd]">
+          <nav className="lg:hidden border-t border-[#d2d2d7]/60 px-4 sm:px-6 py-3 space-y-1 bg-[#fbfbfd] max-h-[70vh] overflow-y-auto">
             {[
               ...MODULES.map(m => ({ id: m.id, label: m.label })),
               { id: 'presenter', label: 'Presenter guides' },
