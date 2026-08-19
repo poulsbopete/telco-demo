@@ -19,6 +19,8 @@ import { config as loadEnv } from 'dotenv';
 import { existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { buildTelcoRegionMapEsql, buildTelematicsGatewayMapEsql, TELEMATICS_GATEWAY_INDEX } from '../lib/telco-regions-geo.js';
+import { TELEMATICS_GATEWAY_LOCATIONS } from '../src/lib/telematics-fleet.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -56,6 +58,135 @@ const TARGET_DEFAULTS = {
 const defaults = TARGET_DEFAULTS[TARGET] || {};
 const KIBANA_URL = (defaults.kibanaUrl || '').replace(/\/$/, '');
 const API_KEY = defaults.apiKey || '';
+const ES_URL = (process.env.ES_URL || process.env.ELASTICSEARCH_URL || KIBANA_URL.replace('.kb.', '.es.')).replace(/\/$/, '');
+
+function buildGeoMapVegaSpec({ title, esqlQuery, sizeField, colorField, sizeTitle, extraTooltips = [] }) {
+  return {
+    $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+    title,
+    width: 'container',
+    height: 'container',
+    autosize: { type: 'fit', contains: 'padding' },
+    config: { view: { stroke: null } },
+    projection: { type: 'naturalEarth1' },
+    data: {
+      url: {
+        ...ES_QL,
+        query: esqlQuery,
+      },
+    },
+    mark: { type: 'circle', opacity: 0.88, stroke: 'white', strokeWidth: 1.2 },
+    encoding: {
+      longitude: { field: 'longitude', type: 'quantitative' },
+      latitude: { field: 'latitude', type: 'quantitative' },
+      size: {
+        field: sizeField,
+        type: 'quantitative',
+        scale: { range: [120, 900] },
+        legend: { title: sizeTitle || 'Volume' },
+      },
+      color: {
+        field: colorField,
+        type: 'nominal',
+        legend: { orient: 'bottom', columns: 2 },
+        scale: colorField === 'status'
+          ? { domain: ['healthy', 'degraded', 'offline'], range: ['#008009', '#bf4800', '#cc0000'] }
+          : undefined,
+      },
+      tooltip: [
+        ...extraTooltips,
+        { field: colorField, type: 'nominal', title: colorField === 'status' ? 'Status' : 'Region' },
+        { field: 'latitude', type: 'quantitative', title: 'Lat', format: '.2f' },
+        { field: 'longitude', type: 'quantitative', title: 'Lon', format: '.2f' },
+        { field: sizeField, type: 'quantitative', title: sizeTitle || 'Volume', format: ',.0f' },
+      ],
+    },
+  };
+}
+
+function buildGatewayDocs() {
+  return TELEMATICS_GATEWAY_LOCATIONS.map((gw, i) => ({
+    gateway_id: gw.id,
+    gateway_name: gw.name,
+    city: gw.city,
+    country: gw.country,
+    region: gw.region,
+    latitude: gw.latitude,
+    longitude: gw.longitude,
+    location: { lat: gw.latitude, lon: gw.longitude },
+    connected_vehicles: 12000 + i * 850,
+    messages_per_min: 4800 + i * 420,
+    status: i % 11 === 0 ? 'offline' : i % 5 === 0 ? 'degraded' : 'healthy',
+  }));
+}
+
+async function esFetch(path, options = {}) {
+  const headers = {
+    Authorization: `ApiKey ${API_KEY}`,
+    ...options.headers,
+  };
+  const res = await fetch(`${ES_URL}${path}`, { ...options, headers });
+  const text = await res.text();
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    data = { raw: text };
+  }
+  if (!res.ok) {
+    throw new Error(data.error?.reason || data.error?.type || text || `ES request failed (${res.status})`);
+  }
+  return data;
+}
+
+async function ensureTelematicsGatewayIndex() {
+  if (!ES_URL || !API_KEY) {
+    console.warn('ES_URL or API key missing — skipping IoT gateway geo index');
+    return;
+  }
+
+  const docs = buildGatewayDocs();
+  await esFetch(`/${TELEMATICS_GATEWAY_INDEX}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      mappings: {
+        properties: {
+          location: { type: 'geo_point' },
+          latitude: { type: 'double' },
+          longitude: { type: 'double' },
+          connected_vehicles: { type: 'integer' },
+          messages_per_min: { type: 'integer' },
+          status: { type: 'keyword' },
+          gateway_id: { type: 'keyword' },
+          gateway_name: { type: 'keyword' },
+          city: { type: 'keyword' },
+          country: { type: 'keyword' },
+          region: { type: 'keyword' },
+        },
+      },
+    }),
+  });
+
+  const bulk = docs.flatMap(doc => [
+    JSON.stringify({ index: { _index: TELEMATICS_GATEWAY_INDEX, _id: doc.gateway_id } }),
+    JSON.stringify(doc),
+  ]).join('\n').concat('\n');
+
+  const bulkRes = await esFetch('/_bulk', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-ndjson' },
+    body: bulk,
+  });
+  if (bulkRes.errors) {
+    const first = bulkRes.items?.find(item => item.index?.error);
+    throw new Error(first?.index?.error?.reason || 'Bulk index failed');
+  }
+  console.log(`Indexed ${docs.length} IoT gateway geo documents → ${TELEMATICS_GATEWAY_INDEX}`);
+}
+
+const TELCO_REGION_MAP_ESQL = buildTelcoRegionMapEsql();
+const TELEMATICS_GATEWAY_MAP_ESQL = buildTelematicsGatewayMapEsql();
 
 if (!TARGET || !['observability', 'telematics', 'search', 'security'].includes(TARGET)) {
   console.error('Usage: KIBANA_URL=... KIBANA_API_KEY=... node scripts/deploy-telco-dashboards.mjs <observability|telematics|search|security>');
@@ -445,6 +576,18 @@ ${TELCO_SERVICE_EVAL}
         },
         layout: { x: 24, y: 34, w: 24, h: 10 },
       },
+      {
+        id: 'telco-o11y-region-map',
+        title: 'iPhone Launch — Log Volume by Region',
+        spec: buildGeoMapVegaSpec({
+          title: 'iPhone Launch — Log Volume by Region',
+          esqlQuery: TELCO_REGION_MAP_ESQL,
+          sizeField: 'volume',
+          colorField: 'region_name',
+          sizeTitle: 'Log events',
+        }),
+        layout: { x: 0, y: 44, w: 48, h: 14 },
+      },
     ],
   },
   telematics: {
@@ -658,6 +801,24 @@ ${TELEMATICS_SERVICE_EVAL}
           },
         },
         layout: { x: 0, y: 34, w: 48, h: 10 },
+      },
+      {
+        id: 'telco-telematics-gateway-map',
+        title: 'Connected Vehicle Gateways — Worldwide Fleet',
+        spec: buildGeoMapVegaSpec({
+          title: 'Connected Vehicle Gateways — Worldwide Fleet',
+          esqlQuery: TELEMATICS_GATEWAY_MAP_ESQL,
+          sizeField: 'connected_vehicles',
+          colorField: 'status',
+          sizeTitle: 'Vehicles',
+          extraTooltips: [
+            { field: 'gateway_name', type: 'nominal', title: 'Gateway' },
+            { field: 'city', type: 'nominal', title: 'City' },
+            { field: 'country', type: 'nominal', title: 'Country' },
+            { field: 'region', type: 'nominal', title: 'Region' },
+          ],
+        }),
+        layout: { x: 0, y: 44, w: 48, h: 14 },
       },
     ],
   },
@@ -892,6 +1053,10 @@ async function importObjects(objects) {
 }
 
 async function main() {
+  if (TARGET === 'telematics') {
+    await ensureTelematicsGatewayIndex();
+  }
+
   const cfg = TARGETS[TARGET];
   const objects = [
     ...cfg.visualizations.map(v => buildVisualization(v.id, v.title, v.spec)),

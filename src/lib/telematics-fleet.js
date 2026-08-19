@@ -1,5 +1,3 @@
-/** Simulated connected-vehicle / IoT gateway fleet for demo map */
-
 const GATEWAYS = [
   { id: 'gw-us-east', name: 'Northeast hub', city: 'New York', country: 'US', latitude: 40.7128, longitude: -74.006, region: 'Americas' },
   { id: 'gw-us-west', name: 'West coast hub', city: 'San Francisco', country: 'US', latitude: 37.7749, longitude: -122.4194, region: 'Americas' },
@@ -24,6 +22,9 @@ const GATEWAYS = [
   { id: 'gw-au-syd', name: 'Sydney fleet PoP', city: 'Sydney', country: 'AU', latitude: -33.8688, longitude: 151.2093, region: 'APAC' },
   { id: 'gw-nz-akl', name: 'Auckland logistics', city: 'Auckland', country: 'NZ', latitude: -36.8485, longitude: 174.7633, region: 'APAC' },
 ];
+
+/** Static gateway locations for Elastic map index (deploy script) */
+export const TELEMATICS_GATEWAY_LOCATIONS = GATEWAYS;
 
 const NETWORK_TYPES = ['5G SA', '5G NSA', 'LTE-M', 'NB-IoT'];
 function hashSeed(str) {
