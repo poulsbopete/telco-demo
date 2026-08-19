@@ -297,18 +297,117 @@ telco-demo-sage.vercel.app · live demo ~12 min
 
 ---
 
+<span class="kicker">TELCO NOC DEMO</span>
+
+# Telco NOC · eight lenses on one platform
+
+<p class="subhead">Each tab in <strong>telco-demo-sage.vercel.app</strong> tells one chapter of the launch story — what operators see, why it matters at scale, and how <strong>Elastic Serverless</strong> solves it without another silo.</p>
+
+<div class="pillar-grid">
+  <div class="pillar"><b>iPhone Launch</b>Live OTel · regions · ML · business KPIs</div>
+  <div class="pillar"><b>Telematics</b>Global IoT gateways · fleet map · geo dashboards</div>
+  <div class="pillar"><b>Networks</b>Fault inject · ML correlate · workflow act</div>
+  <div class="pillar"><b>Response</b>Reactive · proactive · knowledge loops</div>
+  <div class="pillar"><b>Search</b>IVR/chat · KB deflection · Agent Builder</div>
+  <div class="pillar"><b>Scale</b>Retention · cost · streams · executive SLOs</div>
+  <div class="pillar"><b>Security</b>SIEM · SIM swap · cases · detection rules</div>
+  <div class="pillar"><b>Site DR</b>Dual ingest · CCR · snapshots · RPO/RTO</div>
+</div>
+
+<div class="slide-foot"><span>telco-demo-sage.vercel.app</span><span>One ingest path · ES|QL everywhere</span></div>
+
+---
+
+# iPhone Launch · Telematics
+
+<div class="bridge-cols">
+  <div class="bridge-box win">
+    <h3>iPhone Launch</h3>
+    <p><strong>What:</strong> Real OpenTelemetry from Serverless — regional hotspots, 5G core pipeline remapped from OTel services, ML lifecycle forecast, churn and revenue KPIs for launch weekend.</p>
+    <p><strong>Why:</strong> A device launch is a <em>software event</em> — provisioning, signaling, and CDN spikes hit together. Static thresholds generate thousands of alerts; teams need context before subscribers churn.</p>
+    <p><strong>Solve with Elastic:</strong> ES|QL in Discover · Vega dashboards with geo maps · AIOps log-rate analysis · ML anomaly jobs · deep links to APM, Metrics, and Workflows on the same OTel data you already ingest.</p>
+  </div>
+  <div class="bridge-box win">
+    <h3>Telematics</h3>
+    <p><strong>What:</strong> Worldwide connected-vehicle gateway map — ingest latency, messages/min, fleet health by region, with Kibana dashboards and ES|QL drill-downs on otel-demo.</p>
+    <p><strong>Why:</strong> Automotive IoT scales to millions of OBD/CAN/GPS messages at the edge. One degraded gateway strands an entire regional fleet; ops need geo context, not another table.</p>
+    <p><strong>Solve with Elastic:</strong> Geo-indexed gateway fleet · ES|QL scoped by region · telematics dashboards · ML on message-rate anomalies · same Serverless Observability project as the core network.</p>
+  </div>
+</div>
+
+---
+
+# Networks · Response
+
+<div class="bridge-cols">
+  <div class="bridge-box win">
+    <h3>Networks</h3>
+    <p><strong>What:</strong> Inject transport/routing faults (MAC flap, BGP, STP) and watch ML correlate telemetry before an Elastic Workflow remediates — Adaptive Networks on live OTel.</p>
+    <p><strong>Why:</strong> Transport faults look like core signaling issues during launch. Without correlation, NOC rotates consoles for 20 minutes while p99 latency breaches SLA.</p>
+    <p><strong>Solve with Elastic:</strong> Fault injection via OTLP · ES|QL on adaptive-networks logs · ML jobs on link loss · Workflows with approval gates · cases and alerting in one Kibana project.</p>
+  </div>
+  <div class="bridge-box win">
+    <h3>Response</h3>
+    <p><strong>What:</strong> Three incident loops — reactive triage, proactive ML→workflow, and knowledge feedback — with A2A federation across Observability, Security, and Enterprise Search agents.</p>
+    <p><strong>Why:</strong> P1 incidents span metrics, runbooks, and SOC context. Copy-pasting between tools burns the proactive window ML gave you.</p>
+    <p><strong>Solve with Elastic:</strong> Elastic Workflows · A2A agent calls (metrics, Security, Search) · runbook retrieval from telco KB · closed-loop remediation on checkout/signaling latency.</p>
+  </div>
+</div>
+
+---
+
+# Search · Scale
+
+<div class="bridge-cols">
+  <div class="bridge-box win">
+    <h3>Search</h3>
+    <p><strong>What:</strong> IVR/chat simulator — subscribers ask eSIM, activation, trade-in, and pickup questions; answers come from semantic search over the telco knowledge base (ELSER).</p>
+    <p><strong>Why:</strong> Launch weekend care volume spikes 340%. Every avoided escalation protects high-value segments and keeps NOC focused on network — not password resets.</p>
+    <p><strong>Solve with Elastic:</strong> Enterprise Search on telco-tmobile-kb · hybrid + semantic retrieval · Agent Builder · Discover ES|QL on KB index · deflect tickets before they become P1 noise.</p>
+  </div>
+  <div class="bridge-box win">
+    <h3>Scale</h3>
+    <p><strong>What:</strong> Executive observability view — ingest growth, retention tiers, Searchable Snapshots economics, Streams callouts, trace volume, and ML signal intelligence at platform scale.</p>
+    <p><strong>Why:</strong> Telco EBITDA pressure meets petabyte growth. Teams shed logs under cost pressure and lose the signals ML needs — a false economy before the next launch.</p>
+    <p><strong>Solve with Elastic:</strong> Serverless scale-to-zero ingest · unified logs/metrics/traces · ILM + frozen tiers · cost calculator vs legacy SIEM/O11y sprawl · one query language (ES|QL) for board and engineer.</p>
+  </div>
+</div>
+
+---
+
+# Security · Site DR
+
+<div class="bridge-cols">
+  <div class="bridge-box win">
+    <h3>Security</h3>
+    <p><strong>What:</strong> Elastic Security — launch SIM-swap alerts, detection rules, cases, Attack Discovery, and security workflows federated with the observability incident.</p>
+    <p><strong>Why:</strong> Fraud spikes alongside legitimate activations. A credential surge can be DDoS, SIM swap, or launch traffic — SOC and SRE need shared context, not dueling narratives.</p>
+    <p><strong>Solve with Elastic:</strong> SIEM on Serverless · prebuilt + custom detection rules · cases with observables · cross-project deep links · ML on auth anomalies · same ES|QL for hunt and dashboard.</p>
+  </div>
+  <div class="bridge-box win">
+    <h3>Site DR</h3>
+    <p><strong>What:</strong> Interactive DR explainer — dual ingest vs CCR vs hybrid, mandatory snapshot repository, RPO/RTO sliders, DR tier (1d hot + frozen), component matrix for telco sites.</p>
+    <p><strong>Why:</strong> Boards and regulators expect deliberate failover — not hope. Transforms need write-capable DR; snapshots are the corruption undo under every strategy.</p>
+    <p><strong>Solve with Elastic:</strong> Dual Logstash consumer groups · cross-cluster replication where RPO demands it · shared object-storage snapshots · frozen DR tiers for cost · warm ML standby options.</p>
+  </div>
+</div>
+
+<div class="callout"><strong>Talk track:</strong> Start with <strong>iPhone Launch</strong> (stakes) → <strong>Networks + Response</strong> (act) → <strong>Search</strong> (deflect) → <strong>Security</strong> (fraud) → <strong>Scale + Site DR</strong> (executive close).</div>
+
+---
+
 # Live demo · ~12 minutes
 
-**Open** [telco-demo-sage.vercel.app](https://telco-demo-sage.vercel.app) → **Telemetry** tab
+**Open** [telco-demo-sage.vercel.app](https://telco-demo-sage.vercel.app) → **iPhone Launch** tab
 
 <div class="walk-steps">
   <div class="walk-step"><div class="num">1</div><div><b>Launch strip</b></div><div><span>847K activations · 340% spike · $142M gross-add</span></div></div>
-  <div class="walk-step"><div class="num">2</div><div><b>Live OTel</b></div><div><span>Real Serverless data · same agents you run today</span></div></div>
-  <div class="walk-step"><div class="num">3</div><div><b>ML lifecycle</b></div><div><span>Surge vs forecast · see the wave ~2h early</span></div></div>
-  <div class="walk-step"><div class="num">4</div><div><b>Region hotspots</b></div><div><span>NYC retail · CDN edge · West fiber</span></div></div>
-  <div class="walk-step"><div class="num">5</div><div><b>Business KPIs</b></div><div><span>84K churn-risk · care load · revenue next 4h</span></div></div>
-  <div class="walk-step"><div class="num">6</div><div><b>Networks</b></div><div><span>Fault inject → ML correlate → workflow</span></div></div>
-  <div class="walk-step"><div class="num">7</div><div><b>Security · optional</b></div><div><span>Launch SIM swap · 30 sec</span></div></div>
+  <div class="walk-step"><div class="num">2</div><div><b>Live OTel</b></div><div><span>Real Serverless data · ES|QL · geo map by region</span></div></div>
+  <div class="walk-step"><div class="num">3</div><div><b>ML lifecycle</b></div><div><span>Surge vs forecast · AIOps log-rate analysis</span></div></div>
+  <div class="walk-step"><div class="num">4</div><div><b>Telematics</b></div><div><span>Global gateway map · Kibana dashboard drill-down</span></div></div>
+  <div class="walk-step"><div class="num">5</div><div><b>Networks</b></div><div><span>Fault inject → ML correlate → workflow</span></div></div>
+  <div class="walk-step"><div class="num">6</div><div><b>Response · Search</b></div><div><span>Workflow + KB deflection · optional Security SIM swap</span></div></div>
+  <div class="walk-step"><div class="num">7</div><div><b>Scale · Site DR</b></div><div><span>Executive retention story · DR architecture close</span></div></div>
 </div>
 
 <p class="muted"><a href="/presenter/view.html?doc=demo-walk">Full script</a> · <a href="/presenter/view.html?doc=landscape">Landscape reference</a> · <a href="/presenter/">All guides</a></p>
@@ -364,4 +463,4 @@ telco-demo-sage.vercel.app · live demo ~12 min
 
 Engineering the future of telecom resilience — together
 
-telco-demo-sage.vercel.app → **Telemetry**
+telco-demo-sage.vercel.app → **iPhone Launch**
