@@ -68,6 +68,9 @@ function buildGeoMapVegaSpec({
   sizeTitle,
   extraTooltips = [],
   useTimeContext = true,
+  mapLatitude = 20,
+  mapLongitude = 0,
+  mapZoom = 1,
 }) {
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
@@ -75,8 +78,21 @@ function buildGeoMapVegaSpec({
     width: 'container',
     height: 'container',
     autosize: { type: 'fit', contains: 'padding' },
-    config: { view: { stroke: null } },
-    projection: { type: 'naturalEarth1' },
+    config: {
+      view: { stroke: null },
+      kibana: {
+        type: 'map',
+        latitude: mapLatitude,
+        longitude: mapLongitude,
+        zoom: mapZoom,
+        minZoom: 0,
+        maxZoom: 12,
+        scrollWheelZoom: false,
+        zoomControl: false,
+        emsTileServiceId: 'road_map_desaturated',
+        delayRepaint: true,
+      },
+    },
     data: {
       url: {
         ...(useTimeContext ? ES_QL : { '%type%': 'esql', '%context%': false }),
@@ -623,6 +639,25 @@ ${TELCO_SERVICE_EVAL}
     timeFrom: O11Y_DASHBOARD_TIME_FROM,
     visualizations: [
       {
+        id: 'telco-telematics-gateway-map',
+        title: 'Connected Vehicle Gateways — Worldwide Fleet',
+        spec: buildGeoMapVegaSpec({
+          title: 'Connected Vehicle Gateways — Worldwide Fleet',
+          esqlQuery: TELEMATICS_GATEWAY_MAP_ESQL,
+          sizeField: 'connected_vehicles',
+          colorField: 'status',
+          sizeTitle: 'Vehicles',
+          useTimeContext: false,
+          extraTooltips: [
+            { field: 'gateway_name', type: 'nominal', title: 'Gateway' },
+            { field: 'city', type: 'nominal', title: 'City' },
+            { field: 'country', type: 'nominal', title: 'Country' },
+            { field: 'region', type: 'nominal', title: 'Region' },
+          ],
+        }),
+        layout: { x: 0, y: 0, w: 48, h: 14 },
+      },
+      {
         id: 'telco-telematics-volume',
         title: 'Telemetry Message Volume Over Time',
         spec: {
@@ -648,7 +683,7 @@ ${TELCO_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 0, w: 48, h: 10 },
+        layout: { x: 0, y: 14, w: 48, h: 10 },
       },
       {
         id: 'telco-telematics-by-subsystem',
@@ -689,7 +724,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 10, w: 24, h: 12 },
+        layout: { x: 0, y: 24, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-error-rate',
@@ -730,7 +765,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 24, y: 10, w: 24, h: 12 },
+        layout: { x: 24, y: 24, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-event-bus',
@@ -759,7 +794,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 22, w: 24, h: 12 },
+        layout: { x: 0, y: 36, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-fleet-provisioning',
@@ -788,7 +823,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 24, y: 22, w: 24, h: 12 },
+        layout: { x: 24, y: 36, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-edge-faults',
@@ -825,26 +860,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 34, w: 48, h: 10 },
-      },
-      {
-        id: 'telco-telematics-gateway-map',
-        title: 'Connected Vehicle Gateways — Worldwide Fleet',
-        spec: buildGeoMapVegaSpec({
-          title: 'Connected Vehicle Gateways — Worldwide Fleet',
-          esqlQuery: TELEMATICS_GATEWAY_MAP_ESQL,
-          sizeField: 'connected_vehicles',
-          colorField: 'status',
-          sizeTitle: 'Vehicles',
-          useTimeContext: false,
-          extraTooltips: [
-            { field: 'gateway_name', type: 'nominal', title: 'Gateway' },
-            { field: 'city', type: 'nominal', title: 'City' },
-            { field: 'country', type: 'nominal', title: 'Country' },
-            { field: 'region', type: 'nominal', title: 'Region' },
-          ],
-        }),
-        layout: { x: 0, y: 44, w: 48, h: 14 },
+        layout: { x: 0, y: 48, w: 48, h: 10 },
       },
     ],
   },
