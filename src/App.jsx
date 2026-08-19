@@ -10,9 +10,11 @@ import { SlidesEmbed, PresenterEmbed, WorkshopDeckEmbed } from './components/Fra
 import { WorkshopLabEmbed } from './components/WorkshopLabEmbed';
 import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
 import { CcrArchitectureExplainer } from './components/CcrArchitectureExplainer';
+import { AutomobileTelematicsDemo } from './components/AutomobileTelematicsDemo';
 
 const MODULES = [
   { id: 'live', label: 'Telemetry', live: true },
+  { id: 'telematics', label: 'Telematics', live: true },
   { id: 'adaptive-networks', label: 'Networks', live: true },
   { id: 'incident-response', label: 'Response' },
   { id: 'search', label: 'Search' },
@@ -28,6 +30,7 @@ const INSTRUQT_URL =
 
 const MODULE_COMPONENTS = {
   live: LiveElasticDemo,
+  telematics: AutomobileTelematicsDemo,
   'adaptive-networks': AdaptiveNetworksDemo,
   'incident-response': IncidentResponseDemo,
   search: ChatSimulator,

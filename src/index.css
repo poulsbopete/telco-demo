@@ -146,3 +146,14 @@ body {
 .animate-count {
   animation: count-up 0.3s ease-out;
 }
+
+.leaflet-container {
+  font-family: inherit;
+  z-index: 0;
+}
+
+.leaflet-pane,
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 1;
+}
