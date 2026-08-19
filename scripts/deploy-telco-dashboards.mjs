@@ -60,7 +60,15 @@ const KIBANA_URL = (defaults.kibanaUrl || '').replace(/\/$/, '');
 const API_KEY = defaults.apiKey || '';
 const ES_URL = (process.env.ES_URL || process.env.ELASTICSEARCH_URL || KIBANA_URL.replace('.kb.', '.es.')).replace(/\/$/, '');
 
-function buildGeoMapVegaSpec({ title, esqlQuery, sizeField, colorField, sizeTitle, extraTooltips = [] }) {
+function buildGeoMapVegaSpec({
+  title,
+  esqlQuery,
+  sizeField,
+  colorField,
+  sizeTitle,
+  extraTooltips = [],
+  useTimeContext = true,
+}) {
   return {
     $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
     title,
@@ -71,7 +79,7 @@ function buildGeoMapVegaSpec({ title, esqlQuery, sizeField, colorField, sizeTitl
     projection: { type: 'naturalEarth1' },
     data: {
       url: {
-        ...ES_QL,
+        ...(useTimeContext ? ES_QL : { '%type%': 'esql', '%context%': false }),
         query: esqlQuery,
       },
     },
@@ -105,7 +113,9 @@ function buildGeoMapVegaSpec({ title, esqlQuery, sizeField, colorField, sizeTitl
 }
 
 function buildGatewayDocs() {
+  const now = new Date().toISOString();
   return TELEMATICS_GATEWAY_LOCATIONS.map((gw, i) => ({
+    '@timestamp': now,
     gateway_id: gw.id,
     gateway_name: gw.name,
     city: gw.city,
@@ -146,27 +156,42 @@ async function ensureTelematicsGatewayIndex() {
   }
 
   const docs = buildGatewayDocs();
-  await esFetch(`/${TELEMATICS_GATEWAY_INDEX}`, {
+  const mapping = {
+    properties: {
+      '@timestamp': { type: 'date' },
+      location: { type: 'geo_point' },
+      latitude: { type: 'double' },
+      longitude: { type: 'double' },
+      connected_vehicles: { type: 'integer' },
+      messages_per_min: { type: 'integer' },
+      status: { type: 'keyword' },
+      gateway_id: { type: 'keyword' },
+      gateway_name: { type: 'keyword' },
+      city: { type: 'keyword' },
+      country: { type: 'keyword' },
+      region: { type: 'keyword' },
+    },
+  };
+
+  const indexRes = await fetch(`${ES_URL}/${TELEMATICS_GATEWAY_INDEX}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mappings: {
-        properties: {
-          location: { type: 'geo_point' },
-          latitude: { type: 'double' },
-          longitude: { type: 'double' },
-          connected_vehicles: { type: 'integer' },
-          messages_per_min: { type: 'integer' },
-          status: { type: 'keyword' },
-          gateway_id: { type: 'keyword' },
-          gateway_name: { type: 'keyword' },
-          city: { type: 'keyword' },
-          country: { type: 'keyword' },
-          region: { type: 'keyword' },
-        },
-      },
-    }),
+    headers: {
+      Authorization: `ApiKey ${API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ mappings: mapping }),
   });
+  if (!indexRes.ok) {
+    const text = await indexRes.text();
+    if (!text.includes('resource_already_exists_exception')) {
+      throw new Error(text || `Index create failed (${indexRes.status})`);
+    }
+    await esFetch(`/${TELEMATICS_GATEWAY_INDEX}/_mapping`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(mapping),
+    });
+  }
 
   const bulk = docs.flatMap(doc => [
     JSON.stringify({ index: { _index: TELEMATICS_GATEWAY_INDEX, _id: doc.gateway_id } }),
@@ -811,6 +836,7 @@ ${TELEMATICS_SERVICE_EVAL}
           sizeField: 'connected_vehicles',
           colorField: 'status',
           sizeTitle: 'Vehicles',
+          useTimeContext: false,
           extraTooltips: [
             { field: 'gateway_name', type: 'nominal', title: 'Gateway' },
             { field: 'city', type: 'nominal', title: 'City' },
