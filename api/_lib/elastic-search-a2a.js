@@ -11,6 +11,7 @@ import {
   wrapA2AResult,
 } from './a2a-common.js';
 import { CHECKOUT_INCIDENT, checkoutPrompt } from './demo-incident.js';
+import { kibanaDiscoverUrl } from '../../lib/kibana-discover-url.js';
 
 const SEARCH_KIBANA_URL = (
   process.env.SEARCH_KIBANA_URL
@@ -41,12 +42,29 @@ export const SEARCH_AGENT_CARD = {
   authentication: { schemes: ['apiKey', 'oauth2'] },
 };
 
+function buildSearchKbDiscoverEsql(term) {
+  const lines = [`FROM ${SEARCH_ENGINE}`];
+  if (term) {
+    const escaped = String(term).replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    lines.push(`| WHERE title LIKE "*${escaped}*" OR content LIKE "*${escaped}*"`);
+  }
+  lines.push('| KEEP title, section, carrier, persona_tags, content');
+  lines.push('| SORT fetched_at DESC');
+  lines.push('| LIMIT 25');
+  return lines.join(' ');
+}
+
 function buildRunbookResults(regionId, regionName) {
+  const searchTerm = `${CHECKOUT_INCIDENT.criticalSpan} ${CHECKOUT_INCIDENT.criticalSpanMs}ms pool exhaustion ${regionId}`;
   return {
     source: 'enterprise_search.search',
     engine: SEARCH_ENGINE,
-    kibanaUrl: searchKibanaPath('/app/discover'),
-    query: `${CHECKOUT_INCIDENT.criticalSpan} ${CHECKOUT_INCIDENT.criticalSpanMs}ms pool exhaustion ${regionId}`,
+    kibanaUrl: kibanaDiscoverUrl(SEARCH_KIBANA_URL, {
+      query: buildSearchKbDiscoverEsql(searchTerm),
+      timeFrom: 'now-365d',
+      timeTo: 'now',
+    }),
+    query: searchTerm,
     totalHits: 4,
     documents: [
       {

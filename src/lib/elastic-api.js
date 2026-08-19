@@ -3,12 +3,15 @@ import {
   buildTelcoPipelineDiscoverEsql,
   buildTelcoRegionsDiscoverEsql,
   buildTelcoTracesDiscoverEsql,
+  buildTelematicsGatewayDiscoverEsql,
+  buildTelematicsPipelineDiscoverEsql,
   escapeEsql,
 } from '../../lib/telco-discover-esql.js';
 import {
   resolveElasticWorkflowId,
   TELCO_CORE_WORKFLOW_SLUG,
 } from '../../lib/telco-workflow-ids.js';
+import { kibanaDiscoverUrl as buildKibanaDiscoverUrl } from '../../lib/kibana-discover-url.js';
 
 const API_BASE = import.meta.env.VITE_API_BASE || '';
 
@@ -156,6 +159,8 @@ export {
   buildTelcoPipelineDiscoverEsql,
   buildTelcoRegionsDiscoverEsql,
   buildTelcoTracesDiscoverEsql,
+  buildTelematicsGatewayDiscoverEsql,
+  buildTelematicsPipelineDiscoverEsql,
 };
 
 /** OTel demo cluster data can lag — use a wide window so Discover always hits indexed docs */
@@ -205,26 +210,6 @@ export function kibanaDiscoverLogUrl(kibanaBase, log) {
   });
 }
 
-function risonQuote(str) {
-  if (/^[\w\-.*@]+$/.test(str)) return str;
-  return `'${String(str).replace(/'/g, "!'")}'`;
-}
-
-function risonEncode(value) {
-  if (value === null || value === undefined) return '!n';
-  if (value === true) return '!t';
-  if (value === false) return '!f';
-  if (typeof value === 'number') return String(value);
-  if (typeof value === 'string') return risonQuote(value);
-  if (Array.isArray(value)) {
-    return value.length ? `!(${value.map(risonEncode).join(',')})` : '!()';
-  }
-  if (typeof value === 'object') {
-    return `(${Object.entries(value).map(([k, v]) => `${k}:${risonEncode(v)}`).join(',')})`;
-  }
-  return String(value);
-}
-
 /** Registered Elastic Workflows slug (bootstrap via npm run bootstrap:workflow) */
 export const ELASTIC_CORE_WORKFLOW_SLUG = TELCO_CORE_WORKFLOW_SLUG;
 
@@ -235,7 +220,6 @@ export function elasticWorkflowUrl(elasticBase, { workflowId, executionId, url }
   if (url) return url;
   const base = (elasticBase || import.meta.env.VITE_KIBANA_URL || '').replace(/\/$/, '');
   if (!base) return null;
-  // No explicit id → workflows list (avoid 404 on missing demo slug)
   if (!workflowId && !executionId) {
     return `${base}/app/workflows`;
   }
@@ -282,26 +266,15 @@ export function kibanaSecurityUrl(kibanaBase, section = 'alerts') {
   return `${base}${paths[section] || paths.alerts}`;
 }
 
+/** Kibana Discover deep link — always opens ES|QL mode (dataSource.type = esql) */
 export function kibanaDiscoverUrl(kibanaBase, { query, timeFrom = TELCO_DISCOVER_TIME.from, timeTo = TELCO_DISCOVER_TIME.to } = {}) {
   const base = kibanaBase || import.meta.env.VITE_KIBANA_URL || '';
   if (!base) return null;
-
-  const esql = query || TELCO_DISCOVER_ESQL;
-  const appState = {
-    dataSource: { type: 'esql' },
-    filters: [],
-    interval: 'auto',
-    query: { esql },
-    sort: [],
-  };
-  const globalState = {
-    filters: [],
-    refreshInterval: { pause: true, value: 60000 },
-    time: { from: timeFrom, to: timeTo },
-  };
-
-  const hash = `/?_g=${risonEncode(globalState)}&_a=${risonEncode(appState)}`;
-  return `${base.replace(/\/$/, '')}/app/discover#${hash}`;
+  return buildKibanaDiscoverUrl(base, {
+    query: query || TELCO_DISCOVER_ESQL,
+    timeFrom,
+    timeTo,
+  });
 }
 
 export function formatCount(n) {

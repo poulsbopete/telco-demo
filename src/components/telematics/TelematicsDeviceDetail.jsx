@@ -1,6 +1,6 @@
 import { X } from 'lucide-react';
 import { formatCount } from '../../lib/telematics-fleet';
-import { kibanaDiscoverUrl, kibanaTelematicsDashboardUrl, TELCO_DISCOVER_ESQL } from '../../lib/elastic-api';
+import { kibanaDiscoverUrl, kibanaTelematicsDashboardUrl, buildTelematicsGatewayDiscoverEsql } from '../../lib/elastic-api';
 
 const STATUS_STYLE = {
   healthy: 'text-success',
@@ -11,7 +11,7 @@ const STATUS_STYLE = {
 export function TelematicsDeviceDetail({ gateway, onClose, kibanaUrl }) {
   if (!gateway) return null;
 
-  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: buildTelematicsGatewayDiscoverEsql(gateway) });
   const dashboardUrl = kibanaTelematicsDashboardUrl(kibanaUrl);
 
   return (
@@ -65,7 +65,7 @@ export function TelematicsDeviceDetail({ gateway, onClose, kibanaUrl }) {
             rel="noopener noreferrer"
             className="text-[13px] text-[#0071e3] hover:underline"
           >
-            Open telemetry in Discover
+            Open gateway logs in Discover
           </a>
         )}
         {dashboardUrl && (

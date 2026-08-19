@@ -13,7 +13,7 @@ import {
   kibanaO11yOverviewUrl,
   getOtelDemoKibanaUrl,
   OTEL_DEMO_KIBANA_URL,
-  TELCO_DISCOVER_ESQL,
+  buildTelematicsPipelineDiscoverEsql,
 } from '../lib/elastic-api';
 
 const TelematicsWorldMap = lazy(() => import('./telematics/TelematicsWorldMap'));
@@ -30,7 +30,7 @@ export function AutomobileTelematicsDemo() {
   const [loading, setLoading] = useState(false);
 
   const kibanaUrl = getOtelDemoKibanaUrl();
-  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: TELCO_DISCOVER_ESQL });
+  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: buildTelematicsPipelineDiscoverEsql() });
   const dashboardUrl = kibanaTelematicsDashboardUrl(kibanaUrl);
   const apmUrl = kibanaApmServicesUrl(kibanaUrl);
   const metricsUrl = kibanaMetricsExplorerUrl(kibanaUrl);
