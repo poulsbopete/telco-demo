@@ -234,7 +234,7 @@ function PipelineStep({ label, active, dark }) {
   );
 }
 
-function ElasticClusterCard({ title, dark, mlActive, alertActive, storageNote }) {
+function ElasticClusterCard({ title, dark, storageNote }) {
   const card = dark
     ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
     : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
@@ -250,11 +250,10 @@ function ElasticClusterCard({ title, dark, mlActive, alertActive, storageNote })
           <p className={`text-[11px] ${muted}`}>Elastic cluster</p>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-1.5">
+      <div className="grid grid-cols-3 gap-1.5">
         <PipelineStep label="Ingest" active dark={dark} />
         <PipelineStep label="Transform" active dark={dark} />
-        <PipelineStep label="ML" active={mlActive} dark={dark} />
-        <PipelineStep label="Alerting" active={alertActive} dark={dark} />
+        <PipelineStep label="Data" active dark={dark} />
       </div>
       {storageNote && (
         <p className={`mt-2 text-[10px] leading-snug rounded-lg px-2 py-1.5 ${
@@ -451,7 +450,7 @@ function DualIngestHero({ dark }) {
         </div>
 
         <div className="relative flex flex-col gap-3">
-          <ElasticClusterCard title="Production" dark={dark} mlActive alertActive storageNote="Hot / warm / cold as today" />
+          <ElasticClusterCard title="Production" dark={dark} storageNote="Hot / warm / cold as today" />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
             <div className={`rounded-md border px-2 py-1 text-[10px] font-semibold shadow-sm ${
               dark ? 'border-white/20 bg-[#2c2c2e] text-[#f5f5f7]' : 'border-[#d2d2d7] bg-white text-[#1d1d1f]'
@@ -464,8 +463,6 @@ function DualIngestHero({ dark }) {
           <ElasticClusterCard
             title="DR"
             dark={dark}
-            mlActive={false}
-            alertActive={false}
             storageNote="1 day hot · rest frozen (cost)"
           />
           <div className={`pointer-events-none absolute -left-3 top-[22%] w-3 h-0.5 ${line}`}>
@@ -490,11 +487,12 @@ function DualIngestHero({ dark }) {
       </div>
 
       <p className={`mt-6 text-center text-[13px] max-w-2xl mx-auto ${muted}`}>
-        Kafka fans out to two Logstash tiers (separate consumer groups). Both Elastic clusters ingest and
-        transform. DR keeps the full lookback but lands data as{' '}
+        Kafka fans out to two Logstash tiers (separate consumer groups). Both Elastic clusters{' '}
+        <strong className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>ingest, transform, and hold data</strong>
+        {' '}only in the middle — ML and alerting are not drawn on the data plane. DR keeps the full
+        lookback as{' '}
         <strong className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>1 day hot, remainder frozen</strong>
-        {' '}to cut storage cost. ML and alerting stay standby on DR until cutover. Shared object storage
-        holds snapshots for corruption and catch-up.
+        {' '}to cut storage cost. Shared object storage holds snapshots for corruption and catch-up.
       </p>
     </div>
   );
@@ -554,8 +552,6 @@ function OpsClusterHero({ dark }) {
           <ElasticClusterCard
             title="Production (Polaris) · Cluster 1"
             dark={dark}
-            mlActive={false}
-            alertActive={false}
             storageNote="Ingest · transform · data"
           />
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
@@ -570,8 +566,6 @@ function OpsClusterHero({ dark }) {
           <ElasticClusterCard
             title="Production (Titan) · Cluster 2"
             dark={dark}
-            mlActive={false}
-            alertActive={false}
             storageNote="Full parity · dual ingest"
           />
           <div className={`pointer-events-none absolute -left-3 top-[22%] w-3 h-0.5 ${line}`}>
