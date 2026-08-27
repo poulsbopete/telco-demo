@@ -7,6 +7,7 @@ import {
   Database,
   HardDrive,
   Layers,
+  Link2,
   Moon,
   Network,
   Radio,
@@ -35,15 +36,15 @@ const RPO_OPTIONS = [
     summary: 'Near-zero loss; secondary already indexing',
     recommend: 'dual',
     detail:
-      'Choose dual independent ingest (with the required snapshot repository). CCR followers alone are a poor fit when transforms must write on the secondary. Snapshots remain the corruption undo under every path.',
+      'Choose dual independent ingest (with the required snapshot repository). Prefer dual ingest + ops cluster when ML, alerting, and dashboards must stay off the ingest plane. CCR followers alone are a poor fit when transforms must write on the secondary.',
   },
   {
     id: 'minutes',
     label: 'Minutes',
     summary: 'Short lag is fine if the secondary stays complete',
-    recommend: 'dual',
+    recommend: 'dual-ops',
     detail:
-      'Dual ingest still leads: both sites hold the same logical view, catch up via the event bus, and fail over by routing. Real-time CCR is only competitive if the secondary does not need a write-capable transform path. Snapshot repository required either way.',
+      'Dual ingest still leads for data parity. If users, ML, and alert actions should not sit on Polaris/Titan ingest clusters, add operational Cluster 3 via CCS. Real-time CCR is only competitive if the secondary does not need a write-capable transform path. Snapshot repository required either way.',
   },
   {
     id: 'hours',
@@ -51,7 +52,7 @@ const RPO_OPTIONS = [
     summary: 'Looser RPO · still needs a snapshot repository',
     recommend: 'hybrid',
     detail:
-      'Hybrid CCR for hot data plus the mandatory snapshot repository for cold windows and corruption recovery. Dual ingest remains valid if you want a fully warm secondary; snapshots are not optional in any case — they are missing today.',
+      'Hybrid CCR for hot data plus the mandatory snapshot repository for cold windows and corruption recovery. Dual ingest (± ops cluster) remains valid if you want a fully warm secondary; snapshots are not optional in any case — they are missing today.',
   },
 ];
 
@@ -72,6 +73,23 @@ const STRATEGIES = [
     ],
     useCase:
       'Transforms run during ingest; users need an identical complete view after failover. DR storage stays complete but cheaper: 1 day hot, remainder frozen. Snapshot repository is mandatory underneath.',
+  },
+  {
+    id: 'dual-ops',
+    title: 'Dual ingest + ops cluster',
+    subtitle: 'Polaris / Titan data plane · Cluster 3 via CCS',
+    featured: false,
+    rpo: 'Seconds–minutes · same dual-ingest lag',
+    rto: 'Minutes · retarget CCS / promote ops site',
+    bandwidth: 'Dual Logstash fan-out · CCS query traffic to Cluster 3',
+    recovery: [
+      'Confirm Polaris and Titan data clusters stay in parity',
+      'Keep ingest + transforms on Clusters 1 & 2; do not fail those into Cluster 3',
+      'Retarget Cluster 3 CCS to the surviving data cluster (or promote ops site)',
+      'Users stay on Cluster 3 dashboards; alert actions continue from ops',
+    ],
+    useCase:
+      'Same dual-fed Kafka → Logstash ×4 → Polaris/Titan data path, plus a dedicated operational cluster for ML, alerting, and dashboards. Users land on Cluster 3 via CCS — not on the ingest/transform clusters. Snapshot repository still mandatory.',
   },
   {
     id: 'realtime',
@@ -109,14 +127,25 @@ const STRATEGIES = [
 
 const SNAPSHOT_BASELINE = {
   title: 'Shared snapshot repository',
-  subtitle: 'Required under all three choices — not in place today',
+  subtitle: 'Required under all four choices — not in place today',
   points: [
-    'Provision shared object storage and register the repository on both clusters',
-    'Schedule consistent snapshots; prove restore in drills before relying on dual ingest or CCR',
+    'Provision shared object storage and register the repository on both data clusters',
+    'Schedule consistent snapshots; prove restore in drills before relying on dual ingest, ops CCS, or CCR',
     'Only reliable undo when a bad change was applied on both sides',
     'Also backs ML model state restore and long-window catch-up',
   ],
 };
+
+const OPS_CLUSTER_MATRIX = [
+  { component: 'Kafka', role: 'Single source · dual-fed to both Logstash tiers' },
+  { component: 'Logstash', role: '×4 on Polaris path · ×4 on Titan path · separate consumer groups' },
+  { component: 'Cluster 1 · Polaris', role: 'Full ingest · transform · complete dataset' },
+  { component: 'Cluster 2 · Titan', role: 'Full ingest · transform · parity with Cluster 1' },
+  { component: 'Object storage', role: 'Shared snapshot repository between Clusters 1 & 2' },
+  { component: 'Cluster 3 · Operational', role: 'ML · alerting · dashboards · CCS into 1 and/or 2' },
+  { component: 'Users', role: 'Land on Cluster 3 only — not on ingest clusters' },
+  { component: 'Alert actions', role: 'Email / API / etc. fire from Cluster 3' },
+];
 
 const RECOVERY_TIERS = [
   {
@@ -182,7 +211,7 @@ function rtoFromRpo(rpoSeconds) {
 
 function strategyForRpo(rpoSeconds) {
   if (rpoSeconds <= 60) return 'dual';
-  if (rpoSeconds <= 900) return 'dual';
+  if (rpoSeconds <= 900) return 'dual-ops';
   return 'hybrid';
 }
 
@@ -325,6 +354,7 @@ function DualIngestCostSection({ dark }) {
                 <tbody>
                   {[
                     ['Dual ingest', 'Highest steady ingest/compute; DR storage reduced with 1d hot + frozen'],
+                    ['Dual ingest + ops', 'Dual ingest cost + Cluster 3 for ML/alerting/UI; CCS query load'],
                     ['Real-time CCR', 'Second cluster storage + continuous CCR bandwidth; weaker if DR must write'],
                     ['Hybrid CCR', 'Between the two; snapshots still mandatory'],
                   ].map(([path, shape]) => (
@@ -338,8 +368,8 @@ function DualIngestCostSection({ dark }) {
             </div>
 
             <p className={`text-[13px] leading-relaxed ${muted}`}>
-              Snapshots are a must on all three — an added cost vs today either way (repo + storage + restore drills).
-              Dual ingest doesn’t replace that; it sits on top.
+              Snapshots are a must on all four — an added cost vs today either way (repo + storage + restore drills).
+              Dual ingest and dual ingest + ops don’t replace that; they sit on top.
             </p>
 
             <div>
@@ -466,6 +496,152 @@ function DualIngestHero({ dark }) {
         {' '}to cut storage cost. ML and alerting stay standby on DR until cutover. Shared object storage
         holds snapshots for corruption and catch-up.
       </p>
+    </div>
+  );
+}
+
+function OpsClusterHero({ dark }) {
+  const card = dark
+    ? 'border-white/15 bg-[#1c1c1e] text-[#f5f5f7]'
+    : 'border-[#d2d2d7] bg-white text-[#1d1d1f]';
+  const muted = dark ? 'text-[#98989d]' : 'text-[#86868b]';
+  const accent = dark ? 'text-[#64d2ff]' : 'text-[#0071e3]';
+  const line = dark ? 'bg-white/20' : 'bg-[#d2d2d7]';
+  const accentBg = dark ? 'bg-[#64d2ff]' : 'bg-[#0071e3]';
+
+  return (
+    <div
+      className={`mt-8 rounded-3xl border p-4 sm:p-8 overflow-x-auto ${
+        dark ? 'border-white/10 bg-[#111113]' : 'border-[#d2d2d7]/80 bg-[#f5f5f7]'
+      }`}
+    >
+      <div className="flex flex-wrap items-center justify-center gap-2 mb-6">
+        <span className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
+          dark ? 'bg-white/10 text-[#98989d]' : 'bg-black/5 text-[#86868b]'
+        }`}
+        >
+          Draft · meeting
+        </span>
+        <span className={`text-[11px] font-semibold uppercase tracking-wide px-2.5 py-1 rounded-full ${
+          dark ? 'bg-[#64d2ff]/15 text-[#64d2ff]' : 'bg-[#0071e3]/10 text-[#0071e3]'
+        }`}
+        >
+          Dual ingest + ops cluster
+        </span>
+      </div>
+
+      <div className="min-w-[720px] grid grid-cols-[80px_72px_1fr_minmax(160px,200px)_88px] gap-3 items-stretch">
+        <div className={`rounded-xl border p-3 flex flex-col items-center justify-center text-center ${
+          dark ? 'border-[#64d2ff]/30 bg-[#0a84ff]/15' : 'border-[#0071e3]/30 bg-[#0071e3]/10'
+        }`}
+        >
+          <Radio className={`w-5 h-5 ${accent}`} />
+          <p className={`mt-2 text-[13px] font-semibold ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>Kafka</p>
+          <p className={`text-[10px] mt-1 ${muted}`}>dual-fed</p>
+        </div>
+
+        <div className="flex flex-col justify-between py-2 gap-4">
+          {['Polaris', 'Titan'].map(label => (
+            <div key={label} className={`rounded-xl border p-2 text-center ${card}`}>
+              <HardDrive className={`w-4 h-4 mx-auto ${dark ? 'text-[#c4a484]' : 'text-[#8b6914]'}`} />
+              <p className="text-[11px] font-semibold mt-1">{label}</p>
+              <p className={`text-[10px] ${muted}`}>Logstash ×4</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="relative flex flex-col gap-3">
+          <ElasticClusterCard
+            title="Production (Polaris) · Cluster 1"
+            dark={dark}
+            mlActive={false}
+            alertActive={false}
+            storageNote="Ingest · transform · data"
+          />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+            <div className={`rounded-md border px-2 py-1 text-[10px] font-semibold shadow-sm ${
+              dark ? 'border-white/20 bg-[#2c2c2e] text-[#f5f5f7]' : 'border-[#d2d2d7] bg-white text-[#1d1d1f]'
+            }`}
+            >
+              Object storage
+              <span className={`block font-normal ${dark ? 'text-[#ff9f0a]' : 'text-[#bf4800]'}`}>required</span>
+            </div>
+          </div>
+          <ElasticClusterCard
+            title="Production (Titan) · Cluster 2"
+            dark={dark}
+            mlActive={false}
+            alertActive={false}
+            storageNote="Full parity · dual ingest"
+          />
+          <div className={`pointer-events-none absolute -left-3 top-[22%] w-3 h-0.5 ${line}`}>
+            <div className={`h-full w-full ${accentBg} ccr-flow-pulse opacity-70`} />
+          </div>
+          <div className={`pointer-events-none absolute -left-3 bottom-[22%] w-3 h-0.5 ${line}`}>
+            <div className={`h-full w-full ${accentBg} ccr-flow-pulse opacity-70`} />
+          </div>
+        </div>
+
+        <div className={`rounded-2xl border p-3 sm:p-4 flex flex-col ${card}`}>
+          <div className="flex items-center gap-2 mb-2">
+            <Link2 className={`w-4 h-4 ${accent}`} />
+            <div>
+              <p className="text-[13px] font-semibold">Operational · Cluster 3</p>
+              <p className={`text-[11px] ${muted}`}>CCS · Titan or Polaris</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-1.5 flex-1">
+            <PipelineStep label="ML" active dark={dark} />
+            <PipelineStep label="Alerting" active dark={dark} />
+            <PipelineStep label="Dashboards" active dark={dark} />
+          </div>
+          <p className={`mt-2 text-[10px] leading-snug ${muted}`}>
+            Cross-cluster search into Clusters 1 &amp; 2
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <div className={`rounded-xl border p-3 flex-1 ${card}`}>
+            <p className="text-[12px] font-semibold">Users</p>
+            <p className={`mt-1 text-[10px] leading-snug ${muted}`}>
+              Land on Cluster 3 dashboards only
+            </p>
+          </div>
+          <div className={`rounded-xl border p-3 flex-1 ${card}`}>
+            <p className="text-[12px] font-semibold">Alert actions</p>
+            <ul className={`mt-1 text-[10px] space-y-0.5 ${muted}`}>
+              <li>Email</li>
+              <li>API</li>
+              <li>etc.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <p className={`mt-6 text-center text-[13px] max-w-3xl mx-auto ${muted}`}>
+        Full ingest workload dual-fed into Polaris and Titan to keep data parity. Ingest and transforms
+        stay on Clusters 1 &amp; 2. Cluster 3 owns ML, alerting, and dashboards over CCS — users never
+        hit the write path directly. Shared object storage remains required under every path.
+      </p>
+
+      <div className={`mt-6 overflow-x-auto rounded-2xl border ${card}`}>
+        <table className="w-full text-left text-[13px] min-w-[520px]">
+          <thead>
+            <tr className={dark ? 'border-b border-white/10' : 'border-b border-[#d2d2d7]'}>
+              <th className={`px-4 py-3 font-semibold ${muted}`}>Component</th>
+              <th className={`px-4 py-3 font-semibold ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            {OPS_CLUSTER_MATRIX.map(row => (
+              <tr key={row.component} className={dark ? 'border-t border-white/5' : 'border-t border-[#f0f0f2]'}>
+                <td className={`px-4 py-2.5 font-medium ${dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}`}>{row.component}</td>
+                <td className={`px-4 py-2.5 ${muted}`}>{row.role}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -643,13 +819,13 @@ function StrategyCards({ dark, highlightId }) {
     <section className="mt-16">
       <p className={`section-eyebrow ${dark ? '!text-[#98989d]' : ''}`}>Section 2</p>
       <h2 className={`section-title mt-2 ${dark ? '!text-[#f5f5f7]' : ''}`}>
-        Three choices
+        Four choices
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
         Pick one path. Every path includes the shared snapshot repository as a must — that capability does not exist today.
       </p>
 
-      <div className="mt-8 grid lg:grid-cols-3 gap-4">
+      <div className="mt-8 grid md:grid-cols-2 gap-4">
         {STRATEGIES.map(s => {
           const highlighted = highlightId === s.id;
           const emphasize = highlighted || s.featured;
@@ -801,7 +977,7 @@ function RecoveryTimeline({ dark, rpoSeconds, setRpoSeconds }) {
               Preferred strategy: <strong>{strategy?.title}</strong>
             </span>
             <span className={dark ? 'text-[#98989d]' : 'text-[#86868b]'}>
-              Under ~15 minutes RPO, dual ingest keeps cutover as routing. Looser RPO shifts work into restore.
+              Under ~15 minutes RPO, dual ingest (± ops cluster) keeps cutover as routing. Looser RPO shifts work into restore.
             </span>
           </div>
         </div>
@@ -959,7 +1135,7 @@ export function CcrArchitectureExplainer() {
             Dual-site recovery architecture
           </h1>
           <p className={`mt-3 text-[17px] leading-relaxed max-w-2xl ${dark ? 'text-[#98989d]' : 'text-[#86868b]'}`}>
-            Interactive walkthrough of the draft design: three paths, one mandatory snapshot repository.
+            Interactive walkthrough of the draft design: four paths, one mandatory snapshot repository.
           </p>
         </div>
         <button
@@ -978,6 +1154,7 @@ export function CcrArchitectureExplainer() {
       </div>
 
       <DualIngestHero dark={dark} />
+      <OpsClusterHero dark={dark} />
       <DualIngestCostSection dark={dark} />
       <FeaturedDesign dark={dark} />
       <DecisionTree dark={dark} rpoChoice={rpoChoice} setRpoChoice={setRpoChoice} />
