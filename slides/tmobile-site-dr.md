@@ -160,10 +160,10 @@ style: |
 
 <div class="gap">
   <b>Current issue</b>
-  Elastic is <strong>not a core / Tier-1 app</strong> today: <strong>transaction data only</strong>, <strong>one DC (Polaris)</strong>, no Titan peer, no HA Site DR. <strong>Full-fledged T-Mobile data is coming</strong> — Magenta can’t scale that onto a single-DC footprint. Snapshots are restore, not Tier-1 continuity.
+  Elastic is <strong>not a core / Tier-1 app</strong> today: <strong>transaction data only</strong>, <strong>one DC (Polaris)</strong>, no Titan peer, no HA Site DR. Ahead: <strong>full-fledged T-Mobile data</strong> and <strong>ML-based decisions</strong> on that data — Magenta can’t run that on a single-DC footprint. Snapshots are restore, not Tier-1 continuity.
 </div>
 
-<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for that data growth — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
+<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for that data and ML wave — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
 
 ---
 
@@ -171,11 +171,11 @@ style: |
 
 # Make Elastic a Magenta Tier-1 app
 
-<p class="subhead">Today: transactions. Next: <strong>full Magenta data</strong>. Build Tier-1 warm HA now — so the footprint is ready when the firehose arrives.</p>
+<p class="subhead">Today: transactions. Next: <strong>full Magenta data</strong> + <strong>ML-based decisions</strong>. Build Tier-1 warm HA now — so the footprint is ready when automation depends on it.</p>
 
 <div class="today">
   <b>Today · the issue</b>
-  <strong>Transaction data only</strong> · not Tier-1 · <strong>one DC (Polaris)</strong> · no HA. <strong>Full-fledged T-Mobile data is next</strong> — Magenta won’t put that on a single-DC, non-core system.
+  <strong>Transaction data only</strong> · not Tier-1 · <strong>one DC (Polaris)</strong> · no HA. Next: <strong>full T-Mobile data</strong> driving <strong>ML-based decisions</strong> — Magenta won’t put that on a single-DC, non-core system.
 </div>
 
 <div class="cols">
@@ -188,7 +188,7 @@ style: |
   <div class="opt pick">
     <span class="tag">OPTION 2</span>
     <b>Three clusters · CCS on Cluster 3</b>
-    Same Polaris + Titan data plane, plus an ops cluster for ML / alerting / UI via CCS — <strong>touchless automated failover</strong>.
+    Same Polaris + Titan data plane, plus an ops cluster for <strong>ML / alerting / UI</strong> via CCS — <strong>touchless automated failover</strong> when Magenta decisions depend on ML.
     <div class="same">≈ same cost as Option 1</div>
   </div>
 </div>
@@ -208,9 +208,9 @@ style: |
   <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Transactions today; <strong>full T-Mobile data tomorrow</strong>. Magenta won’t call Elastic <strong>Tier-1</strong> while it’s one DC · no HA. These two warm paths cost about the same; Option 2 buys <strong>touchless failover</strong> — DR sized for the data that’s coming.</div>
+<div class="callout"><strong>Talk track:</strong> Transactions today; <strong>full T-Mobile data + ML-based decisions</strong> next. Magenta won’t call Elastic <strong>Tier-1</strong> while it’s one DC · no HA. These two warm paths cost about the same; Option 2 keeps <strong>ML and automation</strong> on Cluster 3 with <strong>touchless failover</strong> — DR sized for decisions that can’t go dark.</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Transactions now · full Magenta data next</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Transactions now · ML decisions on full Magenta data</span></div>
 
 ---
 
@@ -269,15 +269,15 @@ style: |
 
 # What Magenta is buying
 
-<p class="subhead">From <strong>transaction data</strong> to <strong>full T-Mobile data</strong> — Tier-1 warm HA Magenta can trust as a core system.</p>
+<p class="subhead">From <strong>transaction data</strong> to <strong>full T-Mobile data</strong> and <strong>ML-based decisions</strong> — Tier-1 warm HA Magenta can trust as a core system.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>Tier-1 for what’s next</b>Sized for full Magenta data — not just today’s transactions</div>
-  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS for touchless failover</div>
+  <div class="pillar"><b>Tier-1 for ML decisions</b>Full Magenta data + ML — not just today’s transactions</div>
+  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS so ML stays up on failover</div>
   <div class="pillar"><b>Complete after failover</b>Same logical view for NOC and exec dashboards</div>
   <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Today Elastic holds <strong>transaction data</strong> on <strong>one DC</strong> — not Tier-1. <strong>Full-fledged T-Mobile data is coming</strong>. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR that makes Elastic a Magenta Tier-1 app before that wave lands. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate.</div>
+<div class="callout"><strong>Close:</strong> Today Elastic holds <strong>transaction data</strong> on <strong>one DC</strong> — not Tier-1. Ahead: <strong>full-fledged T-Mobile data</strong> and <strong>ML-based decisions</strong> on it. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR that makes Elastic a Magenta Tier-1 app before those decisions go live. Option 2 keeps <strong>ML touchless</strong> on Cluster 3 — not another hot estate.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Tier-1 before full Magenta data</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Tier-1 before ML on full Magenta data</span></div>
