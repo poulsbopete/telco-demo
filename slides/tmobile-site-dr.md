@@ -148,6 +148,17 @@ style: |
     margin-bottom: 0.35em;
   }
   .today b { display: block; color: #bf4800; font-size: 1.05em; margin-bottom: 0.15em; }
+  .uc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 0.35em; }
+  .uc {
+    background: rgba(255,255,255,.04);
+    border: 1px solid #2a2a2e;
+    border-radius: 10px;
+    padding: 9px 10px;
+    font-size: 0.52em;
+    color: #9a9aa0;
+    line-height: 1.35;
+  }
+  .uc b { display: block; color: #00bfb3; font-size: 1.05em; margin-bottom: 0.2em; }
 ---
 
 <!-- _class: lead -->
