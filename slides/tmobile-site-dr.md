@@ -4,7 +4,7 @@ theme: default
 paginate: true
 size: 16:9
 title: T-Mobile · Site Disaster Recovery — Business Value
-description: Leave one-DC Polaris behind — warm Polaris & Titan HA options without hot-tier overages
+description: Elevate Elastic to Magenta Tier-1 — leave one-DC Polaris behind with warm Polaris & Titan HA
 style: |
   section {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -154,28 +154,28 @@ style: |
 
 <span class="kicker">T-MOBILE · SITE DR</span>
 
-# Today: one DC · no HA Site DR
+# Today: not Tier-1 · one DC · no HA
 
-## Deployed only in Polaris — Magenta needs a second live path
+## Not a Magenta core system yet — DR is the unlock
 
 <div class="gap">
   <b>Current issue</b>
-  Observability is <strong>deployed in one data center only (Polaris)</strong>. No Titan peer, no highly available Site DR. A Polaris DC event means <strong>blind NOC / care / exec views</strong> — restore from snapshots is not high availability.
+  Elastic is <strong>not used as a core / Tier-1 app</strong> today: <strong>one data center only (Polaris)</strong>, no Titan peer, no highly available Site DR. A Polaris event means <strong>blind NOC / care / exec views</strong>. Snapshots are restore — not Tier-1 continuity.
 </div>
 
-<p>Two warm options across <strong>Polaris</strong> and <strong>Titan</strong> close that gap at <strong>roughly the same cost</strong> — without standing up a second full hot-tier estate.</p>
+<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
 
 ---
 
-<span class="kicker">T-MOBILE · CLOSE THE HA GAP</span>
+<span class="kicker">T-MOBILE · TIER-1 WITH WARM HA</span>
 
-# From single-site risk to warm HA
+# Make Elastic a Magenta Tier-1 app
 
-<p class="subhead">Close today’s <strong>single-DC · no HA</strong> gap. Both options stay warm (Titan <strong>1 day hot · rest frozen</strong>). Cost is comparable — the delta is automation.</p>
+<p class="subhead">Today it isn’t core. This DR design is what qualifies it as <strong>Tier-1</strong> — single-DC risk closed, warm HA on, cost capped.</p>
 
 <div class="today">
   <b>Today · the issue</b>
-  <strong>One data center only (Polaris)</strong> — no Titan deployment, no highly available Site DR. Polaris loss → hours of blind ops until restore. Not Magenta-grade continuity.
+  <strong>Not a core / Tier-1 system</strong> · <strong>one DC only (Polaris)</strong> · no Titan · no HA Site DR. Polaris loss → hours of blind ops. Magenta won’t run Tier-1 on that footprint.
 </div>
 
 <div class="cols">
@@ -208,9 +208,9 @@ style: |
   <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Today Magenta is <strong>in one DC only</strong> with <strong>no HA Site DR</strong>. These two paths cost about the same; Option 2 spends that band to <strong>remove human cutover</strong> — not to buy another hot mirror.</div>
+<div class="callout"><strong>Talk track:</strong> Magenta won’t treat Elastic as <strong>Tier-1</strong> while it’s <strong>one DC · no HA</strong>. These two warm paths cost about the same; Option 2 spends that band on <strong>touchless failover</strong> — the DR story that makes it a core system.</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>One DC today · close HA · ≈ same cost</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Not Tier-1 today · DR makes it Tier-1</span></div>
 
 ---
 
@@ -269,15 +269,15 @@ style: |
 
 # What Magenta is buying
 
-<p class="subhead">Leave <strong>one-DC-only</strong> behind — continuity engineered so DR is not the next OpEx surprise.</p>
+<p class="subhead">Elevate Elastic from <strong>sidecar</strong> to <strong>Tier-1</strong> — with warm HA Magenta can trust as a core system.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>Second DC · real HA</b>Titan peer path — not restore-from-snapshot as “DR”</div>
+  <div class="pillar"><b>Tier-1 classification</b>DR + dual-DC HA — qualifies Elastic as a Magenta core app</div>
   <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS for touchless failover</div>
   <div class="pillar"><b>Complete after failover</b>Same logical view for NOC and exec dashboards</div>
   <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Magenta today is <strong>deployed in one data center only</strong> with <strong>no HA Site DR</strong>. Two clusters or three with CCS — <strong>roughly the same cost</strong> — put Titan online and close that gap. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate. Fund warm dual-feed — not a full hot mirror.</div>
+<div class="callout"><strong>Close:</strong> Today Elastic is <strong>not a core / Tier-1 system</strong> — <strong>one DC only</strong>, no HA. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR solution that makes it Tier-1. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Leave one-DC behind · warm HA</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Make Elastic Magenta Tier-1</span></div>
