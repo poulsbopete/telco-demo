@@ -39,6 +39,37 @@ style: |
   .cost b { display: block; color: #00bfb3; font-size: 1.02em; margin-bottom: 0.15em; }
   .avoid { background: rgba(191,72,0,.1); border: 1px solid #bf4800; border-radius: 10px; padding: 9px 11px; font-size: 0.62em; color: #9a9aa0; }
   .avoid b { display: block; color: #bf4800; font-size: 1.02em; margin-bottom: 0.15em; }
+  .opt {
+    background: rgba(255,255,255,.04);
+    border: 1px solid #2a2a2e;
+    border-radius: 12px;
+    padding: 11px 12px;
+    font-size: 0.58em;
+    color: #9a9aa0;
+    line-height: 1.35;
+  }
+  .opt.pick {
+    background: rgba(0,191,179,.08);
+    border-color: #00bfb3;
+  }
+  .opt .tag {
+    display: inline-block;
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #e20074;
+    margin-bottom: 0.35em;
+  }
+  .opt.pick .tag { color: #00bfb3; }
+  .opt b { display: block; color: #fff; font-size: 1.08em; margin-bottom: 0.25em; }
+  .opt .same {
+    margin-top: 0.45em;
+    padding-top: 0.4em;
+    border-top: 1px solid #2a2a2e;
+    color: #00bfb3;
+    font-weight: 700;
+    font-size: 0.95em;
+  }
   .kicker {
     display: inline-block;
     background: #e20074;
@@ -105,24 +136,28 @@ style: |
 
 ## Polaris &amp; Titan — Magenta economics built in
 
-<p>T-Mobile is right to worry about DR spend. This design buys <strong>deliberate failover</strong> across <strong>Polaris</strong> and <strong>Titan</strong> without a second full hot-tier estate — cost levers are built in, not bolted on later.</p>
+<p>T-Mobile is right to worry about DR spend. Two warm paths across <strong>Polaris</strong> and <strong>Titan</strong> land at <strong>roughly the same cost</strong> — the third cluster buys <strong>touchless automated failover</strong>, not a second hot estate.</p>
 
 ---
 
-<span class="kicker">T-MOBILE · TRADE + DESIGN</span>
+<span class="kicker">T-MOBILE · TWO OPTIONS · SAME COST BAND</span>
 
-# Continuity without a second hot estate
+# Two clusters or three — same Magenta spend band
 
-<p class="subhead">Avoid a museum DR <em>and</em> a Polaris hot mirror. Dual-feed both DCs; put spend where it protects Magenta.</p>
+<p class="subhead">Both stay warm (Titan <strong>1 day hot · rest frozen</strong>). The delta is automation — not another hot-tier mirror.</p>
 
 <div class="cols">
-  <div class="avoid">
-    <b>Avoid</b>
-    Full hot mirror on Titan · idle museum standby · CCR amplify when transforms must write · ML/alerting on every ingest cluster
+  <div class="opt">
+    <span class="tag">OPTION 1</span>
+    <b>Two clusters · two data centers</b>
+    Polaris + Titan dual ingest. Operators choose which site is live and cut over deliberately when a DC fails.
+    <div class="same">≈ same cost as Option 2</div>
   </div>
-  <div class="cost">
-    <b>Keep warm</b>
-    Dual ingest · Titan <strong>1 day hot, rest frozen</strong> · ops Cluster 3 for ML/alerting/UI · shared snapshots
+  <div class="opt pick">
+    <span class="tag">OPTION 2</span>
+    <b>Three clusters · CCS on Cluster 3</b>
+    Same Polaris + Titan data plane, plus an ops cluster for ML / alerting / UI via CCS — <strong>touchless automated failover</strong>.
+    <div class="same">≈ same cost as Option 1</div>
   </div>
 </div>
 
@@ -136,19 +171,14 @@ style: |
 </div>
 
 <div class="cols-3">
-  <div class="dc"><b>Polaris</b>Ingest · transform · data<br/>Hot / warm / cold as today</div>
-  <div class="dc"><b>Titan</b>Full parity · dual ingest<br/><strong>1 day hot · rest frozen</strong></div>
-  <div class="ops"><b>Ops · Cluster 3</b>ML · alerting · dashboards<br/>Users land here via CCS</div>
+  <div class="dc"><b>Polaris</b>Ingest · transform · data</div>
+  <div class="dc"><b>Titan</b>Parity · <strong>1d hot · rest frozen</strong></div>
+  <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
 </div>
 
-<div class="stat-row">
-  <div class="stat"><b>Frozen, not deleted</b><span>Lookback without hot forever</span></div>
-  <div class="stat"><b>One Kafka</b><span>No second event bus</span></div>
-  <div class="stat"><b>Ops off data plane</b><span>Don’t double ML/alert spend</span></div>
-  <div class="stat"><b>Snapshots once</b><span>Shared undo, not a 3rd copy</span></div>
-</div>
+<div class="callout"><strong>Talk track:</strong> Cost is comparable either way. Option 2 spends the same band to <strong>remove human cutover</strong> — CCS on Cluster 3 keeps users and automation on one ops plane while Polaris/Titan stay warm, not hot-mirrored.</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Warm · deliberate · cost-capped</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>≈ same cost · Option 2 = touchless failover</span></div>
 
 ---
 
@@ -210,12 +240,12 @@ style: |
 <p class="subhead">Continuity and evidence — engineered so DR is not the next OpEx surprise.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>Cutover in minutes</b>Warm Titan already indexing — failover is routing</div>
+  <div class="pillar"><b>Option 1 · two clusters</b>Polaris + Titan dual ingest — deliberate cutover</div>
+  <div class="pillar"><b>Option 2 · three + CCS</b>Same spend band — touchless automated failover</div>
   <div class="pillar"><b>Complete after failover</b>Same logical view for NOC and exec dashboards</div>
-  <div class="pillar"><b>Corruption undo</b>Shared snapshots between Polaris and Titan</div>
-  <div class="pillar"><b>Cost-capped warmth</b>Full lookback without mirroring Polaris hot spend</div>
+  <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Dual ingest costs more than one site — by design. Titan’s <strong>1 day hot + frozen remainder</strong>, shared snapshots, and ops on Cluster 3 keep that delta from becoming an overage. Agree on “seconds of loss vs hours of blind ops,” then fund this path — not a full hot mirror.</div>
+<div class="callout"><strong>Close:</strong> Two clusters or three with CCS — <strong>roughly the same Magenta cost</strong>. Option 2 buys <strong>touchless automated failover</strong> on Cluster 3, not another hot estate. Agree on “seconds of loss vs hours of blind ops,” then fund warm dual-feed — not a full hot mirror.</div>
 
 <div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>As cost-efficient as warm DR allows</span></div>
