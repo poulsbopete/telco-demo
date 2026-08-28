@@ -9,7 +9,7 @@
     "dev:vercel": "vercel dev",
     "build": "npm run build:presenter && vite build",
     "build:presenter": "node scripts/build-presenter-docs.mjs",
-    "build:slides": "marp slides/public-launch-slides.md -o docs/index.html --html --allow-local-files --no-stdin && mkdir -p docs/assets public/slides/assets && cp slides/assets/* docs/assets/ && cp slides/assets/* public/slides/assets/ && cp docs/index.html public/slides/index.html && npm run build:presenter",
+    "build:slides": "marp slides/public-launch-slides.md -o docs/index.html --html --allow-local-files --no-stdin && mkdir -p docs/assets public/slides/assets public/slides/tmobile-site-dr && cp slides/assets/* docs/assets/ && cp slides/assets/* public/slides/assets/ && cp docs/index.html public/slides/index.html && marp slides/tmobile-site-dr.md -o public/slides/tmobile-site-dr/index.html --html --allow-local-files --no-stdin && npm run build:presenter",
     "lint": "eslint .",
     "preview": "vite preview",
     "bootstrap:workflow": "node scripts/bootstrap-kibana-workflow.mjs",

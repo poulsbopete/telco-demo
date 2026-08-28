@@ -386,9 +386,9 @@ telco-demo-sage.vercel.app · live demo ~12 min
   </div>
   <div class="bridge-box win">
     <h3>Site DR</h3>
-    <p><strong>What:</strong> Interactive DR explainer — dual ingest, dual ingest + ops cluster (CCS), CCR vs hybrid, mandatory snapshot repository, RPO/RTO sliders, DR tier (1d hot + frozen), component matrix for telco sites.</p>
+    <p><strong>What:</strong> Interactive DR explainer — dual ingest, dual ingest + ops cluster (CCS), CCR vs hybrid, mandatory snapshot repository, RPO/RTO, cost-aware DR tiers.</p>
     <p><strong>Why:</strong> Boards and regulators expect deliberate failover — not hope. Transforms need write-capable DR; snapshots are the corruption undo under every strategy.</p>
-    <p><strong>Solve with Elastic:</strong> Dual Logstash consumer groups · cross-cluster replication where RPO demands it · shared object-storage snapshots · frozen DR tiers for cost · warm ML standby options.</p>
+    <p><strong>Solve with Elastic:</strong> Dual Logstash consumer groups · ops cluster via CCS · shared object-storage snapshots · frozen DR tiers for cost.</p>
   </div>
 </div>
 
