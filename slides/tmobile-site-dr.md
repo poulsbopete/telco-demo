@@ -131,6 +131,33 @@ style: |
   .pain .ico { width: 48px; height: 48px; margin: 0 auto 0.4em; }
   .pain b { display: block; font-size: 0.68em; color: #fec514; margin-bottom: 0.15em; }
   .pain span { display: block; font-size: 0.5em; color: #9a9aa0; line-height: 1.3; }
+  .lead-note {
+    color: #9a9aa0;
+    font-size: 0.58em;
+    line-height: 1.4;
+    max-width: 42rem;
+    margin: 0.75em auto 0;
+  }
+  .lead-note strong { color: #fff; }
+  .note {
+    margin-top: 0.45em;
+    padding: 8px 12px;
+    background: rgba(0,113,227,.15);
+    border-left: 3px solid #0071e3;
+    border-radius: 0 8px 8px 0;
+    font-size: 0.52em;
+    color: #c8c8cc;
+    line-height: 1.35;
+  }
+  .note strong { color: #fff; }
+  .section-label {
+    font-size: 0.46em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    margin: 0.15em 0 0.35em;
+  }
+  .section-label.now { color: #0071e3; }
+  .section-label.next { color: #00bfb3; margin-top: 0.55em; }
 ---
 
 <!-- _class: lead -->
@@ -170,13 +197,15 @@ style: |
   </div>
 </div>
 
+<p class="lead-note">Elastic already delivers value on <strong>transaction data</strong> — real-time ops dashboards and investigation — but Magenta won’t treat it as <strong>Tier-1</strong> on a single-DC footprint. Ahead: <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong>.</p>
+
 ---
 
 <span class="kicker">TWO OPTIONS · SAME COST BAND</span>
 
 # Warm HA — pick automation level
 
-<p class="sub">Both keep Titan <strong>1 day hot · rest frozen</strong>. Cost is comparable. Option 2 adds touchless failover.</p>
+<p class="sub">Close the HA gap without a second hot estate. Both keep Titan <strong>1 day hot · rest frozen</strong>. Cost is comparable — Option 2 spends the same band on <strong>touchless</strong> failover.</p>
 
 <div class="split">
   <div class="panel">
@@ -193,7 +222,7 @@ style: |
       <circle cx="160" cy="60" r="10" fill="#050816" stroke="#fff" stroke-width="1.5"/>
       <text x="160" y="64" text-anchor="middle" fill="#fff" font-size="10" font-family="sans-serif">+</text>
     </svg>
-    <p>Dual ingest. Operators cut over when a DC fails.</p>
+    <p>Dual ingest into Polaris and Titan. Operators choose the live site and cut over deliberately when a DC fails.</p>
     <div class="eq">≈ same cost as Option 2</div>
   </div>
   <div class="panel pick">
@@ -212,12 +241,14 @@ style: |
       <text x="268" y="86" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">UI · Alert</text>
       <path d="M100 64h12M208 64h12" stroke="#fff" stroke-width="1.5"/>
     </svg>
-    <p>Same data plane + ops cluster for <strong>touchless</strong> failover.</p>
+    <p>Same warm data plane, plus an ops cluster for ML, alerting, and UI via CCS — <strong>touchless automated failover</strong>.</p>
     <div class="eq">≈ same cost as Option 1</div>
   </div>
 </div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Warm HA · cost-capped</span></div>
+<div class="note"><strong>Avoid:</strong> a full hot mirror of Polaris on Titan. Warm dual-feed + shared snapshots caps spend while Magenta builds toward Tier-1.</div>
+
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Warm HA · cost-capped · ≈ same band</span></div>
 
 ---
 
@@ -225,8 +256,9 @@ style: |
 
 # Value now · outcomes next
 
-<p class="sub"><strong>Useful today</strong> on transaction data. <strong>Next</strong>: full Magenta data, ML decisions, closed-loop automation.</p>
+<p class="sub">Don’t wait for full Magenta data to get value — then size Tier-1 warm HA for what’s coming.</p>
 
+<p class="section-label now">USEFUL TODAY · TRANSACTION DATA</p>
 <div class="tiles">
   <div class="tile now">
     <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
@@ -236,7 +268,7 @@ style: |
       <circle cx="36" cy="24" r="5" fill="rgba(0,113,227,.25)" stroke="#0071e3" stroke-width="1.5"/>
     </svg>
     <b>Real-time ops dashboards</b>
-    <span>Live transaction health in ops scenarios</span>
+    <span>Live transaction health for NOC and ops — see what’s failing now, not in a batch report</span>
   </div>
   <div class="tile now">
     <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
@@ -244,7 +276,7 @@ style: |
       <path d="M33 33l8 8" stroke="#0071e3" stroke-width="2.5" stroke-linecap="round"/>
     </svg>
     <b>Search &amp; investigate</b>
-    <span>Dashboard spike → transaction in seconds</span>
+    <span>ES|QL / Discover — drill from a dashboard spike to the offending transaction in seconds</span>
   </div>
   <div class="tile now">
     <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
@@ -253,11 +285,12 @@ style: |
       <circle cx="26" cy="26" r="3" fill="#0071e3"/>
     </svg>
     <b>Alerting today</b>
-    <span>Signals on the data you already have</span>
+    <span>Threshold and anomaly alerts on indexed transactions — early signal before full data lands</span>
   </div>
 </div>
 
-<div class="tiles" style="margin-top:12px">
+<p class="section-label next">NEXT · FULL T-MOBILE DATA · ML · CLOSED LOOP</p>
+<div class="tiles">
   <div class="tile next">
     <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
       <path d="M10 36c8-2 10-14 16-14s8 12 16 14" stroke="#00bfb3" stroke-width="2" stroke-linecap="round"/>
@@ -267,7 +300,7 @@ style: |
       <path d="M38 28l4-8 4 2" stroke="#00bfb3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <b>Closed-loop automation</b>
-    <span>Detect → ML → remediate</span>
+    <span>Detect RAN / core / transport faults → ML correlate → auto remediate</span>
   </div>
   <div class="tile next">
     <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
@@ -277,7 +310,7 @@ style: |
       <path d="M36 15v6M33 18h6" stroke="#00bfb3" stroke-width="1.5" stroke-linecap="round"/>
     </svg>
     <b>Full Magenta data + ML</b>
-    <span>Decisions on T-Mobile’s full estate</span>
+    <span>ML-based decisions on T-Mobile’s full estate — not transactions alone</span>
   </div>
   <div class="tile next">
     <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
@@ -286,8 +319,8 @@ style: |
       <circle cx="26" cy="34" r="7" stroke="#00bfb3" stroke-width="2"/>
       <path d="M24 22l-2 6M28 22l2 6M22 20h8" stroke="#00bfb3" stroke-width="1.5"/>
     </svg>
-    <b>RCA · SLA · fraud</b>
-    <span>Cross-domain ops, eSIM, SIEM on one lake</span>
+    <b>RCA · eSIM SLA · fraud</b>
+    <span>Cross-domain RCA, activation SLA, SIM-swap SIEM on one lake</span>
   </div>
 </div>
 
@@ -298,6 +331,8 @@ style: |
 <span class="kicker">T-MOBILE · CLOSE</span>
 
 # Make Elastic Magenta Tier-1
+
+<p class="sub">Protect today’s ops value. Build the warm HA footprint Magenta needs before full data, ML, and closed loop go live.</p>
 
 <div class="journey">
   <div class="jstep blue">
@@ -337,6 +372,6 @@ style: |
   </svg>
 </div>
 
-<p class="one-liner">Protect <strong>today’s dashboards</strong>. Fund warm dual-feed — not a hot mirror. <em>Option 2</em> keeps ML and closed loop up.</p>
+<div class="note"><strong>Close:</strong> Two clusters or three with CCS — <strong>roughly the same Magenta cost</strong>. Fund warm dual-feed, not a hot mirror. Option 2 keeps <strong>ML and closed-loop automation</strong> touchless on Cluster 3.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Clear · warm · Tier-1 ready</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Ops value today · Tier-1 for what’s next</span></div>
