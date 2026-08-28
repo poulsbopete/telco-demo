@@ -4,7 +4,7 @@ theme: default
 paginate: true
 size: 16:9
 title: T-Mobile · Site Disaster Recovery — Business Value
-description: Cost-efficient Site DR for T-Mobile — Polaris & Titan without hot-tier overages
+description: Close Magenta’s Site DR HA gap — warm Polaris & Titan options without hot-tier overages
 style: |
   section {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -126,25 +126,57 @@ style: |
   .bar-item .meta span { color: #00bfb3; font-weight: 700; }
   .bar-track { height: 8px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
   .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #e20074, #00bfb3); }
+  .gap {
+    background: rgba(191,72,0,.12);
+    border: 1px solid #bf4800;
+    border-radius: 12px;
+    padding: 10px 14px;
+    font-size: 0.62em;
+    color: #9a9aa0;
+    margin: 0.55em auto 0;
+    max-width: 38rem;
+    text-align: left;
+  }
+  .gap b { color: #fec514; display: block; margin-bottom: 0.2em; font-size: 1.05em; }
+  .today {
+    background: rgba(191,72,0,.1);
+    border: 1px solid #bf4800;
+    border-radius: 10px;
+    padding: 9px 11px;
+    font-size: 0.58em;
+    color: #9a9aa0;
+    margin-bottom: 0.35em;
+  }
+  .today b { display: block; color: #bf4800; font-size: 1.05em; margin-bottom: 0.15em; }
 ---
 
 <!-- _class: lead -->
 
 <span class="kicker">T-MOBILE · SITE DR</span>
 
-# Warm DR without cost overages
+# Today: no highly available Site DR
 
-## Polaris &amp; Titan — Magenta economics built in
+## Polaris alone is not HA — Magenta needs a second live path
 
-<p>T-Mobile is right to worry about DR spend. Two warm paths across <strong>Polaris</strong> and <strong>Titan</strong> land at <strong>roughly the same cost</strong> — the third cluster buys <strong>touchless automated failover</strong>, not a second hot estate.</p>
+<div class="gap">
+  <b>Current issue</b>
+  Observability lives in <strong>one primary path</strong>. A Polaris DC event means <strong>blind NOC / care / exec views</strong> — no warm peer site, no automated failover, no cost-efficient HA story. Snapshots alone are restore, not high availability.
+</div>
+
+<p>Two warm options across <strong>Polaris</strong> and <strong>Titan</strong> close that gap at <strong>roughly the same cost</strong> — without standing up a second full hot-tier estate.</p>
 
 ---
 
-<span class="kicker">T-MOBILE · TWO OPTIONS · SAME COST BAND</span>
+<span class="kicker">T-MOBILE · CLOSE THE HA GAP</span>
 
-# Two clusters or three — same Magenta spend band
+# From single-site risk to warm HA
 
-<p class="subhead">Both stay warm (Titan <strong>1 day hot · rest frozen</strong>). The delta is automation — not another hot-tier mirror.</p>
+<p class="subhead">Close today’s <strong>no HA</strong> gap. Both options stay warm (Titan <strong>1 day hot · rest frozen</strong>). Cost is comparable — the delta is automation.</p>
+
+<div class="today">
+  <b>Today · the issue</b>
+  No highly available Site DR — one primary cluster / DC. DC loss → hours of blind ops until restore. Not Magenta-grade continuity.
+</div>
 
 <div class="cols">
   <div class="opt">
@@ -176,9 +208,9 @@ style: |
   <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Cost is comparable either way. Option 2 spends the same band to <strong>remove human cutover</strong> — CCS on Cluster 3 keeps users and automation on one ops plane while Polaris/Titan stay warm, not hot-mirrored.</div>
+<div class="callout"><strong>Talk track:</strong> Today Magenta has <strong>no HA Site DR</strong>. These two paths cost about the same; Option 2 spends that band to <strong>remove human cutover</strong> — not to buy another hot mirror.</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>≈ same cost · Option 2 = touchless failover</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Close HA gap · ≈ same cost · Option 2 = touchless</span></div>
 
 ---
 
@@ -237,15 +269,15 @@ style: |
 
 # What Magenta is buying
 
-<p class="subhead">Continuity and evidence — engineered so DR is not the next OpEx surprise.</p>
+<p class="subhead">Close the <strong>no-HA</strong> gap — continuity engineered so DR is not the next OpEx surprise.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>Option 1 · two clusters</b>Polaris + Titan dual ingest — deliberate cutover</div>
-  <div class="pillar"><b>Option 2 · three + CCS</b>Same spend band — touchless automated failover</div>
+  <div class="pillar"><b>HA where there is none</b>Warm second path — not restore-from-snapshot as “DR”</div>
+  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS for touchless failover</div>
   <div class="pillar"><b>Complete after failover</b>Same logical view for NOC and exec dashboards</div>
   <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Two clusters or three with CCS — <strong>roughly the same Magenta cost</strong>. Option 2 buys <strong>touchless automated failover</strong> on Cluster 3, not another hot estate. Agree on “seconds of loss vs hours of blind ops,” then fund warm dual-feed — not a full hot mirror.</div>
+<div class="callout"><strong>Close:</strong> Magenta’s issue today is <strong>no highly available Site DR</strong>. Two clusters or three with CCS — <strong>roughly the same cost</strong> — close that gap. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate. Fund warm dual-feed — not a full hot mirror.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>As cost-efficient as warm DR allows</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Close the HA gap · cost-efficient warm DR</span></div>
