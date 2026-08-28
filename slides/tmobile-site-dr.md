@@ -159,6 +159,20 @@ style: |
     line-height: 1.35;
   }
   .uc b { display: block; color: #00bfb3; font-size: 1.05em; margin-bottom: 0.2em; }
+  .uc.now {
+    background: rgba(0,113,227,.1);
+    border-color: #0071e3;
+  }
+  .uc.now b { color: #0071e3; }
+  .section-label {
+    font-size: 0.48em;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #9a9aa0;
+    margin: 0.35em 0 0.2em;
+  }
+  .section-label.now { color: #0071e3; }
+  .section-label.next { color: #00bfb3; }
 ---
 
 <!-- _class: lead -->
@@ -174,7 +188,7 @@ style: |
   Elastic is <strong>not a core / Tier-1 app</strong> today: <strong>transaction data only</strong>, <strong>one DC (Polaris)</strong>, no Titan peer, no HA Site DR. Ahead: <strong>full-fledged T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong> — Magenta can’t run that on a single-DC footprint. Snapshots are restore, not Tier-1 continuity.
 </div>
 
-<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for data, ML, and closed loop — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
+<p>Still useful today on transaction data — <strong>real-time ops dashboards</strong>, search, and investigation. Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for full data, ML, and closed loop — two options at <strong>roughly the same cost</strong>.</p>
 
 ---
 
@@ -225,24 +239,32 @@ style: |
 
 ---
 
-<span class="kicker">T-MOBILE · FUTURE USE CASES</span>
+<span class="kicker">T-MOBILE · TODAY + NEXT</span>
 
-# What Tier-1 Elastic unlocks next
+# Useful now · powerful next
 
-<p class="subhead">Once Magenta has <strong>full T-Mobile data</strong>, <strong>ML decisions</strong>, and <strong>closed-loop automation</strong> on a warm HA footprint — these are the outcomes Elastic is built to solve.</p>
+<p class="subhead">Transaction data already delivers ops value. Tier-1 warm HA protects that today — and the Magenta use cases that follow.</p>
 
+<p class="section-label now">USEFUL TODAY · TRANSACTION DATA</p>
 <div class="uc-grid">
-  <div class="uc"><b>Closed-loop fault act</b>Detect RAN / core / transport faults → ML correlate → auto remediate without ticket ping-pong</div>
-  <div class="uc"><b>Activation &amp; eSIM SLA</b>Provisioning queues, SM-DP+, region hotspots — protect launch and migration weekends before churn</div>
-  <div class="uc"><b>Capacity &amp; surge forecast</b>ML lifecycle predicts traffic and care load so Magenta scales ahead of the spike</div>
-  <div class="uc"><b>Cross-domain RCA</b>One query across digital, core, RAN, and care — minutes to root cause, not hours of console hopping</div>
-  <div class="uc"><b>Care + NOC + exec one view</b>Same indexed stream: triage, churn-risk, revenue impact — personas stop arguing over different tools</div>
-  <div class="uc"><b>SIM-swap &amp; fraud SIEM</b>Security detections and cases on the same lake as ops — close the loop from anomaly to action</div>
+  <div class="uc now"><b>Real-time ops dashboards</b>Live transaction health for operations scenarios — NOC and ops see what’s failing now, not in a batch report</div>
+  <div class="uc now"><b>Search &amp; investigate</b>ES|QL / Discover on the same stream — drill from a dashboard spike to the offending transaction in seconds</div>
+  <div class="uc now"><b>Alerting on what you have</b>Threshold and anomaly alerts on indexed transactions — early signal before full Magenta data lands</div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Transactions prove the platform. Full Magenta data + ML + closed loop on <strong>Tier-1 warm HA</strong> is how these use cases stay up when Polaris or Titan takes a hit.</div>
+<p class="section-label next">NEXT · FULL T-MOBILE DATA + ML + CLOSED LOOP</p>
+<div class="uc-grid">
+  <div class="uc"><b>Closed-loop fault act</b>RAN / core / transport → ML correlate → auto remediate</div>
+  <div class="uc"><b>Activation &amp; eSIM SLA</b>Provisioning, SM-DP+, region hotspots — protect launch weekends</div>
+  <div class="uc"><b>Capacity &amp; surge forecast</b>ML predicts traffic and care load ahead of the spike</div>
+  <div class="uc"><b>Cross-domain RCA</b>Digital · core · RAN · care in one query — minutes not hours</div>
+  <div class="uc"><b>Care + NOC + exec one view</b>Triage, churn-risk, revenue — same indexed stream</div>
+  <div class="uc"><b>SIM-swap &amp; fraud SIEM</b>Security detections and cases on the same lake as ops</div>
+</div>
 
-<div class="slide-foot"><span>T-Mobile · future outcomes</span><span>Closed loop · SLA · RCA · security · one view</span></div>
+<div class="callout"><strong>Talk track:</strong> Don’t wait for full Magenta data to get value — <strong>real-time dashboards and ops investigation</strong> work on transactions today. Build Tier-1 warm HA now so those ops views — and tomorrow’s closed loop — don’t go dark on a Polaris outage.</div>
+
+<div class="slide-foot"><span>T-Mobile · today + next</span><span>Ops dashboards now · closed loop next</span></div>
 
 ---
 
@@ -253,12 +275,12 @@ style: |
 <p class="subhead">From <strong>transaction data</strong> to <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong> — Tier-1 warm HA Magenta can trust as a core system.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>Tier-1 for closed loop</b>Full Magenta data → ML decisions → closed-loop automation</div>
-  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS so ML/automation stays up</div>
-  <div class="pillar"><b>Future use cases</b>Fault act · eSIM SLA · surge forecast · RCA · fraud</div>
+  <div class="pillar"><b>Useful today</b>Real-time ops dashboards · search · alerts on transactions</div>
+  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS so ops/ML stay up</div>
+  <div class="pillar"><b>Powerful next</b>Full Magenta data → ML → closed-loop automation</div>
   <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Today Elastic holds <strong>transaction data</strong> on <strong>one DC</strong> — not Tier-1. Magenta is building toward <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong>. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR that makes Elastic Tier-1 before those use cases go live. Option 2 keeps <strong>ML and closed loop touchless</strong> on Cluster 3 — not another hot estate.</div>
+<div class="callout"><strong>Close:</strong> Magenta already gets value from <strong>real-time ops dashboards</strong> on transaction data — but Elastic is still <strong>one DC · not Tier-1</strong>. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) protects today’s ops views and makes Elastic Tier-1 before <strong>full T-Mobile data</strong>, <strong>ML decisions</strong>, and <strong>closed-loop automation</strong> go live. Option 2 keeps that loop <strong>touchless</strong> on Cluster 3.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Tier-1 before closed-loop automation</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Ops value today · Tier-1 for what’s next</span></div>
