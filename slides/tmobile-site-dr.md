@@ -158,6 +158,27 @@ style: |
   }
   .section-label.now { color: #0071e3; }
   .section-label.next { color: #00bfb3; margin-top: 0.55em; }
+  .arch {
+    margin: 0.35em auto 0.25em;
+    max-width: 860px;
+  }
+  .arch svg { width: 100%; height: auto; display: block; }
+  .bullets {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-top: 0.35em;
+  }
+  .bullet {
+    background: rgba(255,255,255,.03);
+    border: 1px solid #2a2a2e;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-size: 0.5em;
+    color: #9a9aa0;
+    line-height: 1.35;
+  }
+  .bullet b { display: block; color: #00bfb3; font-size: 1.05em; margin-bottom: 0.15em; }
 ---
 
 <!-- _class: lead -->
@@ -201,54 +222,46 @@ style: |
 
 ---
 
-<span class="kicker">TWO OPTIONS · SAME COST BAND</span>
+<span class="kicker">RECOMMENDED · WARM HA + CCS</span>
 
-# Warm HA — pick automation level
+# Three clusters · touchless failover
 
-<p class="sub">Close the HA gap without a second hot estate. Both keep Titan <strong>1 day hot · rest frozen</strong>. Cost is comparable — Option 2 spends the same band on <strong>touchless</strong> failover.</p>
+<p class="sub">Polaris + Titan dual ingest (Titan <strong>1 day hot · rest frozen</strong>) plus an ops cluster for ML, alerting, and UI via CCS — Tier-1 ready without a second hot estate.</p>
 
-<div class="split">
-  <div class="panel">
-    <span class="tag">OPTION 1</span>
-    <h3>Two clusters · two DCs</h3>
-    <svg viewBox="0 0 320 120" fill="none" aria-hidden="true">
-      <rect x="20" y="28" width="110" height="64" rx="10" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
-      <text x="75" y="58" text-anchor="middle" fill="#e20074" font-size="14" font-weight="700" font-family="sans-serif">Polaris</text>
-      <text x="75" y="76" text-anchor="middle" fill="#9a9aa0" font-size="11" font-family="sans-serif">Primary DC</text>
-      <rect x="190" y="28" width="110" height="64" rx="10" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
-      <text x="245" y="58" text-anchor="middle" fill="#e20074" font-size="14" font-weight="700" font-family="sans-serif">Titan</text>
-      <text x="245" y="76" text-anchor="middle" fill="#9a9aa0" font-size="11" font-family="sans-serif">Warm peer</text>
-      <path d="M136 60h48" stroke="#fff" stroke-width="2" stroke-dasharray="4 3"/>
-      <circle cx="160" cy="60" r="10" fill="#050816" stroke="#fff" stroke-width="1.5"/>
-      <text x="160" y="64" text-anchor="middle" fill="#fff" font-size="10" font-family="sans-serif">+</text>
-    </svg>
-    <p>Dual ingest into Polaris and Titan. Operators choose the live site and cut over deliberately when a DC fails.</p>
-    <div class="eq">≈ same cost as Option 2</div>
-  </div>
-  <div class="panel pick">
-    <span class="tag">OPTION 2</span>
-    <h3>Three clusters · CCS</h3>
-    <svg viewBox="0 0 320 120" fill="none" aria-hidden="true">
-      <rect x="8" y="38" width="88" height="52" rx="8" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
-      <text x="52" y="62" text-anchor="middle" fill="#e20074" font-size="12" font-weight="700" font-family="sans-serif">Polaris</text>
-      <text x="52" y="78" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">Data</text>
-      <rect x="116" y="38" width="88" height="52" rx="8" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
-      <text x="160" y="62" text-anchor="middle" fill="#e20074" font-size="12" font-weight="700" font-family="sans-serif">Titan</text>
-      <text x="160" y="78" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">Warm</text>
-      <rect x="224" y="28" width="88" height="72" rx="8" fill="rgba(0,191,179,.12)" stroke="#00bfb3" stroke-width="2"/>
-      <text x="268" y="52" text-anchor="middle" fill="#00bfb3" font-size="12" font-weight="700" font-family="sans-serif">Ops 3</text>
-      <text x="268" y="70" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">ML · CCS</text>
-      <text x="268" y="86" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">UI · Alert</text>
-      <path d="M100 64h12M208 64h12" stroke="#fff" stroke-width="1.5"/>
-    </svg>
-    <p>Same warm data plane, plus an ops cluster for ML, alerting, and UI via CCS — <strong>touchless automated failover</strong>.</p>
-    <div class="eq">≈ same cost as Option 1</div>
-  </div>
+<div class="arch">
+  <svg viewBox="0 0 860 200" fill="none" aria-hidden="true">
+    <rect x="20" y="70" width="70" height="50" rx="10" fill="rgba(255,255,255,.06)" stroke="#2a2a2e" stroke-width="2"/>
+    <text x="55" y="100" text-anchor="middle" fill="#fff" font-size="13" font-weight="700" font-family="sans-serif">Kafka</text>
+    <path d="M96 95h28" stroke="#fff" stroke-width="2"/>
+    <polygon points="128,95 120,90 120,100" fill="#fff"/>
+    <rect x="140" y="50" width="160" height="90" rx="12" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
+    <text x="220" y="88" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Polaris</text>
+    <text x="220" y="112" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">Ingest · transform · data</text>
+    <path d="M308 95h28" stroke="#fff" stroke-width="2"/>
+    <polygon points="340,95 332,90 332,100" fill="#fff"/>
+    <text x="324" y="78" text-anchor="middle" fill="#9a9aa0" font-size="11" font-family="sans-serif">+</text>
+    <rect x="350" y="50" width="160" height="90" rx="12" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
+    <text x="430" y="88" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Titan</text>
+    <text x="430" y="112" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">1d hot · rest frozen</text>
+    <path d="M518 95h28" stroke="#fff" stroke-width="2"/>
+    <polygon points="550,95 542,90 542,100" fill="#fff"/>
+    <rect x="560" y="35" width="200" height="120" rx="12" fill="rgba(0,191,179,.12)" stroke="#00bfb3" stroke-width="2"/>
+    <text x="660" y="78" text-anchor="middle" fill="#00bfb3" font-size="18" font-weight="700" font-family="sans-serif">Ops Cluster 3</text>
+    <text x="660" y="104" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">ML · alerting · dashboards</text>
+    <text x="660" y="126" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">CCS · touchless failover</text>
+    <text x="780" y="175" text-anchor="middle" fill="#00bfb3" font-size="12" font-weight="700" font-family="sans-serif">Users &amp; automation land here</text>
+  </svg>
 </div>
 
-<div class="note"><strong>Avoid:</strong> a full hot mirror of Polaris on Titan. Warm dual-feed + shared snapshots caps spend while Magenta builds toward Tier-1.</div>
+<div class="bullets">
+  <div class="bullet"><b>Warm dual-feed</b>Kafka into Polaris and Titan — no second event bus, no idle museum DR</div>
+  <div class="bullet"><b>Cost-capped Titan</b>1 day hot, remainder frozen — lookback without mirroring Polaris hot spend</div>
+  <div class="bullet"><b>Touchless ops plane</b>ML, alerts, and UI on Cluster 3 via CCS — stays up when a data DC fails</div>
+</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Warm HA · cost-capped · ≈ same band</span></div>
+<div class="note"><strong>Avoid:</strong> a full hot mirror of Polaris on Titan. This design buys <strong>touchless automated failover</strong> and Tier-1 continuity — not another hot estate.</div>
+
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan + Ops</span><span>Warm HA · CCS · touchless</span></div>
 
 ---
 
@@ -341,8 +354,8 @@ style: |
   </div>
   <span class="jarrow">→</span>
   <div class="jstep magenta">
-    <b>Warm HA</b>
-    <span>Polaris + Titan · 2 or 3 clusters</span>
+    <b>Warm HA + CCS</b>
+    <span>Polaris + Titan + Ops Cluster 3</span>
   </div>
   <span class="jarrow">→</span>
   <div class="jstep teal">
@@ -352,26 +365,23 @@ style: |
 </div>
 
 <div class="viz">
-  <svg viewBox="0 0 880 160" fill="none" aria-hidden="true">
-    <rect x="40" y="40" width="160" height="90" rx="12" fill="rgba(226,0,116,.1)" stroke="#e20074" stroke-width="2"/>
-    <text x="120" y="78" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Polaris</text>
-    <text x="120" y="102" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">Data plane</text>
-    <rect x="260" y="40" width="160" height="90" rx="12" fill="rgba(226,0,116,.1)" stroke="#e20074" stroke-width="2"/>
-    <text x="340" y="78" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Titan</text>
-    <text x="340" y="102" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">1d hot · frozen</text>
-    <rect x="480" y="30" width="180" height="110" rx="12" fill="rgba(0,191,179,.1)" stroke="#00bfb3" stroke-width="2"/>
-    <text x="570" y="72" text-anchor="middle" fill="#00bfb3" font-size="18" font-weight="700" font-family="sans-serif">Ops Cluster 3</text>
-    <text x="570" y="98" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">ML · alert · CCS</text>
-    <text x="570" y="118" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">Touchless failover</text>
-    <path d="M210 85h40M430 85h40" stroke="#fff" stroke-width="2"/>
-    <polygon points="248,85 240,80 240,90" fill="#fff"/>
-    <polygon points="468,85 460,80 460,90" fill="#fff"/>
-    <text x="780" y="78" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="sans-serif">≈ same</text>
-    <text x="780" y="100" text-anchor="middle" fill="#00bfb3" font-size="16" font-weight="700" font-family="sans-serif">cost band</text>
-    <path d="M680 85h40" stroke="#2a2a2e" stroke-width="2" stroke-dasharray="4 3"/>
+  <svg viewBox="0 0 720 150" fill="none" aria-hidden="true">
+    <rect x="30" y="30" width="160" height="90" rx="12" fill="rgba(226,0,116,.1)" stroke="#e20074" stroke-width="2"/>
+    <text x="110" y="70" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Polaris</text>
+    <text x="110" y="94" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">Data plane</text>
+    <rect x="240" y="30" width="160" height="90" rx="12" fill="rgba(226,0,116,.1)" stroke="#e20074" stroke-width="2"/>
+    <text x="320" y="70" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Titan</text>
+    <text x="320" y="94" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">1d hot · frozen</text>
+    <rect x="450" y="20" width="220" height="110" rx="12" fill="rgba(0,191,179,.1)" stroke="#00bfb3" stroke-width="2"/>
+    <text x="560" y="62" text-anchor="middle" fill="#00bfb3" font-size="18" font-weight="700" font-family="sans-serif">Ops Cluster 3</text>
+    <text x="560" y="88" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">ML · alert · CCS</text>
+    <text x="560" y="108" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">Touchless failover</text>
+    <path d="M200 75h30M410 75h30" stroke="#fff" stroke-width="2"/>
+    <polygon points="228,75 220,70 220,80" fill="#fff"/>
+    <polygon points="438,75 430,70 430,80" fill="#fff"/>
   </svg>
 </div>
 
-<div class="note"><strong>Close:</strong> Two clusters or three with CCS — <strong>roughly the same Magenta cost</strong>. Fund warm dual-feed, not a hot mirror. Option 2 keeps <strong>ML and closed-loop automation</strong> touchless on Cluster 3.</div>
+<div class="note"><strong>Close:</strong> Fund warm dual-feed + CCS — not a hot mirror. Ops Cluster 3 keeps <strong>dashboards, ML, and closed-loop automation</strong> touchless when a data DC fails.</div>
 
 <div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Ops value today · Tier-1 for what’s next</span></div>
