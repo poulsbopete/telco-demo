@@ -160,10 +160,10 @@ style: |
 
 <div class="gap">
   <b>Current issue</b>
-  Elastic is <strong>not a core / Tier-1 app</strong> today: <strong>transaction data only</strong>, <strong>one DC (Polaris)</strong>, no Titan peer, no HA Site DR. Ahead: <strong>full-fledged T-Mobile data</strong> and <strong>ML-based decisions</strong> on that data — Magenta can’t run that on a single-DC footprint. Snapshots are restore, not Tier-1 continuity.
+  Elastic is <strong>not a core / Tier-1 app</strong> today: <strong>transaction data only</strong>, <strong>one DC (Polaris)</strong>, no Titan peer, no HA Site DR. Ahead: <strong>full-fledged T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong> — Magenta can’t run that on a single-DC footprint. Snapshots are restore, not Tier-1 continuity.
 </div>
 
-<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for that data and ML wave — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
+<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for data, ML, and closed loop — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
 
 ---
 
@@ -171,11 +171,11 @@ style: |
 
 # Make Elastic a Magenta Tier-1 app
 
-<p class="subhead">Today: transactions. Next: <strong>full Magenta data</strong> + <strong>ML-based decisions</strong>. Build Tier-1 warm HA now — so the footprint is ready when automation depends on it.</p>
+<p class="subhead">Today: transactions. Next: <strong>full Magenta data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong>. Build Tier-1 warm HA now — before automation depends on it.</p>
 
 <div class="today">
   <b>Today · the issue</b>
-  <strong>Transaction data only</strong> · not Tier-1 · <strong>one DC (Polaris)</strong> · no HA. Next: <strong>full T-Mobile data</strong> driving <strong>ML-based decisions</strong> — Magenta won’t put that on a single-DC, non-core system.
+  <strong>Transaction data only</strong> · not Tier-1 · <strong>one DC (Polaris)</strong> · no HA. Next: <strong>full T-Mobile data</strong> → <strong>ML decisions</strong> → <strong>closed-loop automation</strong> — Magenta won’t put that on a single-DC, non-core system.
 </div>
 
 <div class="cols">
@@ -188,7 +188,7 @@ style: |
   <div class="opt pick">
     <span class="tag">OPTION 2</span>
     <b>Three clusters · CCS on Cluster 3</b>
-    Same Polaris + Titan data plane, plus an ops cluster for <strong>ML / alerting / UI</strong> via CCS — <strong>touchless automated failover</strong> when Magenta decisions depend on ML.
+    Same Polaris + Titan data plane, plus an ops cluster for <strong>ML / alerting / UI</strong> via CCS — <strong>touchless automated failover</strong> when Magenta runs ML decisions and <strong>closed-loop automation</strong>.
     <div class="same">≈ same cost as Option 1</div>
   </div>
 </div>
@@ -208,9 +208,9 @@ style: |
   <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Transactions today; <strong>full T-Mobile data + ML-based decisions</strong> next. Magenta won’t call Elastic <strong>Tier-1</strong> while it’s one DC · no HA. These two warm paths cost about the same; Option 2 keeps <strong>ML and automation</strong> on Cluster 3 with <strong>touchless failover</strong> — DR sized for decisions that can’t go dark.</div>
+<div class="callout"><strong>Talk track:</strong> Transactions today; next <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong>. Magenta won’t call Elastic <strong>Tier-1</strong> while it’s one DC · no HA. These two warm paths cost about the same; Option 2 keeps <strong>ML and closed loop</strong> on Cluster 3 with <strong>touchless failover</strong> — DR sized for automation that can’t go dark.</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Transactions now · ML decisions on full Magenta data</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Transactions now · ML + closed loop next</span></div>
 
 ---
 
