@@ -269,15 +269,15 @@ style: |
 
 # What Magenta is buying
 
-<p class="subhead">Elevate Elastic from <strong>sidecar</strong> to <strong>Tier-1</strong> — with warm HA Magenta can trust as a core system.</p>
+<p class="subhead">From <strong>transaction data</strong> to <strong>full T-Mobile data</strong> — Tier-1 warm HA Magenta can trust as a core system.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>Tier-1 classification</b>DR + dual-DC HA — qualifies Elastic as a Magenta core app</div>
+  <div class="pillar"><b>Tier-1 for what’s next</b>Sized for full Magenta data — not just today’s transactions</div>
   <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS for touchless failover</div>
   <div class="pillar"><b>Complete after failover</b>Same logical view for NOC and exec dashboards</div>
   <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Today Elastic is <strong>not a core / Tier-1 system</strong> — <strong>one DC only</strong>, no HA. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR solution that makes it Tier-1. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate.</div>
+<div class="callout"><strong>Close:</strong> Today Elastic holds <strong>transaction data</strong> on <strong>one DC</strong> — not Tier-1. <strong>Full-fledged T-Mobile data is coming</strong>. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR that makes Elastic a Magenta Tier-1 app before that wave lands. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Make Elastic Magenta Tier-1</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Tier-1 before full Magenta data</span></div>
