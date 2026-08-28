@@ -269,15 +269,15 @@ style: |
 
 # What Magenta is buying
 
-<p class="subhead">From <strong>transaction data</strong> to <strong>full T-Mobile data</strong> and <strong>ML-based decisions</strong> — Tier-1 warm HA Magenta can trust as a core system.</p>
+<p class="subhead">From <strong>transaction data</strong> to <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong> — Tier-1 warm HA Magenta can trust as a core system.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>Tier-1 for ML decisions</b>Full Magenta data + ML — not just today’s transactions</div>
-  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS so ML stays up on failover</div>
+  <div class="pillar"><b>Tier-1 for closed loop</b>Full Magenta data → ML decisions → closed-loop automation</div>
+  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS so ML/automation stays up</div>
   <div class="pillar"><b>Complete after failover</b>Same logical view for NOC and exec dashboards</div>
   <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Today Elastic holds <strong>transaction data</strong> on <strong>one DC</strong> — not Tier-1. Ahead: <strong>full-fledged T-Mobile data</strong> and <strong>ML-based decisions</strong> on it. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR that makes Elastic a Magenta Tier-1 app before those decisions go live. Option 2 keeps <strong>ML touchless</strong> on Cluster 3 — not another hot estate.</div>
+<div class="callout"><strong>Close:</strong> Today Elastic holds <strong>transaction data</strong> on <strong>one DC</strong> — not Tier-1. Magenta is building toward <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong>. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) is the DR that makes Elastic Tier-1 before that loop goes live. Option 2 keeps <strong>ML and closed loop touchless</strong> on Cluster 3 — not another hot estate.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Tier-1 before ML on full Magenta data</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Tier-1 before closed-loop automation</span></div>
