@@ -160,10 +160,10 @@ style: |
 
 <div class="gap">
   <b>Current issue</b>
-  Elastic is <strong>not used as a core / Tier-1 app</strong> today: <strong>one data center only (Polaris)</strong>, no Titan peer, no highly available Site DR. A Polaris event means <strong>blind NOC / care / exec views</strong>. Snapshots are restore — not Tier-1 continuity.
+  Elastic is <strong>not a core / Tier-1 app</strong> today: <strong>transaction data only</strong>, <strong>one DC (Polaris)</strong>, no Titan peer, no HA Site DR. <strong>Full-fledged T-Mobile data is coming</strong> — Magenta can’t scale that onto a single-DC footprint. Snapshots are restore, not Tier-1 continuity.
 </div>
 
-<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
+<p>Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for that data growth — two options at <strong>roughly the same cost</strong>, without a second full hot-tier estate.</p>
 
 ---
 
@@ -171,11 +171,11 @@ style: |
 
 # Make Elastic a Magenta Tier-1 app
 
-<p class="subhead">Today it isn’t core. This DR design is what qualifies it as <strong>Tier-1</strong> — single-DC risk closed, warm HA on, cost capped.</p>
+<p class="subhead">Today: transactions. Next: <strong>full Magenta data</strong>. Build Tier-1 warm HA now — so the footprint is ready when the firehose arrives.</p>
 
 <div class="today">
   <b>Today · the issue</b>
-  <strong>Not a core / Tier-1 system</strong> · <strong>one DC only (Polaris)</strong> · no Titan · no HA Site DR. Polaris loss → hours of blind ops. Magenta won’t run Tier-1 on that footprint.
+  <strong>Transaction data only</strong> · not Tier-1 · <strong>one DC (Polaris)</strong> · no HA. <strong>Full-fledged T-Mobile data is next</strong> — Magenta won’t put that on a single-DC, non-core system.
 </div>
 
 <div class="cols">
@@ -208,9 +208,9 @@ style: |
   <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Magenta won’t treat Elastic as <strong>Tier-1</strong> while it’s <strong>one DC · no HA</strong>. These two warm paths cost about the same; Option 2 spends that band on <strong>touchless failover</strong> — the DR story that makes it a core system.</div>
+<div class="callout"><strong>Talk track:</strong> Transactions today; <strong>full T-Mobile data tomorrow</strong>. Magenta won’t call Elastic <strong>Tier-1</strong> while it’s one DC · no HA. These two warm paths cost about the same; Option 2 buys <strong>touchless failover</strong> — DR sized for the data that’s coming.</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Not Tier-1 today · DR makes it Tier-1</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Transactions now · full Magenta data next</span></div>
 
 ---
 
