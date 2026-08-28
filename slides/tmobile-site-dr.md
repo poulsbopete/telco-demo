@@ -64,6 +64,40 @@ style: |
   .flow { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0.45em 0 0.15em; font-size: 0.58em; color: #9a9aa0; flex-wrap: wrap; }
   .flow span { background: rgba(255,255,255,.06); border: 1px solid #2a2a2e; border-radius: 8px; padding: 5px 9px; color: #fff; }
   .flow em { font-style: normal; color: #e20074; font-weight: 700; }
+  .big-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 0.35em; }
+  .big {
+    background: linear-gradient(165deg, rgba(0,191,179,.12), rgba(255,255,255,.03));
+    border: 1px solid #2a2a2e;
+    border-radius: 16px;
+    padding: 16px 12px 14px;
+    text-align: center;
+    min-height: 118px;
+  }
+  .big .n {
+    display: block;
+    font-size: 1.85em;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: #00bfb3;
+    margin-bottom: 0.28em;
+  }
+  .big .n.magenta { color: #e20074; }
+  .big .n.blue { color: #0071e3; }
+  .big .n.warn { color: #fec514; }
+  .big .l { display: block; font-size: 0.52em; font-weight: 700; color: #fff; letter-spacing: 0.02em; margin-bottom: 0.25em; }
+  .big .d { display: block; font-size: 0.48em; color: #9a9aa0; line-height: 1.35; }
+  .analyst-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0.55em; }
+  .analyst-badge { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 12px; padding: 10px 12px; font-size: 0.55em; line-height: 1.35; text-align: left; }
+  .analyst-badge b { display: block; color: #00bfb3; font-size: 1.05em; margin-bottom: 0.15em; }
+  .analyst-badge span { color: #9a9aa0; }
+  .bar-row { margin-top: 0.45em; }
+  .bar-item { margin-bottom: 0.45em; }
+  .bar-item .meta { display: flex; justify-content: space-between; font-size: 0.55em; margin-bottom: 0.2em; }
+  .bar-item .meta b { color: #fff; }
+  .bar-item .meta span { color: #00bfb3; font-weight: 700; }
+  .bar-track { height: 10px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #e20074, #00bfb3); }
 ---
 
 <!-- _class: lead -->
@@ -135,6 +169,57 @@ style: |
 </div>
 
 <div class="slide-foot"><span>T-Mobile · cost-efficient DR</span><span>Warm Titan · frozen lookback · shared snapshots</span></div>
+
+---
+
+<span class="kicker">ELASTIC BY THE NUMBERS</span>
+
+# Proven at scale — relevant to Magenta economics
+
+<p class="subhead">Infographic proof points for cost, continuity, and platform credibility — not a second hot estate.</p>
+
+<div class="big-grid">
+  <div class="big">
+    <span class="n magenta">50%+</span>
+    <span class="l">Fortune 500</span>
+    <span class="d">Choose Elastic for search, security, and observability</span>
+  </div>
+  <div class="big">
+    <span class="n">50–75%</span>
+    <span class="l">Storage savings</span>
+    <span class="d">Searchable Snapshots / frozen tiers vs keeping everything hot</span>
+  </div>
+  <div class="big">
+    <span class="n blue">80%</span>
+    <span class="l">RCA reduction</span>
+    <span class="d">Telefónica Germany when signals connect on one platform</span>
+  </div>
+  <div class="big">
+    <span class="n warn">1</span>
+    <span class="l">Query language</span>
+    <span class="d">ES|QL across logs, metrics, traces — board and engineer</span>
+  </div>
+</div>
+
+<div class="bar-row">
+  <div class="bar-item">
+    <div class="meta"><b>Hot-tier mirror of Polaris on Titan</b><span>Cost risk ↑↑</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:92%"></div></div>
+  </div>
+  <div class="bar-item">
+    <div class="meta"><b>This design · 1d hot + frozen + shared snapshots</b><span>Cost capped</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:38%"></div></div>
+  </div>
+</div>
+
+<div class="analyst-row">
+  <div class="analyst-badge"><b>Gartner® Magic Quadrant™</b><span><strong>Leader</strong> — Observability Platforms (2025)</span></div>
+  <div class="analyst-badge"><b>Gartner® Magic Quadrant™</b><span><strong>Visionary</strong> — SIEM (2025)</span></div>
+  <div class="analyst-badge"><b>Forrester Wave™</b><span><strong>Leader</strong> — Security Analytics Platforms, Q2 2025</span></div>
+  <div class="analyst-badge"><b>IDC MarketScape</b><span><strong>Leader</strong> — Worldwide XDR Software (2025)</span></div>
+</div>
+
+<div class="slide-foot"><span>Elastic by the numbers</span><span>Analyst recognition · storage economics · telco proof</span></div>
 
 ---
 
