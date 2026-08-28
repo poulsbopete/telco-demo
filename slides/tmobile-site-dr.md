@@ -10,277 +10,333 @@ style: |
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
     background: #050816;
     color: #f5f5f7;
-    padding: 32px 44px 26px;
-    font-size: 21px;
+    padding: 28px 40px 22px;
+    font-size: 22px;
   }
   section.lead { text-align: center; justify-content: center; }
-  section.lead h1 { font-size: 1.95em; font-weight: 700; letter-spacing: -0.03em; margin: 0; color: #fff; }
-  section.lead h2 { color: #00bfb3; font-size: 0.88em; font-weight: 600; margin: 0.45em 0 0; }
-  section.lead p { color: #9a9aa0; font-size: 0.86em; margin-top: 0.85em; max-width: 40rem; margin-left: auto; margin-right: auto; }
-  h1 { font-size: 1.22em; font-weight: 700; margin: 0 0 0.25em; letter-spacing: -0.02em; color: #fff; line-height: 1.2; }
+  section.lead h1 { font-size: 1.85em; font-weight: 700; letter-spacing: -0.03em; margin: 0; color: #fff; }
+  section.lead h2 { color: #00bfb3; font-size: 0.78em; font-weight: 600; margin: 0.4em 0 0; }
+  h1 { font-size: 1.35em; font-weight: 700; margin: 0 0 0.15em; letter-spacing: -0.02em; color: #fff; line-height: 1.15; }
   p { color: #9a9aa0; }
   strong { color: #fff; }
-  .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start; margin-top: 0.3em; }
-  .cols-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 0.3em; }
-  .stat-row { display: flex; gap: 8px; margin-top: 0.35em; }
-  .stat { flex: 1; background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 12px; padding: 9px 10px; text-align: center; }
-  .stat b { display: block; font-size: 0.95em; color: #00bfb3; margin-bottom: 0.15em; }
-  .stat span { font-size: 0.52em; color: #9a9aa0; line-height: 1.3; display: block; }
-  .callout { background: #0071e3; color: #fff; border-radius: 12px; padding: 10px 14px; font-size: 0.66em; margin-top: 0.4em; }
-  .callout strong { color: #fff; }
-  .pillar { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 10px; padding: 9px 11px; font-size: 0.62em; color: #9a9aa0; }
-  .pillar b { display: block; color: #00bfb3; font-size: 1.02em; margin-bottom: 0.15em; }
-  .pillar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 0.3em; }
-  .dc { background: rgba(226,0,116,.08); border: 1px solid rgba(226,0,116,.45); border-radius: 10px; padding: 9px 10px; font-size: 0.58em; color: #9a9aa0; text-align: center; }
-  .dc b { display: block; color: #e20074; font-size: 1.08em; margin-bottom: 0.15em; }
-  .ops { background: rgba(0,191,179,.08); border: 1px solid #00bfb3; border-radius: 10px; padding: 9px 10px; font-size: 0.58em; color: #9a9aa0; text-align: center; }
-  .ops b { display: block; color: #00bfb3; font-size: 1.08em; margin-bottom: 0.15em; }
-  .cost { background: rgba(0,191,179,.06); border: 1px solid #00bfb3; border-radius: 10px; padding: 9px 11px; font-size: 0.62em; color: #9a9aa0; }
-  .cost b { display: block; color: #00bfb3; font-size: 1.02em; margin-bottom: 0.15em; }
-  .avoid { background: rgba(191,72,0,.1); border: 1px solid #bf4800; border-radius: 10px; padding: 9px 11px; font-size: 0.62em; color: #9a9aa0; }
-  .avoid b { display: block; color: #bf4800; font-size: 1.02em; margin-bottom: 0.15em; }
-  .opt {
-    background: rgba(255,255,255,.04);
-    border: 1px solid #2a2a2e;
-    border-radius: 12px;
-    padding: 11px 12px;
-    font-size: 0.58em;
-    color: #9a9aa0;
-    line-height: 1.35;
-  }
-  .opt.pick {
-    background: rgba(0,191,179,.08);
-    border-color: #00bfb3;
-  }
-  .opt .tag {
-    display: inline-block;
-    font-size: 0.85em;
-    font-weight: 700;
-    letter-spacing: 0.04em;
-    color: #e20074;
-    margin-bottom: 0.35em;
-  }
-  .opt.pick .tag { color: #00bfb3; }
-  .opt b { display: block; color: #fff; font-size: 1.08em; margin-bottom: 0.25em; }
-  .opt .same {
-    margin-top: 0.45em;
-    padding-top: 0.4em;
-    border-top: 1px solid #2a2a2e;
-    color: #00bfb3;
-    font-weight: 700;
-    font-size: 0.95em;
-  }
   .kicker {
     display: inline-block;
     background: #e20074;
     color: #fff;
-    font-size: 0.48em;
+    font-size: 0.45em;
     font-weight: 700;
     letter-spacing: 0.06em;
     padding: 3px 9px;
-    margin-bottom: 0.4em;
+    margin-bottom: 0.35em;
   }
-  .subhead { color: #9a9aa0; font-size: 0.64em; line-height: 1.4; margin: 0.25em 0 0.5em; max-width: 94%; }
-  .subhead strong { color: #fff; }
+  .sub { color: #9a9aa0; font-size: 0.62em; margin: 0.15em 0 0.55em; }
+  .sub strong { color: #fff; }
   .slide-foot {
-    position: absolute; bottom: 18px; left: 44px; right: 44px;
+    position: absolute; bottom: 16px; left: 40px; right: 40px;
     border-top: 2px solid #e20074;
-    padding-top: 6px;
-    font-size: 0.48em;
+    padding-top: 5px;
+    font-size: 0.45em;
     color: #9a9aa0;
     display: flex; justify-content: space-between;
   }
-  .flow { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 0.3em 0 0.1em; font-size: 0.52em; color: #9a9aa0; flex-wrap: wrap; }
-  .flow span { background: rgba(255,255,255,.06); border: 1px solid #2a2a2e; border-radius: 7px; padding: 4px 8px; color: #fff; }
-  .flow em { font-style: normal; color: #e20074; font-weight: 700; }
-  .big-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 0.25em; }
-  .big {
-    background: linear-gradient(165deg, rgba(0,191,179,.12), rgba(255,255,255,.03));
+  .viz { display: flex; justify-content: center; margin: 0.4em 0 0.2em; }
+  .viz svg { width: 100%; max-width: 920px; height: auto; }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 0.4em; align-items: stretch; }
+  .panel {
+    background: rgba(255,255,255,.03);
     border: 1px solid #2a2a2e;
-    border-radius: 12px;
-    padding: 10px 8px 9px;
+    border-radius: 14px;
+    padding: 14px 14px 12px;
     text-align: center;
   }
-  .big .n {
-    display: block;
-    font-size: 1.45em;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    color: #00bfb3;
-    margin-bottom: 0.18em;
-  }
-  .big .n.magenta { color: #e20074; }
-  .big .n.blue { color: #0071e3; }
-  .big .n.warn { color: #fec514; }
-  .big .l { display: block; font-size: 0.48em; font-weight: 700; color: #fff; margin-bottom: 0.12em; }
-  .big .d { display: block; font-size: 0.44em; color: #9a9aa0; line-height: 1.3; }
-  .analyst-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 7px; margin-top: 0.35em; }
-  .analyst-badge { background: rgba(255,255,255,.04); border: 1px solid #2a2a2e; border-radius: 9px; padding: 7px 8px; font-size: 0.46em; line-height: 1.3; text-align: left; }
-  .analyst-badge b { display: block; color: #00bfb3; margin-bottom: 0.1em; }
-  .analyst-badge span { color: #9a9aa0; }
-  .bar-row { margin-top: 0.3em; }
-  .bar-item { margin-bottom: 0.28em; }
-  .bar-item .meta { display: flex; justify-content: space-between; font-size: 0.5em; margin-bottom: 0.15em; }
-  .bar-item .meta b { color: #fff; }
-  .bar-item .meta span { color: #00bfb3; font-weight: 700; }
-  .bar-track { height: 8px; border-radius: 999px; background: rgba(255,255,255,.08); overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, #e20074, #00bfb3); }
-  .gap {
-    background: rgba(191,72,0,.12);
-    border: 1px solid #bf4800;
-    border-radius: 12px;
-    padding: 10px 14px;
-    font-size: 0.62em;
-    color: #9a9aa0;
-    margin: 0.55em auto 0;
-    max-width: 38rem;
-    text-align: left;
-  }
-  .gap b { color: #fec514; display: block; margin-bottom: 0.2em; font-size: 1.05em; }
-  .today {
-    background: rgba(191,72,0,.1);
-    border: 1px solid #bf4800;
-    border-radius: 10px;
-    padding: 9px 11px;
-    font-size: 0.58em;
-    color: #9a9aa0;
-    margin-bottom: 0.35em;
-  }
-  .today b { display: block; color: #bf4800; font-size: 1.05em; margin-bottom: 0.15em; }
-  .uc-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 0.35em; }
-  .uc {
-    background: rgba(255,255,255,.04);
-    border: 1px solid #2a2a2e;
-    border-radius: 10px;
-    padding: 9px 10px;
-    font-size: 0.52em;
-    color: #9a9aa0;
-    line-height: 1.35;
-  }
-  .uc b { display: block; color: #00bfb3; font-size: 1.05em; margin-bottom: 0.2em; }
-  .uc.now {
-    background: rgba(0,113,227,.1);
-    border-color: #0071e3;
-  }
-  .uc.now b { color: #0071e3; }
-  .section-label {
+  .panel.pick { border-color: #00bfb3; background: rgba(0,191,179,.07); }
+  .panel .tag {
+    display: inline-block;
     font-size: 0.48em;
     font-weight: 700;
-    letter-spacing: 0.06em;
-    color: #9a9aa0;
-    margin: 0.35em 0 0.2em;
+    letter-spacing: 0.05em;
+    color: #e20074;
+    margin-bottom: 0.35em;
   }
-  .section-label.now { color: #0071e3; }
-  .section-label.next { color: #00bfb3; }
+  .panel.pick .tag { color: #00bfb3; }
+  .panel h3 { margin: 0 0 0.35em; font-size: 0.78em; color: #fff; font-weight: 700; }
+  .panel p { margin: 0; font-size: 0.52em; line-height: 1.35; color: #9a9aa0; }
+  .panel .eq {
+    margin-top: 0.55em;
+    font-size: 0.52em;
+    font-weight: 700;
+    color: #00bfb3;
+  }
+  .panel svg { width: 100%; max-width: 360px; height: auto; margin: 0.2em auto 0.45em; display: block; }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-top: 0.25em; }
+  .tile {
+    background: rgba(255,255,255,.03);
+    border: 1px solid #2a2a2e;
+    border-radius: 14px;
+    padding: 14px 12px 12px;
+    text-align: center;
+  }
+  .tile.now { border-color: #0071e3; background: rgba(0,113,227,.08); }
+  .tile.next { border-color: #00bfb3; background: rgba(0,191,179,.07); }
+  .tile .ico { width: 52px; height: 52px; margin: 0 auto 0.45em; }
+  .tile b { display: block; font-size: 0.62em; color: #fff; margin-bottom: 0.2em; }
+  .tile span { display: block; font-size: 0.48em; color: #9a9aa0; line-height: 1.3; }
+  .journey {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin: 0.7em 0 0.5em;
+    flex-wrap: wrap;
+  }
+  .jstep {
+    background: rgba(255,255,255,.04);
+    border: 1px solid #2a2a2e;
+    border-radius: 12px;
+    padding: 12px 16px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .jstep b { display: block; font-size: 0.58em; color: #fff; }
+  .jstep span { display: block; font-size: 0.44em; color: #9a9aa0; margin-top: 0.15em; }
+  .jstep.magenta { border-color: rgba(226,0,116,.55); }
+  .jstep.magenta b { color: #e20074; }
+  .jstep.blue { border-color: #0071e3; }
+  .jstep.blue b { color: #0071e3; }
+  .jstep.teal { border-color: #00bfb3; }
+  .jstep.teal b { color: #00bfb3; }
+  .jarrow { color: #e20074; font-size: 1.1em; font-weight: 700; }
+  .one-liner {
+    text-align: center;
+    font-size: 0.72em;
+    color: #fff;
+    margin-top: 0.35em;
+    line-height: 1.35;
+  }
+  .one-liner em { font-style: normal; color: #00bfb3; }
+  .pain-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    margin: 0.7em auto 0;
+    max-width: 820px;
+  }
+  .pain {
+    background: rgba(191,72,0,.12);
+    border: 1px solid #bf4800;
+    border-radius: 14px;
+    padding: 16px 12px;
+    text-align: center;
+  }
+  .pain .ico { width: 48px; height: 48px; margin: 0 auto 0.4em; }
+  .pain b { display: block; font-size: 0.68em; color: #fec514; margin-bottom: 0.15em; }
+  .pain span { display: block; font-size: 0.5em; color: #9a9aa0; line-height: 1.3; }
 ---
 
 <!-- _class: lead -->
 
 <span class="kicker">T-MOBILE · SITE DR</span>
 
-# Today: not Tier-1 · one DC · no HA
+# One DC. Not Tier-1. No HA.
 
-## Not a Magenta core system yet — DR is the unlock
+## Transactions today · Magenta Tier-1 tomorrow
 
-<div class="gap">
-  <b>Current issue</b>
-  Elastic is <strong>not a core / Tier-1 app</strong> today: <strong>transaction data only</strong>, <strong>one DC (Polaris)</strong>, no Titan peer, no HA Site DR. Ahead: <strong>full-fledged T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong> — Magenta can’t run that on a single-DC footprint. Snapshots are restore, not Tier-1 continuity.
+<div class="pain-row">
+  <div class="pain">
+    <svg class="ico" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <rect x="14" y="10" width="20" height="28" rx="3" stroke="#bf4800" stroke-width="2"/>
+      <circle cx="24" cy="34" r="2" fill="#fec514"/>
+      <path d="M10 42h28" stroke="#bf4800" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    <b>One data center</b>
+    <span>Polaris only — no Titan peer</span>
+  </div>
+  <div class="pain">
+    <svg class="ico" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <circle cx="24" cy="24" r="14" stroke="#bf4800" stroke-width="2"/>
+      <path d="M16 24h16M24 16v16" stroke="#fec514" stroke-width="2" stroke-linecap="round"/>
+      <path d="M8 8l32 32" stroke="#bf4800" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <b>Not a core system</b>
+    <span>Not Magenta Tier-1 yet</span>
+  </div>
+  <div class="pain">
+    <svg class="ico" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+      <path d="M24 8l14 8v10c0 9-6 14-14 16-8-2-14-7-14-16V16l14-8z" stroke="#bf4800" stroke-width="2"/>
+      <path d="M24 20v8M24 32h.01" stroke="#fec514" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <b>No HA Site DR</b>
+    <span>Restore ≠ high availability</span>
+  </div>
 </div>
-
-<p>Still useful today on transaction data — <strong>real-time ops dashboards</strong>, search, and investigation. Warm dual-feed across <strong>Polaris</strong> and <strong>Titan</strong> makes Elastic a <strong>Tier-1</strong> Magenta system ready for full data, ML, and closed loop — two options at <strong>roughly the same cost</strong>.</p>
 
 ---
 
-<span class="kicker">T-MOBILE · TIER-1 WITH WARM HA</span>
+<span class="kicker">TWO OPTIONS · SAME COST BAND</span>
 
-# Make Elastic a Magenta Tier-1 app
+# Warm HA — pick automation level
 
-<p class="subhead">Today: transactions. Next: <strong>full Magenta data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong>. Build Tier-1 warm HA now — before automation depends on it.</p>
+<p class="sub">Both keep Titan <strong>1 day hot · rest frozen</strong>. Cost is comparable. Option 2 adds touchless failover.</p>
 
-<div class="today">
-  <b>Today · the issue</b>
-  <strong>Transaction data only</strong> · not Tier-1 · <strong>one DC (Polaris)</strong> · no HA. Next: <strong>full T-Mobile data</strong> → <strong>ML decisions</strong> → <strong>closed-loop automation</strong> — Magenta won’t put that on a single-DC, non-core system.
-</div>
-
-<div class="cols">
-  <div class="opt">
+<div class="split">
+  <div class="panel">
     <span class="tag">OPTION 1</span>
-    <b>Two clusters · two data centers</b>
-    Polaris + Titan dual ingest. Operators choose which site is live and cut over deliberately when a DC fails.
-    <div class="same">≈ same cost as Option 2</div>
+    <h3>Two clusters · two DCs</h3>
+    <svg viewBox="0 0 320 120" fill="none" aria-hidden="true">
+      <rect x="20" y="28" width="110" height="64" rx="10" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
+      <text x="75" y="58" text-anchor="middle" fill="#e20074" font-size="14" font-weight="700" font-family="sans-serif">Polaris</text>
+      <text x="75" y="76" text-anchor="middle" fill="#9a9aa0" font-size="11" font-family="sans-serif">Primary DC</text>
+      <rect x="190" y="28" width="110" height="64" rx="10" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
+      <text x="245" y="58" text-anchor="middle" fill="#e20074" font-size="14" font-weight="700" font-family="sans-serif">Titan</text>
+      <text x="245" y="76" text-anchor="middle" fill="#9a9aa0" font-size="11" font-family="sans-serif">Warm peer</text>
+      <path d="M136 60h48" stroke="#fff" stroke-width="2" stroke-dasharray="4 3"/>
+      <circle cx="160" cy="60" r="10" fill="#050816" stroke="#fff" stroke-width="1.5"/>
+      <text x="160" y="64" text-anchor="middle" fill="#fff" font-size="10" font-family="sans-serif">+</text>
+    </svg>
+    <p>Dual ingest. Operators cut over when a DC fails.</p>
+    <div class="eq">≈ same cost as Option 2</div>
   </div>
-  <div class="opt pick">
+  <div class="panel pick">
     <span class="tag">OPTION 2</span>
-    <b>Three clusters · CCS on Cluster 3</b>
-    Same Polaris + Titan data plane, plus an ops cluster for <strong>ML / alerting / UI</strong> via CCS — <strong>touchless automated failover</strong> when Magenta runs ML decisions and <strong>closed-loop automation</strong>.
-    <div class="same">≈ same cost as Option 1</div>
+    <h3>Three clusters · CCS</h3>
+    <svg viewBox="0 0 320 120" fill="none" aria-hidden="true">
+      <rect x="8" y="38" width="88" height="52" rx="8" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
+      <text x="52" y="62" text-anchor="middle" fill="#e20074" font-size="12" font-weight="700" font-family="sans-serif">Polaris</text>
+      <text x="52" y="78" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">Data</text>
+      <rect x="116" y="38" width="88" height="52" rx="8" fill="rgba(226,0,116,.12)" stroke="#e20074" stroke-width="2"/>
+      <text x="160" y="62" text-anchor="middle" fill="#e20074" font-size="12" font-weight="700" font-family="sans-serif">Titan</text>
+      <text x="160" y="78" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">Warm</text>
+      <rect x="224" y="28" width="88" height="72" rx="8" fill="rgba(0,191,179,.12)" stroke="#00bfb3" stroke-width="2"/>
+      <text x="268" y="52" text-anchor="middle" fill="#00bfb3" font-size="12" font-weight="700" font-family="sans-serif">Ops 3</text>
+      <text x="268" y="70" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">ML · CCS</text>
+      <text x="268" y="86" text-anchor="middle" fill="#9a9aa0" font-size="10" font-family="sans-serif">UI · Alert</text>
+      <path d="M100 64h12M208 64h12" stroke="#fff" stroke-width="1.5"/>
+    </svg>
+    <p>Same data plane + ops cluster for <strong>touchless</strong> failover.</p>
+    <div class="eq">≈ same cost as Option 1</div>
   </div>
 </div>
 
-<div class="flow">
-  <span>Kafka</span> →
-  <span><em>Polaris</em></span>
-  <span>+</span>
-  <span><em>Titan</em></span>
-  <span>→</span>
-  <span>Ops Cluster 3 (CCS)</span>
-</div>
-
-<div class="cols-3">
-  <div class="dc"><b>Polaris</b>Ingest · transform · data</div>
-  <div class="dc"><b>Titan</b>Parity · <strong>1d hot · rest frozen</strong></div>
-  <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
-</div>
-
-<div class="callout"><strong>Talk track:</strong> Transactions today; next <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong>. Magenta won’t call Elastic <strong>Tier-1</strong> while it’s one DC · no HA. These two warm paths cost about the same; Option 2 keeps <strong>ML and closed loop</strong> on Cluster 3 with <strong>touchless failover</strong> — DR sized for automation that can’t go dark.</div>
-
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Transactions now · ML + closed loop next</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Warm HA · cost-capped</span></div>
 
 ---
 
-<span class="kicker">T-MOBILE · TODAY + NEXT</span>
+<span class="kicker">TODAY + NEXT</span>
 
-# Useful now · powerful next
+# Value now · outcomes next
 
-<p class="subhead">Transaction data already delivers ops value. Tier-1 warm HA protects that today — and the Magenta use cases that follow.</p>
+<p class="sub"><strong>Useful today</strong> on transaction data. <strong>Next</strong>: full Magenta data, ML decisions, closed-loop automation.</p>
 
-<p class="section-label now">USEFUL TODAY · TRANSACTION DATA</p>
-<div class="uc-grid">
-  <div class="uc now"><b>Real-time ops dashboards</b>Live transaction health for operations scenarios — NOC and ops see what’s failing now, not in a batch report</div>
-  <div class="uc now"><b>Search &amp; investigate</b>ES|QL / Discover on the same stream — drill from a dashboard spike to the offending transaction in seconds</div>
-  <div class="uc now"><b>Alerting on what you have</b>Threshold and anomaly alerts on indexed transactions — early signal before full Magenta data lands</div>
+<div class="tiles">
+  <div class="tile now">
+    <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <rect x="6" y="10" width="40" height="28" rx="4" stroke="#0071e3" stroke-width="2"/>
+      <path d="M14 36v4h24v-4" stroke="#0071e3" stroke-width="2"/>
+      <path d="M14 22h8M14 28h16" stroke="#0071e3" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="36" cy="24" r="5" fill="rgba(0,113,227,.25)" stroke="#0071e3" stroke-width="1.5"/>
+    </svg>
+    <b>Real-time ops dashboards</b>
+    <span>Live transaction health in ops scenarios</span>
+  </div>
+  <div class="tile now">
+    <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <circle cx="24" cy="24" r="12" stroke="#0071e3" stroke-width="2"/>
+      <path d="M33 33l8 8" stroke="#0071e3" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+    <b>Search &amp; investigate</b>
+    <span>Dashboard spike → transaction in seconds</span>
+  </div>
+  <div class="tile now">
+    <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <path d="M26 8v8M26 36v8M8 26h8M36 26h8" stroke="#0071e3" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="26" cy="26" r="10" stroke="#0071e3" stroke-width="2"/>
+      <circle cx="26" cy="26" r="3" fill="#0071e3"/>
+    </svg>
+    <b>Alerting today</b>
+    <span>Signals on the data you already have</span>
+  </div>
 </div>
 
-<p class="section-label next">NEXT · FULL T-MOBILE DATA + ML + CLOSED LOOP</p>
-<div class="uc-grid">
-  <div class="uc"><b>Closed-loop fault act</b>RAN / core / transport → ML correlate → auto remediate</div>
-  <div class="uc"><b>Activation &amp; eSIM SLA</b>Provisioning, SM-DP+, region hotspots — protect launch weekends</div>
-  <div class="uc"><b>Capacity &amp; surge forecast</b>ML predicts traffic and care load ahead of the spike</div>
-  <div class="uc"><b>Cross-domain RCA</b>Digital · core · RAN · care in one query — minutes not hours</div>
-  <div class="uc"><b>Care + NOC + exec one view</b>Triage, churn-risk, revenue — same indexed stream</div>
-  <div class="uc"><b>SIM-swap &amp; fraud SIEM</b>Security detections and cases on the same lake as ops</div>
+<div class="tiles" style="margin-top:12px">
+  <div class="tile next">
+    <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <path d="M10 36c8-2 10-14 16-14s8 12 16 14" stroke="#00bfb3" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="14" cy="36" r="3" fill="#00bfb3"/>
+      <circle cx="26" cy="22" r="3" fill="#00bfb3"/>
+      <circle cx="38" cy="36" r="3" fill="#00bfb3"/>
+      <path d="M38 28l4-8 4 2" stroke="#00bfb3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <b>Closed-loop automation</b>
+    <span>Detect → ML → remediate</span>
+  </div>
+  <div class="tile next">
+    <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <rect x="10" y="14" width="32" height="24" rx="4" stroke="#00bfb3" stroke-width="2"/>
+      <path d="M18 26h16M18 32h10" stroke="#00bfb3" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="36" cy="18" r="6" fill="#050816" stroke="#00bfb3" stroke-width="2"/>
+      <path d="M36 15v6M33 18h6" stroke="#00bfb3" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <b>Full Magenta data + ML</b>
+    <span>Decisions on T-Mobile’s full estate</span>
+  </div>
+  <div class="tile next">
+    <svg class="ico" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+      <circle cx="18" cy="20" r="7" stroke="#00bfb3" stroke-width="2"/>
+      <circle cx="34" cy="20" r="7" stroke="#00bfb3" stroke-width="2"/>
+      <circle cx="26" cy="34" r="7" stroke="#00bfb3" stroke-width="2"/>
+      <path d="M24 22l-2 6M28 22l2 6M22 20h8" stroke="#00bfb3" stroke-width="1.5"/>
+    </svg>
+    <b>RCA · SLA · fraud</b>
+    <span>Cross-domain ops, eSIM, SIEM on one lake</span>
+  </div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Don’t wait for full Magenta data to get value — <strong>real-time dashboards and ops investigation</strong> work on transactions today. Build Tier-1 warm HA now so those ops views — and tomorrow’s closed loop — don’t go dark on a Polaris outage.</div>
-
-<div class="slide-foot"><span>T-Mobile · today + next</span><span>Ops dashboards now · closed loop next</span></div>
+<div class="slide-foot"><span>T-Mobile · today + next</span><span>Ops value now · closed loop next</span></div>
 
 ---
 
 <span class="kicker">T-MOBILE · CLOSE</span>
 
-# What Magenta is buying
+# Make Elastic Magenta Tier-1
 
-<p class="subhead">From <strong>transaction data</strong> to <strong>full T-Mobile data</strong>, <strong>ML-based decisions</strong>, and <strong>closed-loop automation</strong> — Tier-1 warm HA Magenta can trust as a core system.</p>
-
-<div class="pillar-grid">
-  <div class="pillar"><b>Useful today</b>Real-time ops dashboards · search · alerts on transactions</div>
-  <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS so ops/ML stay up</div>
-  <div class="pillar"><b>Powerful next</b>Full Magenta data → ML → closed-loop automation</div>
-  <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
+<div class="journey">
+  <div class="jstep blue">
+    <b>Today</b>
+    <span>Transactions · ops dashboards</span>
+  </div>
+  <span class="jarrow">→</span>
+  <div class="jstep magenta">
+    <b>Warm HA</b>
+    <span>Polaris + Titan · 2 or 3 clusters</span>
+  </div>
+  <span class="jarrow">→</span>
+  <div class="jstep teal">
+    <b>Tier-1</b>
+    <span>Full data · ML · closed loop</span>
+  </div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Magenta already gets value from <strong>real-time ops dashboards</strong> on transaction data — but Elastic is still <strong>one DC · not Tier-1</strong>. Warm dual-feed (two clusters or three with CCS at <strong>roughly the same cost</strong>) protects today’s ops views and makes Elastic Tier-1 before <strong>full T-Mobile data</strong>, <strong>ML decisions</strong>, and <strong>closed-loop automation</strong> go live. Option 2 keeps that loop <strong>touchless</strong> on Cluster 3.</div>
+<div class="viz">
+  <svg viewBox="0 0 880 160" fill="none" aria-hidden="true">
+    <rect x="40" y="40" width="160" height="90" rx="12" fill="rgba(226,0,116,.1)" stroke="#e20074" stroke-width="2"/>
+    <text x="120" y="78" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Polaris</text>
+    <text x="120" y="102" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">Data plane</text>
+    <rect x="260" y="40" width="160" height="90" rx="12" fill="rgba(226,0,116,.1)" stroke="#e20074" stroke-width="2"/>
+    <text x="340" y="78" text-anchor="middle" fill="#e20074" font-size="18" font-weight="700" font-family="sans-serif">Titan</text>
+    <text x="340" y="102" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">1d hot · frozen</text>
+    <rect x="480" y="30" width="180" height="110" rx="12" fill="rgba(0,191,179,.1)" stroke="#00bfb3" stroke-width="2"/>
+    <text x="570" y="72" text-anchor="middle" fill="#00bfb3" font-size="18" font-weight="700" font-family="sans-serif">Ops Cluster 3</text>
+    <text x="570" y="98" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">ML · alert · CCS</text>
+    <text x="570" y="118" text-anchor="middle" fill="#9a9aa0" font-size="13" font-family="sans-serif">Touchless failover</text>
+    <path d="M210 85h40M430 85h40" stroke="#fff" stroke-width="2"/>
+    <polygon points="248,85 240,80 240,90" fill="#fff"/>
+    <polygon points="468,85 460,80 460,90" fill="#fff"/>
+    <text x="780" y="78" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="sans-serif">≈ same</text>
+    <text x="780" y="100" text-anchor="middle" fill="#00bfb3" font-size="16" font-weight="700" font-family="sans-serif">cost band</text>
+    <path d="M680 85h40" stroke="#2a2a2e" stroke-width="2" stroke-dasharray="4 3"/>
+  </svg>
+</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Ops value today · Tier-1 for what’s next</span></div>
+<p class="one-liner">Protect <strong>today’s dashboards</strong>. Fund warm dual-feed — not a hot mirror. <em>Option 2</em> keeps ML and closed loop up.</p>
+
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Clear · warm · Tier-1 ready</span></div>
