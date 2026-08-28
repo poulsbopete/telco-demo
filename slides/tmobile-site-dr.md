@@ -4,7 +4,7 @@ theme: default
 paginate: true
 size: 16:9
 title: T-Mobile · Site Disaster Recovery — Business Value
-description: Close Magenta’s Site DR HA gap — warm Polaris & Titan options without hot-tier overages
+description: Leave one-DC Polaris behind — warm Polaris & Titan HA options without hot-tier overages
 style: |
   section {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -154,13 +154,13 @@ style: |
 
 <span class="kicker">T-MOBILE · SITE DR</span>
 
-# Today: no highly available Site DR
+# Today: one DC · no HA Site DR
 
-## Polaris alone is not HA — Magenta needs a second live path
+## Deployed only in Polaris — Magenta needs a second live path
 
 <div class="gap">
   <b>Current issue</b>
-  Observability lives in <strong>one primary path</strong>. A Polaris DC event means <strong>blind NOC / care / exec views</strong> — no warm peer site, no automated failover, no cost-efficient HA story. Snapshots alone are restore, not high availability.
+  Observability is <strong>deployed in one data center only (Polaris)</strong>. No Titan peer, no highly available Site DR. A Polaris DC event means <strong>blind NOC / care / exec views</strong> — restore from snapshots is not high availability.
 </div>
 
 <p>Two warm options across <strong>Polaris</strong> and <strong>Titan</strong> close that gap at <strong>roughly the same cost</strong> — without standing up a second full hot-tier estate.</p>
@@ -171,11 +171,11 @@ style: |
 
 # From single-site risk to warm HA
 
-<p class="subhead">Close today’s <strong>no HA</strong> gap. Both options stay warm (Titan <strong>1 day hot · rest frozen</strong>). Cost is comparable — the delta is automation.</p>
+<p class="subhead">Close today’s <strong>single-DC · no HA</strong> gap. Both options stay warm (Titan <strong>1 day hot · rest frozen</strong>). Cost is comparable — the delta is automation.</p>
 
 <div class="today">
   <b>Today · the issue</b>
-  No highly available Site DR — one primary cluster / DC. DC loss → hours of blind ops until restore. Not Magenta-grade continuity.
+  <strong>One data center only (Polaris)</strong> — no Titan deployment, no highly available Site DR. Polaris loss → hours of blind ops until restore. Not Magenta-grade continuity.
 </div>
 
 <div class="cols">
@@ -208,9 +208,9 @@ style: |
   <div class="ops"><b>Ops · Cluster 3</b>ML · alert · dashboards · CCS</div>
 </div>
 
-<div class="callout"><strong>Talk track:</strong> Today Magenta has <strong>no HA Site DR</strong>. These two paths cost about the same; Option 2 spends that band to <strong>remove human cutover</strong> — not to buy another hot mirror.</div>
+<div class="callout"><strong>Talk track:</strong> Today Magenta is <strong>in one DC only</strong> with <strong>no HA Site DR</strong>. These two paths cost about the same; Option 2 spends that band to <strong>remove human cutover</strong> — not to buy another hot mirror.</div>
 
-<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>Close HA gap · ≈ same cost · Option 2 = touchless</span></div>
+<div class="slide-foot"><span>T-Mobile · Polaris &amp; Titan</span><span>One DC today · close HA · ≈ same cost</span></div>
 
 ---
 
@@ -269,15 +269,15 @@ style: |
 
 # What Magenta is buying
 
-<p class="subhead">Close the <strong>no-HA</strong> gap — continuity engineered so DR is not the next OpEx surprise.</p>
+<p class="subhead">Leave <strong>one-DC-only</strong> behind — continuity engineered so DR is not the next OpEx surprise.</p>
 
 <div class="pillar-grid">
-  <div class="pillar"><b>HA where there is none</b>Warm second path — not restore-from-snapshot as “DR”</div>
+  <div class="pillar"><b>Second DC · real HA</b>Titan peer path — not restore-from-snapshot as “DR”</div>
   <div class="pillar"><b>Option 1 or 2 · same band</b>Two DCs, or three + CCS for touchless failover</div>
   <div class="pillar"><b>Complete after failover</b>Same logical view for NOC and exec dashboards</div>
   <div class="pillar"><b>Cost-capped warmth</b>1d hot + frozen — not a Polaris hot mirror</div>
 </div>
 
-<div class="callout"><strong>Close:</strong> Magenta’s issue today is <strong>no highly available Site DR</strong>. Two clusters or three with CCS — <strong>roughly the same cost</strong> — close that gap. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate. Fund warm dual-feed — not a full hot mirror.</div>
+<div class="callout"><strong>Close:</strong> Magenta today is <strong>deployed in one data center only</strong> with <strong>no HA Site DR</strong>. Two clusters or three with CCS — <strong>roughly the same cost</strong> — put Titan online and close that gap. Option 2 buys <strong>touchless automated failover</strong>, not another hot estate. Fund warm dual-feed — not a full hot mirror.</div>
 
-<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Close the HA gap · cost-efficient warm DR</span></div>
+<div class="slide-foot"><span>Elastic × T-Mobile · Site DR</span><span>Leave one-DC behind · warm HA</span></div>
