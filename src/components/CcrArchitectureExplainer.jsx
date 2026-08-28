@@ -23,10 +23,10 @@ const SITE_MATRIX = [
   { component: 'Elasticsearch', primary: 'Complete dataset', secondary: 'Complete dataset (cheaper tiers)' },
   { component: 'Data tiers', primary: 'Production hot / warm / cold as today', secondary: '1 day hot · remainder frozen' },
   { component: 'Ingest + transforms', primary: 'Active (write path)', secondary: 'Active (write path)' },
-  { component: 'Machine learning', primary: 'Jobs running', secondary: 'Standby · model state via snapshots (option)' },
-  { component: 'Alerting framework', primary: 'Active · actions enabled', secondary: 'Standby · actions suppressed' },
+  { component: 'Machine learning', primary: 'Not on data-plane clusters · ops / Cluster 3', secondary: 'Not on data-plane clusters · ops / Cluster 3' },
+  { component: 'Alerting framework', primary: 'Not on data-plane clusters · ops / Cluster 3', secondary: 'Not on data-plane clusters · ops / Cluster 3' },
   { component: 'Object storage', primary: 'Shared snapshot repository', secondary: 'Shared snapshot repository' },
-  { component: 'Users', primary: 'Routed here normally', secondary: 'Routed here on deliberate failover' },
+  { component: 'Users', primary: 'Routed here normally · or via ops cluster', secondary: 'Routed here on deliberate failover' },
 ];
 
 const RPO_OPTIONS = [
@@ -481,7 +481,7 @@ function DualIngestHero({ dark }) {
             <li>etc.</li>
           </ul>
           <p className={`mt-3 text-[10px] leading-snug ${muted}`}>
-            Solid from production · dashed from DR until cutover
+            From ops / Cluster 3 — not from the data-plane clusters
           </p>
         </div>
       </div>
@@ -653,10 +653,11 @@ function FeaturedDesign({ dark }) {
       </h2>
       <p className={`section-lead mt-3 ${dark ? '!text-[#98989d]' : ''}`}>
         Kafka stays on the production site. Separate Logstash consumer groups feed complete Elastic
-        clusters on both sides. DR uses{' '}
+        clusters on both sides. The data-plane boxes are{' '}
+        <strong className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>ingest · transform · data only</strong>
+        {' '}— ML and alerting sit on the operational cluster (Cluster 3), not in the middle. DR uses{' '}
         <strong className={dark ? 'text-[#f5f5f7]' : 'text-[#1d1d1f]'}>1 day hot + frozen for the rest</strong>
-        {' '}so the logical dataset stays complete without mirroring production hot-tier spend. Transforms
-        stay active on DR; ML and alert actions stay standby until cutover.
+        {' '}so the logical dataset stays complete without mirroring production hot-tier spend.
       </p>
 
       <div className={`mt-8 overflow-x-auto rounded-2xl border ${card}`}>
