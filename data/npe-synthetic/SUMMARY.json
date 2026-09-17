@@ -1,0 +1,46 @@
+{
+  "generated_at": "2026-09-17T21:27:15.380Z",
+  "note": "grounded on 338 indices from /Users/psimkins/Downloads/mapping.json",
+  "counts": {
+    "proclog": 400,
+    "transaction_details": 400,
+    "ml_anomaly_records": 800,
+    "silent_failures": 69,
+    "hard_failures": 46,
+    "healthy": 285
+  },
+  "partners": [
+    "116",
+    "135",
+    "117",
+    "89",
+    "138",
+    "78",
+    "100",
+    "114",
+    "132",
+    "10032",
+    "10033",
+    "20408",
+    "22508",
+    "22510",
+    "20428",
+    "20047",
+    "22250",
+    "21808",
+    "10018",
+    "21208",
+    "10007",
+    "10008",
+    "82",
+    "79",
+    "144"
+  ],
+  "indices": [
+    "npe-synthetic-proclog",
+    "npe-synthetic-transaction-details",
+    "npe-synthetic-ml-anomalies"
+  ],
+  "silent_failure_definition": "transactionstatus/status SUCCESS (or proclog status SUCCESS) but napstatus FAILED and/or noncorefailed=true; payload flags napAsScore=false or dualProvisioningFlag=OFF",
+  "load_hint": "Bulk load to YOUR NPE/serverless project (not otel-demo): curl -s -H \"Authorization: ApiKey $ES_API_KEY\" -H \"Content-Type: application/x-ndjson\" --data-binary @data/npe-synthetic/bulk_npe_transaction_details.ndjson \"$ES_URL/_bulk\""
+}
