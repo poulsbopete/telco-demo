@@ -11,7 +11,10 @@ Generated from field shapes in `~/Downloads/mapping.json` (NPE proclog / transac
 | `npe_proclog_synthetic.ndjson` | Wire logs with NPC-style XML payloads |
 | `npe_transaction_details_synthetic.ndjson` | Subsystem statuses (`napstatus`, `noncorefailed`, …) |
 | `ml_anomalies_partner_synthetic.ndjson` | Partner × time `record_score` for heatmaps |
+| `partner_lookup.ndjson` | partnerID → name, tier, region, channel, NOC owner |
 | `bulk_*.ndjson` | Ready for Elasticsearch `_bulk` |
+
+Partner attributes are also **denormalized** onto proclog / transaction / ML docs (`partner_name`, `partner_tier`, …) so NOC panels don’t need a join at query time.
 
 ## Silent failure definition (synthetic)
 

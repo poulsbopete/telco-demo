@@ -22,6 +22,51 @@ PARTNERS = [
     "10032", "10033", "20408", "22508", "22510", "20428", "20047", "22250",
     "21808", "10018", "21208", "10007", "10008", "82", "79", "144",
 ]
+
+# Lookup table: partnerID → human-readable wholesale / MVNO attributes
+PARTNER_LOOKUP = {
+    "116": {"partner_name": "Apex Wireless Wholesale", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
+    "135": {"partner_name": "Cascade Mobile Partners", "partner_tier": "Silver", "partner_region": "Northwest", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
+    "117": {"partner_name": "MetroLink Reseller", "partner_tier": "Gold", "partner_region": "Central", "partner_channel": "Reseller", "partner_owner": "NOC-Central"},
+    "89": {"partner_name": "HarborLink Prepaid", "partner_tier": "Bronze", "partner_region": "Northeast", "partner_channel": "Prepaid", "partner_owner": "NOC-East"},
+    "138": {"partner_name": "Summit IoT Exchange", "partner_tier": "Silver", "partner_region": "Mountain", "partner_channel": "IoT", "partner_owner": "NOC-Central"},
+    "78": {"partner_name": "Bay Area Connect", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
+    "100": {"partner_name": "Prairie Star Wireless", "partner_tier": "Silver", "partner_region": "Central", "partner_channel": "Reseller", "partner_owner": "NOC-Central"},
+    "114": {"partner_name": "Atlantic Edge MVNO", "partner_tier": "Gold", "partner_region": "Northeast", "partner_channel": "MVNO", "partner_owner": "NOC-East"},
+    "132": {"partner_name": "Gulf Coast Partners", "partner_tier": "Bronze", "partner_region": "South", "partner_channel": "Reseller", "partner_owner": "NOC-South"},
+    "10032": {"partner_name": "Northstar Enterprise", "partner_tier": "Platinum", "partner_region": "National", "partner_channel": "Enterprise", "partner_owner": "NOC-National"},
+    "10033": {"partner_name": "Redwood Business Line", "partner_tier": "Platinum", "partner_region": "West", "partner_channel": "Enterprise", "partner_owner": "NOC-West"},
+    "20408": {"partner_name": "Lakeside Family Plans", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "Retail", "partner_owner": "NOC-Central"},
+    "22508": {"partner_name": "Pacific Wholesale Co", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "Wholesale", "partner_owner": "NOC-West"},
+    "22510": {"partner_name": "Desert Sun Mobile", "partner_tier": "Bronze", "partner_region": "Southwest", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
+    "20428": {"partner_name": "Great Lakes Relay", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "IoT", "partner_owner": "NOC-Central"},
+    "20047": {"partner_name": "Capital Region MVNO", "partner_tier": "Gold", "partner_region": "Mid-Atlantic", "partner_channel": "MVNO", "partner_owner": "NOC-East"},
+    "22250": {"partner_name": "Frontier Bundle Partners", "partner_tier": "Silver", "partner_region": "South", "partner_channel": "Reseller", "partner_owner": "NOC-South"},
+    "21808": {"partner_name": "Skyline Prepaid Hub", "partner_tier": "Bronze", "partner_region": "Mountain", "partner_channel": "Prepaid", "partner_owner": "NOC-Central"},
+    "10018": {"partner_name": "Empire State Wholesale", "partner_tier": "Platinum", "partner_region": "Northeast", "partner_channel": "Wholesale", "partner_owner": "NOC-East"},
+    "21208": {"partner_name": "Sunshine State Mobile", "partner_tier": "Gold", "partner_region": "Southeast", "partner_channel": "MVNO", "partner_owner": "NOC-South"},
+    "10007": {"partner_name": "Twin Cities Connect", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "Retail", "partner_owner": "NOC-Central"},
+    "10008": {"partner_name": "Liberty Bell Partners", "partner_tier": "Gold", "partner_region": "Northeast", "partner_channel": "Enterprise", "partner_owner": "NOC-East"},
+    "82": {"partner_name": "Riverbend Wireless", "partner_tier": "Bronze", "partner_region": "Central", "partner_channel": "MVNO", "partner_owner": "NOC-Central"},
+    "79": {"partner_name": "Cascadia Prepaid", "partner_tier": "Silver", "partner_region": "Northwest", "partner_channel": "Prepaid", "partner_owner": "NOC-West"},
+    "144": {"partner_name": "Lone Star Wholesale", "partner_tier": "Gold", "partner_region": "South", "partner_channel": "Wholesale", "partner_owner": "NOC-South"},
+}
+
+
+def partner_attrs(partner_id: str) -> dict:
+    base = PARTNER_LOOKUP.get(
+        str(partner_id),
+        {
+            "partner_name": f"Partner {partner_id}",
+            "partner_tier": "Unknown",
+            "partner_region": "Unknown",
+            "partner_channel": "Unknown",
+            "partner_owner": "NOC-Unassigned",
+        },
+    )
+    return {"partnerID": str(partner_id), **base}
+
+
 CLUSTERS = ["polaris-a", "polaris-b", "titan-a"]
 OPERATIONS = ["ADD_FEATURE", "REMOVE_FEATURE", "CHANGE_RATEPLAN", "PROVISION", "UPDATE_NAP"]
 BRANDS = ["TMOBILE_POSTPAID", "TMOBILE_PREPAID", "METRO"]
@@ -303,12 +348,13 @@ def main() -> None:
             when = when.replace(minute=(when.minute // 15) * 15, second=0, microsecond=0)
         scenario = random.choice(SCENARIOS)
         pl = make_proclog(i, when, scenario)
+        attrs = partner_attrs(partner)
+        pl.update(attrs)
         pl["clientid"] = partner
         pl["routingid"] = partner
-        pl["partnerID"] = partner
         pl["consumerid"] = f"cons-{partner}"
         details_doc = make_txn_details(i, when, scenario)
-        details_doc["partnerID"] = partner
+        details_doc.update(attrs)
         details_doc["clientid"] = partner
         details_doc["consumerid"] = f"cons-{partner}"
         if str(partner).isdigit():
@@ -322,7 +368,7 @@ def main() -> None:
                     minute=(ml_when.minute // 15) * 15, second=0, microsecond=0
                 )
             ml = make_ml_record(i, ml_when)
-            ml["partnerID"] = partner
+            ml.update(attrs)
             ml["partition_field_value"] = partner
             ml["by_field_value"] = partner
             ml["influencer_field_value"] = partner
@@ -334,13 +380,23 @@ def main() -> None:
             ]
             ml_recs.append(ml)
 
+    lookup_docs = []
+    for pid in PARTNERS:
+        row = partner_attrs(pid)
+        row["@timestamp"] = ts(utc_now())
+        row["active"] = True
+        row["source"] = "npe-synthetic-partner-lookup"
+        lookup_docs.append(row)
+
     write_ndjson(OUT / "npe_proclog_synthetic.ndjson", proclogs)
     write_ndjson(OUT / "npe_transaction_details_synthetic.ndjson", details)
     write_ndjson(OUT / "ml_anomalies_partner_synthetic.ndjson", ml_recs)
+    write_ndjson(OUT / "partner_lookup.ndjson", lookup_docs)
 
     write_bulk(OUT / "bulk_npe_proclog.ndjson", "npe-synthetic-proclog", proclogs)
     write_bulk(OUT / "bulk_npe_transaction_details.ndjson", "npe-synthetic-transaction-details", details)
     write_bulk(OUT / "bulk_ml_anomalies_partner.ndjson", "npe-synthetic-ml-anomalies", ml_recs)
+    write_bulk(OUT / "bulk_partner_lookup.ndjson", "npe-synthetic-partner-lookup", lookup_docs)
 
     silent_n = sum(1 for d in details if d.get("silent_failure"))
     hard_n = sum(1 for d in details if d.get("synthetic_scenario") == "hard_fail")
@@ -351,15 +407,18 @@ def main() -> None:
             "proclog": len(proclogs),
             "transaction_details": len(details),
             "ml_anomaly_records": len(ml_recs),
+            "partner_lookup": len(lookup_docs),
             "silent_failures": silent_n,
             "hard_failures": hard_n,
             "healthy": len(details) - silent_n - hard_n,
         },
         "partners": PARTNERS,
+        "partner_lookup_sample": lookup_docs[:3],
         "indices": [
             "npe-synthetic-proclog",
             "npe-synthetic-transaction-details",
             "npe-synthetic-ml-anomalies",
+            "npe-synthetic-partner-lookup",
         ],
         "silent_failure_definition": (
             "transactionstatus/status SUCCESS (or proclog status SUCCESS) but "
@@ -367,11 +426,8 @@ def main() -> None:
             "or dualProvisioningFlag=OFF"
         ),
         "load_hint": (
-            "Bulk load to YOUR NPE/serverless project (not otel-demo): "
-            "curl -s -H \"Authorization: ApiKey $ES_API_KEY\" "
-            "-H \"Content-Type: application/x-ndjson\" "
-            "--data-binary @data/npe-synthetic/bulk_npe_transaction_details.ndjson "
-            "\"$ES_URL/_bulk\""
+            "Bulk load to otel-demo / NPE serverless: "
+            "curl bulk files under data/npe-synthetic/bulk_*.ndjson to $ES_URL/_bulk"
         ),
     }
     (OUT / "SUMMARY.json").write_text(json.dumps(summary, indent=2) + "\n")

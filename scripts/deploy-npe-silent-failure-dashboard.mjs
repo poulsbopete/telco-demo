@@ -92,22 +92,24 @@ const heatmap = {
 | STATS
     silent_count = COUNT(*) WHERE silent_failure == true,
     total = COUNT(*)
-  BY partnerID, bucket = BUCKET(@timestamp, 15 minutes)
+  BY partnerID, partner_name, bucket = BUCKET(@timestamp, 15 minutes)
 | EVAL silent_rate = CASE(total > 0, silent_count * 1.0 / total, 0)
+| EVAL facet_label = CONCAT(partner_name, " (", partnerID, ")")
 | SORT partnerID, bucket`,
     },
   },
-  // Dense strip heatmaps — one facet row/column per partner
+  // Dense strip heatmaps — one facet per partner (name + ID)
   facet: {
-    field: 'partnerID',
+    field: 'facet_label',
     type: 'nominal',
     columns: 5,
     sort: { op: 'sum', field: 'silent_count', order: 'descending' },
     header: {
-      labelFontSize: 11,
+      labelFontSize: 10,
       labelFontWeight: 'bold',
-      title: 'partnerID',
+      title: 'Partner',
       titleFontSize: 12,
+      labelLimit: 160,
     },
   },
   spec: {

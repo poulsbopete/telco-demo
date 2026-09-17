@@ -1,10 +1,11 @@
 {
-  "generated_at": "2026-09-17T21:36:00.113Z",
+  "generated_at": "2026-09-17T21:40:23.590Z",
   "note": "grounded on 338 indices from /Users/psimkins/Downloads/mapping.json",
   "counts": {
     "proclog": 2500,
     "transaction_details": 2500,
     "ml_anomaly_records": 5000,
+    "partner_lookup": 25,
     "silent_failures": 886,
     "hard_failures": 242,
     "healthy": 1372
@@ -36,11 +37,47 @@
     "79",
     "144"
   ],
+  "partner_lookup_sample": [
+    {
+      "partnerID": "116",
+      "partner_name": "Apex Wireless Wholesale",
+      "partner_tier": "Gold",
+      "partner_region": "West",
+      "partner_channel": "MVNO",
+      "partner_owner": "NOC-West",
+      "@timestamp": "2026-09-17T21:40:23.361Z",
+      "active": true,
+      "source": "npe-synthetic-partner-lookup"
+    },
+    {
+      "partnerID": "135",
+      "partner_name": "Cascade Mobile Partners",
+      "partner_tier": "Silver",
+      "partner_region": "Northwest",
+      "partner_channel": "MVNO",
+      "partner_owner": "NOC-West",
+      "@timestamp": "2026-09-17T21:40:23.361Z",
+      "active": true,
+      "source": "npe-synthetic-partner-lookup"
+    },
+    {
+      "partnerID": "117",
+      "partner_name": "MetroLink Reseller",
+      "partner_tier": "Gold",
+      "partner_region": "Central",
+      "partner_channel": "Reseller",
+      "partner_owner": "NOC-Central",
+      "@timestamp": "2026-09-17T21:40:23.361Z",
+      "active": true,
+      "source": "npe-synthetic-partner-lookup"
+    }
+  ],
   "indices": [
     "npe-synthetic-proclog",
     "npe-synthetic-transaction-details",
-    "npe-synthetic-ml-anomalies"
+    "npe-synthetic-ml-anomalies",
+    "npe-synthetic-partner-lookup"
   ],
   "silent_failure_definition": "transactionstatus/status SUCCESS (or proclog status SUCCESS) but napstatus FAILED and/or noncorefailed=true; payload flags napAsScore=false or dualProvisioningFlag=OFF",
-  "load_hint": "Bulk load to YOUR NPE/serverless project (not otel-demo): curl -s -H \"Authorization: ApiKey $ES_API_KEY\" -H \"Content-Type: application/x-ndjson\" --data-binary @data/npe-synthetic/bulk_npe_transaction_details.ndjson \"$ES_URL/_bulk\""
+  "load_hint": "Bulk load to otel-demo / NPE serverless: curl bulk files under data/npe-synthetic/bulk_*.ndjson to $ES_URL/_bulk"
 }
