@@ -23,33 +23,33 @@ PARTNERS = [
     "21808", "10018", "21208", "10007", "10008", "82", "79", "144",
 ]
 
-# Lookup table: partnerID → human-readable wholesale / MVNO attributes
+# Lookup table: partnerID → human-readable wholesale / MVNO attributes + map coords
 PARTNER_LOOKUP = {
-    "116": {"partner_name": "Apex Wireless Wholesale", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
-    "135": {"partner_name": "Cascade Mobile Partners", "partner_tier": "Silver", "partner_region": "Northwest", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
-    "117": {"partner_name": "MetroLink Reseller", "partner_tier": "Gold", "partner_region": "Central", "partner_channel": "Reseller", "partner_owner": "NOC-Central"},
-    "89": {"partner_name": "HarborLink Prepaid", "partner_tier": "Bronze", "partner_region": "Northeast", "partner_channel": "Prepaid", "partner_owner": "NOC-East"},
-    "138": {"partner_name": "Summit IoT Exchange", "partner_tier": "Silver", "partner_region": "Mountain", "partner_channel": "IoT", "partner_owner": "NOC-Central"},
-    "78": {"partner_name": "Bay Area Connect", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
-    "100": {"partner_name": "Prairie Star Wireless", "partner_tier": "Silver", "partner_region": "Central", "partner_channel": "Reseller", "partner_owner": "NOC-Central"},
-    "114": {"partner_name": "Atlantic Edge MVNO", "partner_tier": "Gold", "partner_region": "Northeast", "partner_channel": "MVNO", "partner_owner": "NOC-East"},
-    "132": {"partner_name": "Gulf Coast Partners", "partner_tier": "Bronze", "partner_region": "South", "partner_channel": "Reseller", "partner_owner": "NOC-South"},
-    "10032": {"partner_name": "Northstar Enterprise", "partner_tier": "Platinum", "partner_region": "National", "partner_channel": "Enterprise", "partner_owner": "NOC-National"},
-    "10033": {"partner_name": "Redwood Business Line", "partner_tier": "Platinum", "partner_region": "West", "partner_channel": "Enterprise", "partner_owner": "NOC-West"},
-    "20408": {"partner_name": "Lakeside Family Plans", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "Retail", "partner_owner": "NOC-Central"},
-    "22508": {"partner_name": "Pacific Wholesale Co", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "Wholesale", "partner_owner": "NOC-West"},
-    "22510": {"partner_name": "Desert Sun Mobile", "partner_tier": "Bronze", "partner_region": "Southwest", "partner_channel": "MVNO", "partner_owner": "NOC-West"},
-    "20428": {"partner_name": "Great Lakes Relay", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "IoT", "partner_owner": "NOC-Central"},
-    "20047": {"partner_name": "Capital Region MVNO", "partner_tier": "Gold", "partner_region": "Mid-Atlantic", "partner_channel": "MVNO", "partner_owner": "NOC-East"},
-    "22250": {"partner_name": "Frontier Bundle Partners", "partner_tier": "Silver", "partner_region": "South", "partner_channel": "Reseller", "partner_owner": "NOC-South"},
-    "21808": {"partner_name": "Skyline Prepaid Hub", "partner_tier": "Bronze", "partner_region": "Mountain", "partner_channel": "Prepaid", "partner_owner": "NOC-Central"},
-    "10018": {"partner_name": "Empire State Wholesale", "partner_tier": "Platinum", "partner_region": "Northeast", "partner_channel": "Wholesale", "partner_owner": "NOC-East"},
-    "21208": {"partner_name": "Sunshine State Mobile", "partner_tier": "Gold", "partner_region": "Southeast", "partner_channel": "MVNO", "partner_owner": "NOC-South"},
-    "10007": {"partner_name": "Twin Cities Connect", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "Retail", "partner_owner": "NOC-Central"},
-    "10008": {"partner_name": "Liberty Bell Partners", "partner_tier": "Gold", "partner_region": "Northeast", "partner_channel": "Enterprise", "partner_owner": "NOC-East"},
-    "82": {"partner_name": "Riverbend Wireless", "partner_tier": "Bronze", "partner_region": "Central", "partner_channel": "MVNO", "partner_owner": "NOC-Central"},
-    "79": {"partner_name": "Cascadia Prepaid", "partner_tier": "Silver", "partner_region": "Northwest", "partner_channel": "Prepaid", "partner_owner": "NOC-West"},
-    "144": {"partner_name": "Lone Star Wholesale", "partner_tier": "Gold", "partner_region": "South", "partner_channel": "Wholesale", "partner_owner": "NOC-South"},
+    "116": {"partner_name": "Apex Wireless Wholesale", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "MVNO", "partner_owner": "NOC-West", "latitude": 37.77, "longitude": -122.42},
+    "135": {"partner_name": "Cascade Mobile Partners", "partner_tier": "Silver", "partner_region": "Northwest", "partner_channel": "MVNO", "partner_owner": "NOC-West", "latitude": 47.61, "longitude": -122.33},
+    "117": {"partner_name": "MetroLink Reseller", "partner_tier": "Gold", "partner_region": "Central", "partner_channel": "Reseller", "partner_owner": "NOC-Central", "latitude": 41.88, "longitude": -87.63},
+    "89": {"partner_name": "HarborLink Prepaid", "partner_tier": "Bronze", "partner_region": "Northeast", "partner_channel": "Prepaid", "partner_owner": "NOC-East", "latitude": 40.71, "longitude": -74.01},
+    "138": {"partner_name": "Summit IoT Exchange", "partner_tier": "Silver", "partner_region": "Mountain", "partner_channel": "IoT", "partner_owner": "NOC-Central", "latitude": 39.74, "longitude": -104.99},
+    "78": {"partner_name": "Bay Area Connect", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "MVNO", "partner_owner": "NOC-West", "latitude": 37.33, "longitude": -121.89},
+    "100": {"partner_name": "Prairie Star Wireless", "partner_tier": "Silver", "partner_region": "Central", "partner_channel": "Reseller", "partner_owner": "NOC-Central", "latitude": 39.10, "longitude": -94.58},
+    "114": {"partner_name": "Atlantic Edge MVNO", "partner_tier": "Gold", "partner_region": "Northeast", "partner_channel": "MVNO", "partner_owner": "NOC-East", "latitude": 42.36, "longitude": -71.06},
+    "132": {"partner_name": "Gulf Coast Partners", "partner_tier": "Bronze", "partner_region": "South", "partner_channel": "Reseller", "partner_owner": "NOC-South", "latitude": 29.76, "longitude": -95.37},
+    "10032": {"partner_name": "Northstar Enterprise", "partner_tier": "Platinum", "partner_region": "National", "partner_channel": "Enterprise", "partner_owner": "NOC-National", "latitude": 39.83, "longitude": -98.58},
+    "10033": {"partner_name": "Redwood Business Line", "partner_tier": "Platinum", "partner_region": "West", "partner_channel": "Enterprise", "partner_owner": "NOC-West", "latitude": 34.05, "longitude": -118.24},
+    "20408": {"partner_name": "Lakeside Family Plans", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "Retail", "partner_owner": "NOC-Central", "latitude": 43.04, "longitude": -87.91},
+    "22508": {"partner_name": "Pacific Wholesale Co", "partner_tier": "Gold", "partner_region": "West", "partner_channel": "Wholesale", "partner_owner": "NOC-West", "latitude": 45.52, "longitude": -122.68},
+    "22510": {"partner_name": "Desert Sun Mobile", "partner_tier": "Bronze", "partner_region": "Southwest", "partner_channel": "MVNO", "partner_owner": "NOC-West", "latitude": 33.45, "longitude": -112.07},
+    "20428": {"partner_name": "Great Lakes Relay", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "IoT", "partner_owner": "NOC-Central", "latitude": 42.33, "longitude": -83.05},
+    "20047": {"partner_name": "Capital Region MVNO", "partner_tier": "Gold", "partner_region": "Mid-Atlantic", "partner_channel": "MVNO", "partner_owner": "NOC-East", "latitude": 38.91, "longitude": -77.04},
+    "22250": {"partner_name": "Frontier Bundle Partners", "partner_tier": "Silver", "partner_region": "South", "partner_channel": "Reseller", "partner_owner": "NOC-South", "latitude": 32.78, "longitude": -96.80},
+    "21808": {"partner_name": "Skyline Prepaid Hub", "partner_tier": "Bronze", "partner_region": "Mountain", "partner_channel": "Prepaid", "partner_owner": "NOC-Central", "latitude": 40.76, "longitude": -111.89},
+    "10018": {"partner_name": "Empire State Wholesale", "partner_tier": "Platinum", "partner_region": "Northeast", "partner_channel": "Wholesale", "partner_owner": "NOC-East", "latitude": 40.75, "longitude": -73.99},
+    "21208": {"partner_name": "Sunshine State Mobile", "partner_tier": "Gold", "partner_region": "Southeast", "partner_channel": "MVNO", "partner_owner": "NOC-South", "latitude": 25.76, "longitude": -80.19},
+    "10007": {"partner_name": "Twin Cities Connect", "partner_tier": "Silver", "partner_region": "Midwest", "partner_channel": "Retail", "partner_owner": "NOC-Central", "latitude": 44.98, "longitude": -93.27},
+    "10008": {"partner_name": "Liberty Bell Partners", "partner_tier": "Gold", "partner_region": "Northeast", "partner_channel": "Enterprise", "partner_owner": "NOC-East", "latitude": 39.95, "longitude": -75.17},
+    "82": {"partner_name": "Riverbend Wireless", "partner_tier": "Bronze", "partner_region": "Central", "partner_channel": "MVNO", "partner_owner": "NOC-Central", "latitude": 38.63, "longitude": -90.20},
+    "79": {"partner_name": "Cascadia Prepaid", "partner_tier": "Silver", "partner_region": "Northwest", "partner_channel": "Prepaid", "partner_owner": "NOC-West", "latitude": 45.51, "longitude": -122.68},
+    "144": {"partner_name": "Lone Star Wholesale", "partner_tier": "Gold", "partner_region": "South", "partner_channel": "Wholesale", "partner_owner": "NOC-South", "latitude": 30.27, "longitude": -97.74},
 }
 
 
@@ -62,9 +62,13 @@ def partner_attrs(partner_id: str) -> dict:
             "partner_region": "Unknown",
             "partner_channel": "Unknown",
             "partner_owner": "NOC-Unassigned",
+            "latitude": 39.83,
+            "longitude": -98.58,
         },
     )
-    return {"partnerID": str(partner_id), **base}
+    out = {"partnerID": str(partner_id), **base}
+    out["location"] = {"lat": out["latitude"], "lon": out["longitude"]}
+    return out
 
 
 CLUSTERS = ["polaris-a", "polaris-b", "titan-a"]

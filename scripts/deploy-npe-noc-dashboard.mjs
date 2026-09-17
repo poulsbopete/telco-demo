@@ -344,15 +344,87 @@ const lookupPanel = {
   config: { view: { stroke: null } },
 };
 
+const partnerRegionMap = {
+  $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+  title: 'Silent failures by partnerID · mapped by region',
+  width: 'container',
+  height: 'container',
+  autosize: { type: 'fit', contains: 'padding' },
+  config: {
+    view: { stroke: null },
+    kibana: {
+      type: 'map',
+      latitude: 39.5,
+      longitude: -98.0,
+      zoom: 3.4,
+      minZoom: 2,
+      maxZoom: 10,
+      scrollWheelZoom: false,
+      zoomControl: true,
+      emsTileServiceId: 'road_map_desaturated',
+      delayRepaint: true,
+    },
+  },
+  data: {
+    url: {
+      ...ES_QL,
+      query: `FROM npe-synthetic-transaction-details
+${TIME}
+| WHERE silent_failure == true
+| STATS
+    silent_count = COUNT(*),
+    latitude = MAX(latitude),
+    longitude = MAX(longitude)
+  BY partnerID, partner_name, partner_region, partner_tier, partner_owner
+| WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+| SORT silent_count DESC`,
+    },
+  },
+  mark: {
+    type: 'circle',
+    opacity: 0.88,
+    stroke: 'white',
+    strokeWidth: 1.2,
+    tooltip: true,
+  },
+  encoding: {
+    longitude: { field: 'longitude', type: 'quantitative' },
+    latitude: { field: 'latitude', type: 'quantitative' },
+    size: {
+      field: 'silent_count',
+      type: 'quantitative',
+      scale: { range: [140, 1100] },
+      legend: { title: 'Silent failures' },
+    },
+    color: {
+      field: 'partner_region',
+      type: 'nominal',
+      title: 'Region',
+      legend: { orient: 'bottom', columns: 4 },
+    },
+    tooltip: [
+      { field: 'partnerID', type: 'nominal', title: 'partnerID' },
+      { field: 'partner_name', type: 'nominal', title: 'Partner' },
+      { field: 'partner_region', type: 'nominal', title: 'Region' },
+      { field: 'partner_tier', type: 'nominal', title: 'Tier' },
+      { field: 'partner_owner', type: 'nominal', title: 'NOC owner' },
+      { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
+      { field: 'latitude', type: 'quantitative', title: 'Lat', format: '.2f' },
+      { field: 'longitude', type: 'quantitative', title: 'Lon', format: '.2f' },
+    ],
+  },
+};
+
 const viz = [
   { id: 'npe-noc-kpi-silent', title: 'KPI · Silent failures', spec: kpiSilentSimple, layout: { x: 0, y: 0, w: 16, h: 6 } },
   { id: 'npe-noc-kpi-offenders', title: 'KPI · Offending partners', spec: kpiPartners, layout: { x: 16, y: 0, w: 16, h: 6 } },
   { id: 'npe-noc-kpi-hard', title: 'KPI · Hard failures', spec: kpiHard, layout: { x: 32, y: 0, w: 16, h: 6 } },
-  { id: 'npe-noc-top-offenders', title: 'Top offenders', spec: topOffenders, layout: { x: 0, y: 6, w: 28, h: 16 } },
-  { id: 'npe-noc-by-region', title: 'By region', spec: byRegion, layout: { x: 28, y: 6, w: 20, h: 8 } },
-  { id: 'npe-noc-trend', title: 'Trend', spec: trend, layout: { x: 28, y: 14, w: 20, h: 8 } },
-  { id: 'npe-noc-offender-board', title: 'Offender board', spec: offendersTable, layout: { x: 0, y: 22, w: 48, h: 12 } },
-  { id: 'npe-noc-partner-lookup', title: 'Partner lookup', spec: lookupPanel, layout: { x: 0, y: 34, w: 48, h: 14 } },
+  { id: 'npe-noc-partner-map', title: 'Partner map by region', spec: partnerRegionMap, layout: { x: 0, y: 6, w: 48, h: 16 } },
+  { id: 'npe-noc-top-offenders', title: 'Top offenders', spec: topOffenders, layout: { x: 0, y: 22, w: 28, h: 16 } },
+  { id: 'npe-noc-by-region', title: 'By region', spec: byRegion, layout: { x: 28, y: 22, w: 20, h: 8 } },
+  { id: 'npe-noc-trend', title: 'Trend', spec: trend, layout: { x: 28, y: 30, w: 20, h: 8 } },
+  { id: 'npe-noc-offender-board', title: 'Offender board', spec: offendersTable, layout: { x: 0, y: 38, w: 48, h: 12 } },
+  { id: 'npe-noc-partner-lookup', title: 'Partner lookup', spec: lookupPanel, layout: { x: 0, y: 50, w: 48, h: 14 } },
 ];
 
 const objects = [
@@ -360,7 +432,7 @@ const objects = [
   buildDashboard(
     'npe-noc-silent-failures',
     'NPE NOC · Silent Failures & Top Offenders',
-    'NOC board: silent failures with partnerID lookup (name, tier, region, owner). Synthetic npe-synthetic-* data.',
+    'NOC board: silent failures with partnerID lookup + regional map. Synthetic npe-synthetic-* data.',
     viz.map((v) => ({ vizId: v.id, ...v.layout })),
   ),
 ];
