@@ -26,11 +26,11 @@ CLUSTERS = ["polaris-a", "polaris-b", "titan-a"]
 OPERATIONS = ["ADD_FEATURE", "REMOVE_FEATURE", "CHANGE_RATEPLAN", "PROVISION", "UPDATE_NAP"]
 BRANDS = ["TMOBILE_POSTPAID", "TMOBILE_PREPAID", "METRO"]
 
-# Scenario mix: healthy / hard_fail / silent_fail
+# Scenario mix: healthy / hard_fail / silent_fail (denser silent signal for heatmaps)
 SCENARIOS = (
-    ["healthy"] * 70
+    ["healthy"] * 55
     + ["hard_fail"] * 10
-    + ["silent_fail"] * 20
+    + ["silent_fail"] * 35
 )
 
 
@@ -290,19 +290,49 @@ def main() -> None:
             maps = json.load(f)
         mapping_note = f"grounded on {len(maps)} indices from {MAPPING}"
 
-    n = 400
+    n = 2500  # denser partner × time coverage for faceted heatmaps
     start = utc_now() - timedelta(days=7)
     proclogs, details, ml_recs = [], [], []
 
+    # Round-robin partners so every partnerID gets steady coverage
     for i in range(n):
+        partner = PARTNERS[i % len(PARTNERS)]
         when = start + timedelta(minutes=random.randint(0, 7 * 24 * 60))
+        # Snap many events onto 15m boundaries for denser heatmap cells
+        if random.random() < 0.7:
+            when = when.replace(minute=(when.minute // 15) * 15, second=0, microsecond=0)
         scenario = random.choice(SCENARIOS)
-        proclogs.append(make_proclog(i, when, scenario))
-        details.append(make_txn_details(i, when, scenario))
-        # denser ML grid for heatmaps
+        pl = make_proclog(i, when, scenario)
+        pl["clientid"] = partner
+        pl["routingid"] = partner
+        pl["partnerID"] = partner
+        pl["consumerid"] = f"cons-{partner}"
+        details_doc = make_txn_details(i, when, scenario)
+        details_doc["partnerID"] = partner
+        details_doc["clientid"] = partner
+        details_doc["consumerid"] = f"cons-{partner}"
+        if str(partner).isdigit():
+            details_doc["routingid"] = int(partner)
+        proclogs.append(pl)
+        details.append(details_doc)
         for _ in range(2):
             ml_when = start + timedelta(minutes=random.randint(0, 7 * 24 * 60))
-            ml_recs.append(make_ml_record(i, ml_when))
+            if random.random() < 0.7:
+                ml_when = ml_when.replace(
+                    minute=(ml_when.minute // 15) * 15, second=0, microsecond=0
+                )
+            ml = make_ml_record(i, ml_when)
+            ml["partnerID"] = partner
+            ml["partition_field_value"] = partner
+            ml["by_field_value"] = partner
+            ml["influencer_field_value"] = partner
+            ml["influencers"] = [
+                {
+                    "influencer_field_name": "partnerID",
+                    "influencer_field_values": [partner],
+                }
+            ]
+            ml_recs.append(ml)
 
     write_ndjson(OUT / "npe_proclog_synthetic.ndjson", proclogs)
     write_ndjson(OUT / "npe_transaction_details_synthetic.ndjson", details)

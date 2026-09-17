@@ -82,37 +82,85 @@ function buildDashboard(id, title, description, panels) {
 
 const heatmap = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  title: 'Silent failures by partnerID over time',
+  title: 'Silent failures · faceted by partnerID (15m buckets)',
   data: {
     url: {
+      '%type%': 'esql',
       '%context%': true,
-      '%timefield%': '@timestamp',
-      index: 'npe-synthetic-transaction-details',
+      query: `FROM npe-synthetic-transaction-details
+| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend
+| STATS
+    silent_count = COUNT(*) WHERE silent_failure == true,
+    total = COUNT(*)
+  BY partnerID, bucket = BUCKET(@timestamp, 15 minutes)
+| EVAL silent_rate = CASE(total > 0, silent_count * 1.0 / total, 0)
+| SORT partnerID, bucket`,
     },
-    format: { property: 'hits.hits' },
   },
-  transform: [
-    { calculate: "datum._source.partnerID", as: 'partnerID' },
-    { calculate: 'datum._source.silent_failure', as: 'silent_failure' },
-    { calculate: "toDate(datum._source['@timestamp'])", as: 'time' },
-    { filter: 'datum.silent_failure == true' },
-  ],
-  mark: { type: 'rect', tooltip: true },
-  encoding: {
-    x: { field: 'time', type: 'temporal', timeUnit: 'hours', title: 'Time' },
-    y: { field: 'partnerID', type: 'nominal', sort: '-color', title: 'partnerID' },
-    color: {
-      aggregate: 'count',
-      type: 'quantitative',
-      title: 'Silent failures',
-      scale: { scheme: 'blues' },
+  // Dense strip heatmaps — one facet row/column per partner
+  facet: {
+    field: 'partnerID',
+    type: 'nominal',
+    columns: 5,
+    sort: { op: 'sum', field: 'silent_count', order: 'descending' },
+    header: {
+      labelFontSize: 11,
+      labelFontWeight: 'bold',
+      title: 'partnerID',
+      titleFontSize: 12,
     },
-    tooltip: [
-      { field: 'partnerID', type: 'nominal' },
-      { aggregate: 'count', type: 'quantitative', title: 'Silent failures' },
-    ],
   },
-  config: { view: { stroke: null }, axis: { labelFontSize: 11 } },
+  spec: {
+    width: 145,
+    height: 36,
+    mark: {
+      type: 'rect',
+      tooltip: true,
+      stroke: '#050816',
+      strokeWidth: 0.25,
+    },
+    encoding: {
+      x: {
+        field: 'bucket',
+        type: 'temporal',
+        title: null,
+        axis: {
+          format: '%m/%d %H:%M',
+          labelAngle: -40,
+          labelFontSize: 7,
+          tickCount: 6,
+          grid: false,
+        },
+      },
+      y: {
+        field: 'band',
+        type: 'nominal',
+        title: null,
+        axis: null,
+        scale: { domain: ['silent'] },
+      },
+      color: {
+        field: 'silent_count',
+        type: 'quantitative',
+        title: 'Silent',
+        scale: { scheme: 'blues', zero: true },
+        legend: { orient: 'bottom', titleFontSize: 10, labelFontSize: 9 },
+      },
+      tooltip: [
+        { field: 'partnerID', type: 'nominal', title: 'partnerID' },
+        { field: 'bucket', type: 'temporal', title: 'Bucket', format: '%Y-%m-%d %H:%M' },
+        { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
+        { field: 'total', type: 'quantitative', title: 'Total txns' },
+        { field: 'silent_rate', type: 'quantitative', title: 'Silent rate', format: '.0%' },
+      ],
+    },
+    transform: [{ calculate: "'silent'", as: 'band' }],
+  },
+  resolve: { scale: { x: 'shared', color: 'shared' } },
+  config: {
+    view: { stroke: '#2a2a2e' },
+    facet: { spacing: 6 },
+  },
 };
 
 const bars = {
@@ -201,21 +249,21 @@ async function importObjects(objects) {
 const viz = [
   {
     id: 'npe-silent-fail-heatmap',
-    title: 'Silent failures heatmap (partnerID × time)',
+    title: 'Silent failures heatmap — faceted by partnerID',
     spec: heatmap,
-    layout: { x: 0, y: 0, w: 48, h: 18 },
+    layout: { x: 0, y: 0, w: 48, h: 28 },
   },
   {
     id: 'npe-silent-fail-by-partner',
     title: 'Silent failures by partnerID',
     spec: bars,
-    layout: { x: 0, y: 18, w: 24, h: 14 },
+    layout: { x: 0, y: 28, w: 24, h: 14 },
   },
   {
     id: 'npe-partner-anomaly-scatter',
     title: 'Partner record_score anomalies',
     spec: scatter,
-    layout: { x: 24, y: 18, w: 24, h: 14 },
+    layout: { x: 24, y: 28, w: 24, h: 14 },
   },
 ];
 

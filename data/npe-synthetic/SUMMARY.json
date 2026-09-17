@@ -1,13 +1,13 @@
 {
-  "generated_at": "2026-09-17T21:27:15.380Z",
+  "generated_at": "2026-09-17T21:36:00.113Z",
   "note": "grounded on 338 indices from /Users/psimkins/Downloads/mapping.json",
   "counts": {
-    "proclog": 400,
-    "transaction_details": 400,
-    "ml_anomaly_records": 800,
-    "silent_failures": 69,
-    "hard_failures": 46,
-    "healthy": 285
+    "proclog": 2500,
+    "transaction_details": 2500,
+    "ml_anomaly_records": 5000,
+    "silent_failures": 886,
+    "hard_failures": 242,
+    "healthy": 1372
   },
   "partners": [
     "116",
