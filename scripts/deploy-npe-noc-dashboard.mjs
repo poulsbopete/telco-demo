@@ -223,6 +223,8 @@ ${TIME}
       { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
     ],
   },
+  // Kibana enables autosize by default; keep step height with autosize none
+  autosize: 'none',
   height: { step: 28 },
   config: { view: { stroke: null }, axis: { grid: false } },
 };
@@ -258,8 +260,8 @@ ${TIME}
     y: { field: 'row', type: 'nominal', sort: { field: 'silent_count', order: 'descending' }, axis: null },
     text: { field: 'row', type: 'nominal' },
   },
+  autosize: 'none',
   height: { step: 22 },
-  width: 'container',
   config: { view: { stroke: null } },
 };
 
@@ -340,6 +342,7 @@ const lookupPanel = {
     y: { field: 'partner_name', type: 'nominal', sort: 'ascending', axis: null },
     text: { field: 'row', type: 'nominal' },
   },
+  autosize: 'none',
   height: { step: 18 },
   config: { view: { stroke: null } },
 };
@@ -347,9 +350,6 @@ const lookupPanel = {
 const partnerRegionMap = {
   $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
   title: 'Silent failures by partnerID · mapped by region',
-  width: 'container',
-  height: 'container',
-  autosize: { type: 'fit', contains: 'padding' },
   config: {
     view: { stroke: null },
     kibana: {
