@@ -245,6 +245,8 @@ ${TIME}
 const topOffenders = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   title: 'Top offenders — silent failures by partner',
+  width: 'container',
+  height: { step: 28 },
   data: {
     url: {
       ...ES_QL,
@@ -264,7 +266,15 @@ ${TIME}
       type: 'nominal',
       sort: '-x',
       title: null,
-      axis: { labelLimit: 280, labelFontSize: 11 },
+      axis: {
+        labelLimit: 320,
+        labelFontSize: 12,
+        labelColor: '#1d1d1f',
+        labelOverlap: false,
+        ticks: false,
+        domain: false,
+        minExtent: 200,
+      },
     },
     x: { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
     color: {
@@ -278,24 +288,24 @@ ${TIME}
     },
     tooltip: [
       { field: 'partnerID', title: 'partnerID' },
-      { field: 'partner_name', title: 'Name' },
+      { field: 'partner_name', title: 'Partner name' },
       { field: 'partner_tier', title: 'Tier' },
       { field: 'partner_region', title: 'Region' },
       { field: 'partner_owner', title: 'NOC owner' },
       { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
     ],
   },
-  // Kibana enables autosize by default; keep step height with autosize none
-  autosize: 'none',
-  height: { step: 28 },
-  config: { view: { stroke: null }, axis: { grid: false } },
+  config: {
+    view: { stroke: null },
+    axis: { grid: false, labelColor: '#1d1d1f' },
+  },
 };
 
 const offendersTable = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   title: {
-    text: 'Offender board — partner lookup + silent rate',
-    subtitle: 'partnerID · Partner · Tier · Region · NOC owner · Silent · Rate',
+    text: 'Offender board — partner names + silent rate',
+    subtitle: 'Sorted by silent failures · hover for tier / region / NOC owner',
     subtitleFontSize: 11,
     subtitleColor: '#6e6e73',
     anchor: 'start',
@@ -315,52 +325,92 @@ ${TIME}
 | WHERE silent_count > 0
 | SORT silent_count DESC
 | LIMIT 15
-| EVAL row = CONCAT(
-    partnerID, "   ",
-    partner_name, "   ",
-    partner_tier, "   ",
-    partner_region, "   ",
-    partner_owner, "   silent=",
-    silent_count::keyword, "   ",
-    ROUND(100 * silent_rate), "%"
-  )`,
+| EVAL label = CONCAT(partner_name, "  ·  ", partnerID)`,
     },
   },
-  mark: {
-    type: 'text',
-    align: 'left',
-    baseline: 'middle',
-    fontSize: 13,
-    font: 'IBM Plex Mono, Menlo, monospace',
-    color: '#1d1d1f',
-    dx: 4,
-  },
-  encoding: {
-    y: {
-      field: 'partner_name',
-      type: 'nominal',
-      sort: { field: 'silent_count', order: 'descending' },
-      axis: null,
+  layer: [
+    {
+      mark: { type: 'bar', cornerRadiusEnd: 2, tooltip: true },
+      encoding: {
+        y: {
+          field: 'label',
+          type: 'nominal',
+          sort: '-x',
+          title: null,
+          axis: {
+            labelLimit: 360,
+            labelFontSize: 12,
+            labelColor: '#1d1d1f',
+            labelFontWeight: 500,
+            labelOverlap: false,
+            ticks: false,
+            domain: false,
+            minExtent: 240,
+          },
+        },
+        x: {
+          field: 'silent_count',
+          type: 'quantitative',
+          title: 'Silent failures',
+          axis: { labelColor: '#1d1d1f', titleColor: '#6e6e73' },
+        },
+        color: {
+          field: 'partner_tier',
+          type: 'nominal',
+          title: 'Tier',
+          scale: {
+            domain: ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unknown'],
+            range: ['#e20074', '#0071e3', '#00bfb3', '#fec514', '#9a9aa0'],
+          },
+        },
+        tooltip: [
+          { field: 'partner_name', title: 'Partner name' },
+          { field: 'partnerID', title: 'partnerID' },
+          { field: 'partner_tier', title: 'Tier' },
+          { field: 'partner_region', title: 'Region' },
+          { field: 'partner_owner', title: 'NOC owner' },
+          { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
+          { field: 'silent_rate', type: 'quantitative', title: 'Silent rate', format: '.0%' },
+        ],
+      },
     },
-    text: { field: 'row', type: 'nominal' },
-    tooltip: [
-      { field: 'partnerID', title: 'partnerID' },
-      { field: 'partner_name', title: 'Partner' },
-      { field: 'partner_tier', title: 'Tier' },
-      { field: 'partner_region', title: 'Region' },
-      { field: 'partner_owner', title: 'NOC owner' },
-      { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
-      { field: 'silent_rate', type: 'quantitative', title: 'Silent rate', format: '.0%' },
-    ],
+    {
+      mark: {
+        type: 'text',
+        align: 'left',
+        baseline: 'middle',
+        dx: 6,
+        fontSize: 11,
+        fontWeight: 600,
+        color: '#1d1d1f',
+      },
+      encoding: {
+        y: {
+          field: 'label',
+          type: 'nominal',
+          sort: '-x',
+          axis: null,
+        },
+        x: { field: 'silent_count', type: 'quantitative' },
+        text: {
+          field: 'silent_rate',
+          type: 'quantitative',
+          format: '.0%',
+        },
+      },
+    },
+  ],
+  config: {
+    view: { stroke: null },
+    axis: { grid: true, gridColor: '#f0f0f2', labelColor: '#1d1d1f' },
   },
-  config: { view: { stroke: null } },
 };
 
 const lookupPanel = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   title: {
-    text: 'Partner lookup — partnerID → name / tier / region / channel / NOC',
-    subtitle: 'Full wholesale / MVNO directory (synthetic)',
+    text: 'Partner lookup — names, tiers, regions, NOC owners',
+    subtitle: 'Full wholesale / MVNO directory',
     subtitleFontSize: 11,
     subtitleColor: '#6e6e73',
     anchor: 'start',
@@ -375,43 +425,62 @@ const lookupPanel = {
 | KEEP partnerID, partner_name, partner_tier, partner_region, partner_channel, partner_owner
 | SORT partner_name
 | LIMIT 30
-| EVAL row = CONCAT(
-    partnerID, "   ",
-    partner_name, "   [",
-    partner_tier, "]   ",
-    partner_region, " / ",
-    partner_channel, "   → ",
-    partner_owner
-  )`,
+| EVAL label = CONCAT(partner_name, "  ·  ", partnerID)
+| EVAL detail = CONCAT(partner_tier, "  ·  ", partner_region, "  ·  ", partner_channel, "  →  ", partner_owner)`,
     },
   },
-  mark: {
-    type: 'text',
-    align: 'left',
-    baseline: 'middle',
-    fontSize: 13,
-    font: 'IBM Plex Mono, Menlo, monospace',
-    color: '#1d1d1f',
-    dx: 4,
-  },
-  encoding: {
-    y: {
-      field: 'partner_name',
-      type: 'nominal',
-      sort: 'ascending',
-      axis: null,
+  layer: [
+    {
+      mark: { type: 'bar', color: '#e8e8ed', cornerRadiusEnd: 2, tooltip: true },
+      encoding: {
+        y: {
+          field: 'label',
+          type: 'nominal',
+          sort: 'ascending',
+          title: null,
+          axis: {
+            labelLimit: 360,
+            labelFontSize: 12,
+            labelColor: '#1d1d1f',
+            labelFontWeight: 500,
+            labelOverlap: false,
+            ticks: false,
+            domain: false,
+            minExtent: 240,
+          },
+        },
+        x: { value: 1 },
+        tooltip: [
+          { field: 'partner_name', title: 'Partner name' },
+          { field: 'partnerID', title: 'partnerID' },
+          { field: 'partner_tier', title: 'Tier' },
+          { field: 'partner_region', title: 'Region' },
+          { field: 'partner_channel', title: 'Channel' },
+          { field: 'partner_owner', title: 'NOC owner' },
+        ],
+      },
     },
-    text: { field: 'row', type: 'nominal' },
-    tooltip: [
-      { field: 'partnerID', title: 'partnerID' },
-      { field: 'partner_name', title: 'Partner' },
-      { field: 'partner_tier', title: 'Tier' },
-      { field: 'partner_region', title: 'Region' },
-      { field: 'partner_channel', title: 'Channel' },
-      { field: 'partner_owner', title: 'NOC owner' },
-    ],
+    {
+      mark: {
+        type: 'text',
+        align: 'left',
+        baseline: 'middle',
+        dx: 8,
+        fontSize: 12,
+        color: '#1d1d1f',
+        font: 'IBM Plex Mono, Menlo, monospace',
+      },
+      encoding: {
+        y: { field: 'label', type: 'nominal', sort: 'ascending', axis: null },
+        x: { value: 0 },
+        text: { field: 'detail', type: 'nominal' },
+      },
+    },
+  ],
+  config: {
+    view: { stroke: null },
+    axis: { grid: false, labelColor: '#1d1d1f' },
   },
-  config: { view: { stroke: null } },
 };
 
 
