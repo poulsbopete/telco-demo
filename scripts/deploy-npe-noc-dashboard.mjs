@@ -180,6 +180,68 @@ ${TIME}
   config: { view: { stroke: null } },
 };
 
+const kpiPattern = {
+  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+  title: 'Pattern drift (SUCCESS + wrong speed)',
+  data: {
+    url: {
+      ...ES_QL,
+      query: `FROM npe-synthetic-transaction-details
+${TIME}
+| WHERE silent_pattern_deviation == true
+| STATS drifted = COUNT(*)`,
+    },
+  },
+  mark: { type: 'text', align: 'center', baseline: 'middle', fontSize: 48, fontWeight: 'bold', color: '#0071e3' },
+  encoding: { text: { field: 'drifted', type: 'quantitative' } },
+  config: { view: { stroke: null } },
+};
+
+const patternByFeatureSpeed = {
+  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+  title: 'Silent pattern change — feature × speed (Jian Yao example)',
+  data: {
+    url: {
+      ...ES_QL,
+      query: `FROM npe-synthetic-transaction-details
+${TIME}
+| WHERE status == "SUCCESS" AND feature IS NOT NULL AND speed IS NOT NULL
+| STATS txn = COUNT(*), drifted = COUNT(*) WHERE silent_pattern_deviation == true
+  BY feature, speed, tierName
+| EVAL label = CONCAT(feature, " · ", speed)
+| SORT drifted DESC, txn DESC
+| LIMIT 12`,
+    },
+  },
+  mark: { type: 'bar', tooltip: true, cornerRadiusEnd: 2 },
+  encoding: {
+    y: {
+      field: 'label',
+      type: 'nominal',
+      sort: '-x',
+      title: null,
+      axis: { labelLimit: 220, labelFontSize: 11 },
+    },
+    x: { field: 'txn', type: 'quantitative', title: 'SUCCESS txns' },
+    color: {
+      field: 'drifted',
+      type: 'quantitative',
+      title: 'Drifted',
+      scale: { range: ['#d2d2d7', '#e20074'] },
+    },
+    tooltip: [
+      { field: 'feature', title: 'feature' },
+      { field: 'speed', title: 'speed' },
+      { field: 'tierName', title: 'tier' },
+      { field: 'txn', type: 'quantitative', title: 'SUCCESS txns' },
+      { field: 'drifted', type: 'quantitative', title: 'Pattern deviations' },
+    ],
+  },
+  autosize: 'none',
+  height: { step: 26 },
+  config: { view: { stroke: null }, axis: { grid: false } },
+};
+
 const topOffenders = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
   title: 'Top offenders — silent failures by partner',
@@ -416,15 +478,17 @@ ${TIME}
 };
 
 const viz = [
-  { id: 'npe-noc-kpi-silent', title: 'KPI · Silent failures', spec: kpiSilentSimple, layout: { x: 0, y: 0, w: 16, h: 6 } },
-  { id: 'npe-noc-kpi-offenders', title: 'KPI · Offending partners', spec: kpiPartners, layout: { x: 16, y: 0, w: 16, h: 6 } },
-  { id: 'npe-noc-kpi-hard', title: 'KPI · Hard failures', spec: kpiHard, layout: { x: 32, y: 0, w: 16, h: 6 } },
+  { id: 'npe-noc-kpi-silent', title: 'KPI · Silent failures', spec: kpiSilentSimple, layout: { x: 0, y: 0, w: 12, h: 6 } },
+  { id: 'npe-noc-kpi-offenders', title: 'KPI · Offending partners', spec: kpiPartners, layout: { x: 12, y: 0, w: 12, h: 6 } },
+  { id: 'npe-noc-kpi-hard', title: 'KPI · Hard failures', spec: kpiHard, layout: { x: 24, y: 0, w: 12, h: 6 } },
+  { id: 'npe-noc-kpi-pattern', title: 'KPI · Pattern drift', spec: kpiPattern, layout: { x: 36, y: 0, w: 12, h: 6 } },
   { id: 'npe-noc-partner-map', title: 'Partner map by region', spec: partnerRegionMap, layout: { x: 0, y: 6, w: 48, h: 16 } },
-  { id: 'npe-noc-top-offenders', title: 'Top offenders', spec: topOffenders, layout: { x: 0, y: 22, w: 28, h: 16 } },
-  { id: 'npe-noc-by-region', title: 'By region', spec: byRegion, layout: { x: 28, y: 22, w: 20, h: 8 } },
-  { id: 'npe-noc-trend', title: 'Trend', spec: trend, layout: { x: 28, y: 30, w: 20, h: 8 } },
-  { id: 'npe-noc-offender-board', title: 'Offender board', spec: offendersTable, layout: { x: 0, y: 38, w: 48, h: 12 } },
-  { id: 'npe-noc-partner-lookup', title: 'Partner lookup', spec: lookupPanel, layout: { x: 0, y: 50, w: 48, h: 14 } },
+  { id: 'npe-noc-pattern-feature-speed', title: 'Pattern change · feature × speed', spec: patternByFeatureSpeed, layout: { x: 0, y: 22, w: 24, h: 14 } },
+  { id: 'npe-noc-top-offenders', title: 'Top offenders', spec: topOffenders, layout: { x: 24, y: 22, w: 24, h: 14 } },
+  { id: 'npe-noc-by-region', title: 'By region', spec: byRegion, layout: { x: 0, y: 36, w: 24, h: 8 } },
+  { id: 'npe-noc-trend', title: 'Trend', spec: trend, layout: { x: 24, y: 36, w: 24, h: 8 } },
+  { id: 'npe-noc-offender-board', title: 'Offender board', spec: offendersTable, layout: { x: 0, y: 44, w: 48, h: 12 } },
+  { id: 'npe-noc-partner-lookup', title: 'Partner lookup', spec: lookupPanel, layout: { x: 0, y: 56, w: 48, h: 14 } },
 ];
 
 const objects = [
@@ -432,7 +496,7 @@ const objects = [
   buildDashboard(
     'npe-noc-silent-failures',
     'NPE NOC · Silent Failures & Top Offenders',
-    'NOC board: silent failures with partnerID lookup + regional map. Synthetic npe-synthetic-* data.',
+    'NOC board: silent failures, Jian Yao pattern drift (feature×speed), partnerID lookup + regional map.',
     viz.map((v) => ({ vizId: v.id, ...v.layout })),
   ),
 ];

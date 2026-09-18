@@ -18,12 +18,15 @@ Partner attributes are also **denormalized** onto proclog / transaction / ML doc
 
 ## Silent failure definition (synthetic)
 
-- Outer call **SUCCESS** (`status` / `transactionstatus`)
-- But **NAP / non-core failed** (`napstatus=FAILED`, `noncorefailed=true`)
-- Payload flags: `napAsScore=false`, `dualProvisioningFlag=OFF`
+Two SUCCESS-path failure modes:
 
-Helper fields (not in production mapping): `silent_failure`, `synthetic_scenario`, `partnerID`  
+1. **Subsystem silent fail** — outer call **SUCCESS** (`status` / `transactionstatus`) but **NAP / non-core failed** (`napstatus=FAILED`, `noncorefailed=true`); payload flags `napAsScore=false`, `dualProvisioningFlag=OFF`
+2. **Pattern change (Jian Yao)** — end-to-end **SUCCESS**, but provisioning JSON in `fullrequest`/`fullresponse` drifts: feature `2412001` expected `speed=thr128kbps`, observed `thr16kbps` (`silent_pattern_deviation=true`)
+
+Helper fields (not in production mapping): `silent_failure`, `synthetic_scenario`, `partnerID`, `feature`, `tierName`, `speed`, `silent_pattern_deviation`  
 Mapped stand-ins: `clientid` / `routingid` = partner id
+
+Pilot ML job shape: `scripts/npe-ml-silent-pattern-job.example.json` (`rare` by `speed`, partition `feature`, 15m bucket).
 
 ## Regenerate
 

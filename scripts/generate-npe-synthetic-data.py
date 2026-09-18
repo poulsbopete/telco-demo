@@ -75,12 +75,19 @@ CLUSTERS = ["polaris-a", "polaris-b", "titan-a"]
 OPERATIONS = ["ADD_FEATURE", "REMOVE_FEATURE", "CHANGE_RATEPLAN", "PROVISION", "UPDATE_NAP"]
 BRANDS = ["TMOBILE_POSTPAID", "TMOBILE_PREPAID", "METRO"]
 
-# Scenario mix: healthy / hard_fail / silent_fail (denser silent signal for heatmaps)
+# Scenario mix: healthy / hard_fail / silent_fail / pattern_change (Jian Yao example)
 SCENARIOS = (
-    ["healthy"] * 55
-    + ["hard_fail"] * 10
-    + ["silent_fail"] * 35
+    ["healthy"] * 50
+    + ["hard_fail"] * 8
+    + ["silent_fail"] * 27
+    + ["pattern_change"] * 15
 )
+
+# Jian Yao silent pattern: feature 2412001 normally thr128kbps; drift → thr16kbps
+FEATURE_EXPECTED_SPEED = {
+    "2412001": "thr128kbps",
+}
+FEATURE_IDS = ["2412001", "2412002", "2412100"]
 
 
 def utc_now() -> datetime:
@@ -112,18 +119,53 @@ def npc_payload(*, silent: bool, partner_id: str, operation: str) -> str:
     )
 
 
+def provisioning_tier_payload(*, feature: str, speed: str, when: datetime) -> str:
+    """Jian Yao-style JSON fragment inside fullRequest / fullResponse."""
+    body = {
+        "feature": feature,
+        "bucketSize": "6144",
+        "startDateTime": when.astimezone(timezone(timedelta(hours=-7))).strftime(
+            "%Y-%m-%dT%H:%M:%S-07:00"
+        ),
+        "tiers": [
+            {
+                "tierName": "tier4",
+                "threshold": "6144",
+                "behaviour": "throttle",
+                "speed": speed,
+            }
+        ],
+    }
+    return json.dumps(body, separators=(",", ":"))
+
+
+def feature_speed_for_scenario(scenario: str) -> tuple[str, str, bool]:
+    """Return (feature, speed, pattern_deviation)."""
+    feature = random.choice(FEATURE_IDS)
+    expected = FEATURE_EXPECTED_SPEED.get(feature, "thr128kbps")
+    if scenario == "pattern_change" and feature == "2412001":
+        return feature, "thr16kbps", True
+    if scenario == "pattern_change":
+        # Force the known silent-drift feature for this scenario
+        return "2412001", "thr16kbps", True
+    return feature, expected, False
+
+
 def make_proclog(i: int, when: datetime, scenario: str) -> dict:
     partner = random.choice(PARTNERS)
     op = random.choice(OPERATIONS)
     txn = f"TXN-{uuid.uuid4().hex[:12].upper()}"
     silent = scenario == "silent_fail"
+    pattern = scenario == "pattern_change"
     hard = scenario == "hard_fail"
+    feature, speed, pattern_deviation = feature_speed_for_scenario(scenario)
+    tier_json = provisioning_tier_payload(feature=feature, speed=speed, when=when)
 
     if hard:
         status, responsecode, errorcode = "FAILED", "500", "NPE-HARD-500"
         errormessage = "Downstream timeout talking to NAP"
     else:
-        # healthy + silent_fail both look successful on the wire
+        # healthy + silent_fail + pattern_change all look successful on the wire
         status, responsecode, errorcode = "SUCCESS", "200", ""
         errormessage = ""
 
@@ -170,7 +212,7 @@ def make_proclog(i: int, when: datetime, scenario: str) -> dict:
         "sdpid": f"SDP-{partner}",
         "segment": random.choice(BRANDS),
         "serviceid": "NPE-CORE",
-        "severity": "ERROR" if hard else ("WARN" if silent else "INFO"),
+        "severity": "ERROR" if hard else ("WARN" if silent or pattern else "INFO"),
         "source": "npe-synthetic",
         "sourcenamespace": "npe-prod",
         "sourcepod": f"adapter-{random.randint(1, 10)}",
@@ -180,12 +222,24 @@ def make_proclog(i: int, when: datetime, scenario: str) -> dict:
         "transactionid": txn,
         "user": "synthetic-loader",
         "version": "2.25.11.0",
-        "fullrequest": npc_payload(silent=silent, partner_id=partner, operation=op),
-        "fullrequestpayload": npc_payload(silent=silent, partner_id=partner, operation=op),
-        "fullresponse": npc_payload(silent=silent, partner_id=partner, operation=op),
+        "fullrequest": tier_json if pattern or op == "PROVISION" else npc_payload(
+            silent=silent, partner_id=partner, operation=op
+        ),
+        "fullrequestpayload": tier_json if pattern or op == "PROVISION" else npc_payload(
+            silent=silent, partner_id=partner, operation=op
+        ),
+        "fullresponse": tier_json if pattern or op == "PROVISION" else npc_payload(
+            silent=silent, partner_id=partner, operation=op
+        ),
+        # Extracted Wholesale params (stand-in for runtime fields / data-view scripts)
+        "feature": feature,
+        "tierName": "tier4",
+        "speed": speed,
+        "bucketSize": "6144",
+        "silent_pattern_deviation": pattern_deviation,
         # Demo helpers (not in mapping) — easy filters for silent-failure dashboards
         "synthetic_scenario": scenario,
-        "silent_failure": silent,
+        "silent_failure": silent or pattern_deviation,
         "partnerID": partner,
     }
 
@@ -194,7 +248,9 @@ def make_txn_details(i: int, when: datetime, scenario: str) -> dict:
     partner = random.choice(PARTNERS)
     op = random.choice(OPERATIONS)
     silent = scenario == "silent_fail"
+    pattern = scenario == "pattern_change"
     hard = scenario == "hard_fail"
+    feature, speed, pattern_deviation = feature_speed_for_scenario(scenario)
 
     if hard:
         txn_status, status, nap, noncore = "FAILED", "FAILED", "FAILED", "true"
@@ -204,6 +260,11 @@ def make_txn_details(i: int, when: datetime, scenario: str) -> dict:
         # Outer transaction SUCCESS, NAP / non-core failed → silent failure
         txn_status, status, nap, noncore = "SUCCESS", "SUCCESS", "FAILED", "true"
         status_desc = "Silent failure — wire OK, NAP/non-core failed"
+        err = ""
+    elif pattern:
+        # Jian Yao: SUCCESS end-to-end, but throttle speed drifted (thr16kbps)
+        txn_status, status, nap, noncore = "SUCCESS", "SUCCESS", "SUCCESS", "false"
+        status_desc = "Silent pattern change — SUCCESS but unexpected speed tier"
         err = ""
     else:
         txn_status, status, nap, noncore = "SUCCESS", "SUCCESS", "SUCCESS", "false"
@@ -269,8 +330,13 @@ def make_txn_details(i: int, when: datetime, scenario: str) -> dict:
         "allnoncoreauthorized": "false" if silent else "true",
         "allnoncoreregistered": "false" if silent else "true",
         "atleastonenoncoresuccess": "true",
+        "feature": feature,
+        "tierName": "tier4",
+        "speed": speed,
+        "bucketSize": "6144",
+        "silent_pattern_deviation": pattern_deviation,
         "synthetic_scenario": scenario,
-        "silent_failure": silent,
+        "silent_failure": silent or pattern_deviation,
         "partnerID": partner,
         "clientid": partner,
     }
@@ -404,6 +470,7 @@ def main() -> None:
 
     silent_n = sum(1 for d in details if d.get("silent_failure"))
     hard_n = sum(1 for d in details if d.get("synthetic_scenario") == "hard_fail")
+    pattern_n = sum(1 for d in details if d.get("silent_pattern_deviation"))
     summary = {
         "generated_at": ts(utc_now()),
         "note": mapping_note,
@@ -413,6 +480,7 @@ def main() -> None:
             "ml_anomaly_records": len(ml_recs),
             "partner_lookup": len(lookup_docs),
             "silent_failures": silent_n,
+            "pattern_deviations": pattern_n,
             "hard_failures": hard_n,
             "healthy": len(details) - silent_n - hard_n,
         },
@@ -428,6 +496,10 @@ def main() -> None:
             "transactionstatus/status SUCCESS (or proclog status SUCCESS) but "
             "napstatus FAILED and/or noncorefailed=true; payload flags napAsScore=false "
             "or dualProvisioningFlag=OFF"
+        ),
+        "pattern_change_definition": (
+            "Jian Yao / Erickson example: SUCCESS provisioning where feature 2412001 "
+            "expected speed thr128kbps but payload carries thr16kbps (tier4 throttle drift)"
         ),
         "load_hint": (
             "Bulk load to otel-demo / NPE serverless: "

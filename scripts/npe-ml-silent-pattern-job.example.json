@@ -1,0 +1,66 @@
+{
+  "description": "Pilot: silent pattern change — rare throttle speed per feature (Jian Yao / Erickson example)",
+  "job_id": "npe-silent-pattern-speed-by-feature",
+  "analysis_config": {
+    "bucket_span": "15m",
+    "influencers": ["partnerID", "clientid", "feature", "speed"],
+    "detectors": [
+      {
+        "detector_description": "Rare speed value for a given feature (e.g. thr16kbps on 2412001)",
+        "function": "rare",
+        "by_field_name": "speed",
+        "partition_field_name": "feature"
+      },
+      {
+        "detector_description": "Spike in known silent pattern deviations",
+        "function": "high_count",
+        "by_field_name": "partnerID"
+      }
+    ]
+  },
+  "data_description": {
+    "time_field": "@timestamp"
+  },
+  "datafeed_config": {
+    "indices": ["npe-synthetic-proclog", "npe-synthetic-transaction-details"],
+    "query": {
+      "bool": {
+        "must": [
+          { "term": { "status": "SUCCESS" } }
+        ]
+      }
+    },
+    "runtime_mappings": {
+      "feature": {
+        "type": "keyword",
+        "script": {
+          "source": "if (doc.containsKey('feature.keyword') && doc['feature.keyword'].size()!=0) { emit(doc['feature.keyword'].value); } else if (doc.containsKey('feature') && doc['feature'].size()!=0) { emit(doc['feature'].value); }"
+        }
+      },
+      "speed": {
+        "type": "keyword",
+        "script": {
+          "source": "if (doc.containsKey('speed.keyword') && doc['speed.keyword'].size()!=0) { emit(doc['speed.keyword'].value); } else if (doc.containsKey('speed') && doc['speed'].size()!=0) { emit(doc['speed'].value); }"
+        }
+      }
+    }
+  },
+  "custom_settings": {
+    "custom_urls": [
+      {
+        "url_name": "NOC silent-failure board",
+        "url_value": "dashboards#/view/npe-noc-silent-failures?_g=(time:(from:'$earliest$',to:'$latest$'))&_a=(query:(language:kuery,query:'feature:$feature$ AND speed:$speed$'))"
+      },
+      {
+        "url_name": "Discover (data view must define same runtime fields)",
+        "time_range": "1h",
+        "url_value": "discover#/?_g=(time:(from:'$earliest$',mode:absolute,to:'$latest$'))&_a=(index:'npe-synthetic-proclog',query:(language:kuery,query:'feature:\"$feature$\" AND speed:\"$speed$\"'))"
+      }
+    ]
+  },
+  "notes": [
+    "For production Wholesale: put JSON-path extraction from fullRequest/fullResponse in datafeed runtime_mappings AND mirror identical scripts on the Kibana data view so Anomaly Explorer → Discover drill-down works.",
+    "Optional second job: high_count filtered to silent_pattern_deviation:true when a feature→expected-speed golden map exists.",
+    "Confirm change timing with AIOps change-point or ES|QL CHANGE_POINT on % of thr16kbps for feature 2412001."
+  ]
+}

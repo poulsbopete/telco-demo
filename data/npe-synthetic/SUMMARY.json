@@ -1,14 +1,15 @@
 {
-  "generated_at": "2026-09-17T21:43:02.919Z",
+  "generated_at": "2026-09-18T18:44:20.011Z",
   "note": "grounded on 338 indices from /Users/psimkins/Downloads/mapping.json",
   "counts": {
     "proclog": 2500,
     "transaction_details": 2500,
     "ml_anomaly_records": 5000,
     "partner_lookup": 25,
-    "silent_failures": 886,
-    "hard_failures": 242,
-    "healthy": 1372
+    "silent_failures": 1080,
+    "pattern_deviations": 360,
+    "hard_failures": 218,
+    "healthy": 1202
   },
   "partners": [
     "116",
@@ -51,7 +52,7 @@
         "lat": 37.77,
         "lon": -122.42
       },
-      "@timestamp": "2026-09-17T21:43:02.628Z",
+      "@timestamp": "2026-09-18T18:44:19.737Z",
       "active": true,
       "source": "npe-synthetic-partner-lookup"
     },
@@ -68,7 +69,7 @@
         "lat": 47.61,
         "lon": -122.33
       },
-      "@timestamp": "2026-09-17T21:43:02.628Z",
+      "@timestamp": "2026-09-18T18:44:19.737Z",
       "active": true,
       "source": "npe-synthetic-partner-lookup"
     },
@@ -85,7 +86,7 @@
         "lat": 41.88,
         "lon": -87.63
       },
-      "@timestamp": "2026-09-17T21:43:02.628Z",
+      "@timestamp": "2026-09-18T18:44:19.737Z",
       "active": true,
       "source": "npe-synthetic-partner-lookup"
     }
@@ -97,5 +98,6 @@
     "npe-synthetic-partner-lookup"
   ],
   "silent_failure_definition": "transactionstatus/status SUCCESS (or proclog status SUCCESS) but napstatus FAILED and/or noncorefailed=true; payload flags napAsScore=false or dualProvisioningFlag=OFF",
+  "pattern_change_definition": "Jian Yao / Erickson example: SUCCESS provisioning where feature 2412001 expected speed thr128kbps but payload carries thr16kbps (tier4 throttle drift)",
   "load_hint": "Bulk load to otel-demo / NPE serverless: curl bulk files under data/npe-synthetic/bulk_*.ndjson to $ES_URL/_bulk"
 }
