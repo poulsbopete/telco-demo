@@ -220,7 +220,15 @@ ${TIME}
       type: 'nominal',
       sort: '-x',
       title: null,
-      axis: { labelLimit: 220, labelFontSize: 11 },
+      axis: {
+        labelLimit: 220,
+        labelFontSize: 11,
+        labelColor: '#1d1d1f',
+        labelOverlap: false,
+        ticks: false,
+        domain: false,
+        minExtent: 160,
+      },
     },
     x: { field: 'txn', type: 'quantitative', title: 'SUCCESS txns' },
     color: {
@@ -237,85 +245,388 @@ ${TIME}
       { field: 'drifted', type: 'quantitative', title: 'Pattern deviations' },
     ],
   },
-  autosize: 'none',
+  width: 'container',
   height: { step: 26 },
-  config: { view: { stroke: null }, axis: { grid: false } },
+  config: { view: { stroke: null }, axis: { grid: false, labelColor: '#1d1d1f' } },
 };
 
-const topOffenders = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+/** Full Vega (not Lite) so kibanaAddFilter works on click — filters whole dashboard by partnerID */
+function clickablePartnerBarsVega({
+  title,
+  subtitle,
+  query,
+  context = true,
+  valueField = 'silent_count',
+  valueTitle = 'Silent failures',
+  colorField = 'partner_tier',
+  sortDescending = true,
+  showRate = false,
+  rowPx = 28,
+}) {
+  const sort = sortDescending
+    ? { field: valueField, order: 'descending' }
+    : { field: 'partner_name', order: 'ascending' };
+
+  const marks = [
+    {
+      type: 'rect',
+      name: 'partner_bar',
+      from: { data: 'source' },
+      encode: {
+        update: {
+          y: { scale: 'yscale', field: 'label' },
+          height: { scale: 'yscale', band: 1 },
+          x: { scale: 'xscale', value: 0 },
+          x2: { scale: 'xscale', field: valueField },
+          fill: colorField
+            ? { scale: 'color', field: colorField }
+            : { value: '#0071e3' },
+          cornerRadiusTopRight: { value: 2 },
+          cornerRadiusBottomRight: { value: 2 },
+          cursor: { value: 'pointer' },
+          tooltip: {
+            signal: showRate
+              ? `{"Partner": datum.partner_name, "partnerID": datum.partnerID, "Tier": datum.partner_tier, "Region": datum.partner_region, "NOC": datum.partner_owner, "Silent": datum.silent_count, "Rate": format(datum.silent_rate, ".0%"), "hint": "Click to filter dashboard"}`
+              : `{"Partner": datum.partner_name, "partnerID": datum.partnerID, "Tier": datum.partner_tier, "Region": datum.partner_region, "NOC": datum.partner_owner, "Silent": datum.${valueField}, "hint": "Click to filter dashboard"}`,
+          },
+        },
+        hover: { fillOpacity: { value: 0.85 } },
+      },
+    },
+    {
+      type: 'text',
+      name: 'partner_value',
+      from: { data: 'source' },
+      encode: {
+        update: {
+          y: { scale: 'yscale', field: 'label', band: 0.5 },
+          x: { scale: 'xscale', field: valueField },
+          dx: { value: 6 },
+          align: { value: 'left' },
+          baseline: { value: 'middle' },
+          fill: { value: '#1d1d1f' },
+          fontSize: { value: 11 },
+          fontWeight: { value: 600 },
+          cursor: { value: 'pointer' },
+          text: showRate
+            ? { signal: 'format(datum.silent_rate, ".0%")' }
+            : { field: valueField },
+        },
+      },
+    },
+  ];
+
+  return {
+    $schema: 'https://vega.github.io/schema/vega/v5.json',
+    description: 'Click a partner to filter the dashboard by partnerID',
+    autosize: { type: 'fit', contains: 'padding' },
+    padding: 8,
+    config: {
+      kibana: { restoreSignalValuesOnRefresh: true },
+      axis: { labelColor: '#1d1d1f', titleColor: '#6e6e73' },
+      view: { stroke: null },
+    },
+    title: {
+      text: title,
+      subtitle: `${subtitle} · Click bar to filter by partnerID (Shift+click clears filters)`,
+      subtitleFontSize: 11,
+      subtitleColor: '#6e6e73',
+      anchor: 'start',
+      color: '#1d1d1f',
+      fontSize: 14,
+      offset: 4,
+    },
+    data: [
+      {
+        name: 'source',
+        url: {
+          '%type%': 'esql',
+          '%context%': context,
+          query,
+        },
+        transform: [
+          {
+            type: 'formula',
+            as: 'label',
+            expr: 'datum.partner_name + " · " + datum.partnerID',
+          },
+        ],
+      },
+    ],
+    signals: [
+      {
+        name: 'partner_click',
+        on: [
+          {
+            events: '@partner_bar:click[!event.shiftKey], @partner_value:click[!event.shiftKey]',
+            update:
+              'kibanaAddFilter({"match_phrase":{"partnerID":datum.partnerID}}, "npe-synthetic-transaction-details", "partnerID: " + datum.partnerID)',
+          },
+          {
+            events: '@partner_bar:click[event.shiftKey], @partner_value:click[event.shiftKey]',
+            update: 'kibanaRemoveAllFilters()',
+          },
+        ],
+      },
+    ],
+    scales: [
+      {
+        name: 'yscale',
+        type: 'band',
+        domain: { data: 'source', field: 'label', sort },
+        range: { step: rowPx },
+        paddingInner: 0.18,
+        paddingOuter: 0.05,
+      },
+      {
+        name: 'xscale',
+        type: 'linear',
+        domain: { data: 'source', field: valueField },
+        range: 'width',
+        nice: true,
+        zero: true,
+      },
+      {
+        name: 'color',
+        type: 'ordinal',
+        domain: ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unknown'],
+        range: ['#e20074', '#0071e3', '#00bfb3', '#fec514', '#9a9aa0'],
+      },
+    ],
+    axes: [
+      {
+        orient: 'left',
+        scale: 'yscale',
+        title: null,
+        domain: false,
+        ticks: false,
+        labelLimit: 300,
+        labelFontSize: 12,
+        labelColor: '#1d1d1f',
+        labelPadding: 6,
+      },
+      {
+        orient: 'bottom',
+        scale: 'xscale',
+        title: valueTitle,
+        grid: true,
+        gridColor: '#f0f0f2',
+        tickCount: 5,
+        labelFontSize: 11,
+      },
+    ],
+    legends: colorField
+      ? [
+          {
+            fill: 'color',
+            title: 'Tier',
+            orient: 'bottom',
+            direction: 'horizontal',
+            labelColor: '#1d1d1f',
+            titleColor: '#6e6e73',
+          },
+        ]
+      : [],
+    marks,
+  };
+}
+
+function clickablePartnerDirectoryVega() {
+  return {
+    $schema: 'https://vega.github.io/schema/vega/v5.json',
+    description: 'Partner directory — click a row to filter dashboard by partnerID',
+    autosize: { type: 'fit', contains: 'padding' },
+    padding: 8,
+    config: {
+      kibana: { restoreSignalValuesOnRefresh: true },
+      view: { stroke: null },
+    },
+    title: {
+      text: 'Partner lookup — click partnerID / name to drill down',
+      subtitle:
+        'Filters the whole dashboard by partnerID · Shift+click clears filters',
+      subtitleFontSize: 11,
+      subtitleColor: '#6e6e73',
+      anchor: 'start',
+      color: '#1d1d1f',
+      fontSize: 14,
+    },
+    data: [
+      {
+        name: 'source',
+        url: {
+          '%type%': 'esql',
+          '%context%': false,
+          query: `FROM npe-synthetic-partner-lookup
+| KEEP partnerID, partner_name, partner_tier, partner_region, partner_channel, partner_owner
+| SORT partner_name
+| LIMIT 30`,
+        },
+        transform: [
+          {
+            type: 'formula',
+            as: 'label',
+            expr: 'datum.partner_name + " · " + datum.partnerID',
+          },
+          {
+            type: 'formula',
+            as: 'detail',
+            expr:
+              'datum.partner_tier + "  ·  " + datum.partner_region + "  ·  " + datum.partner_channel + "  →  " + datum.partner_owner',
+          },
+          {
+            type: 'window',
+            ops: ['row_number'],
+            as: ['rank'],
+          },
+        ],
+      },
+    ],
+    signals: [
+      {
+        name: 'partner_click',
+        on: [
+          {
+            events: '@row_bg:click[!event.shiftKey], @row_id:click[!event.shiftKey], @row_name:click[!event.shiftKey], @row_detail:click[!event.shiftKey]',
+            update:
+              'kibanaAddFilter({"match_phrase":{"partnerID":datum.partnerID}}, "npe-synthetic-transaction-details", "partnerID: " + datum.partnerID)',
+          },
+          {
+            events: '@row_bg:click[event.shiftKey], @row_id:click[event.shiftKey], @row_name:click[event.shiftKey], @row_detail:click[event.shiftKey]',
+            update: 'kibanaRemoveAllFilters()',
+          },
+        ],
+      },
+    ],
+    scales: [
+      {
+        name: 'yscale',
+        type: 'band',
+        domain: { data: 'source', field: 'label', sort: true },
+        range: { step: 26 },
+        paddingInner: 0.12,
+      },
+    ],
+    axes: [
+      {
+        orient: 'left',
+        scale: 'yscale',
+        title: null,
+        domain: false,
+        ticks: false,
+        labels: false,
+      },
+    ],
+    marks: [
+      {
+        type: 'rect',
+        name: 'row_bg',
+        from: { data: 'source' },
+        encode: {
+          update: {
+            y: { scale: 'yscale', field: 'label' },
+            height: { scale: 'yscale', band: 1 },
+            x: { value: 0 },
+            x2: { signal: 'width' },
+            fill: {
+              signal: 'datum.rank % 2 === 0 ? "#f5f5f7" : "#ffffff"',
+            },
+            cursor: { value: 'pointer' },
+            tooltip: {
+              signal:
+                '{"Partner": datum.partner_name, "partnerID": datum.partnerID, "Tier": datum.partner_tier, "Region": datum.partner_region, "Channel": datum.partner_channel, "NOC": datum.partner_owner, "hint": "Click to filter dashboard"}',
+            },
+          },
+          hover: { fill: { value: '#d6e8ff' } },
+        },
+      },
+      {
+        type: 'text',
+        name: 'row_id',
+        from: { data: 'source' },
+        encode: {
+          update: {
+            y: { scale: 'yscale', field: 'label', band: 0.5 },
+            x: { value: 8 },
+            align: { value: 'left' },
+            baseline: { value: 'middle' },
+            text: { field: 'partnerID' },
+            fill: { value: '#0071e3' },
+            fontSize: { value: 12 },
+            fontWeight: { value: 700 },
+            font: { value: 'IBM Plex Mono, Menlo, monospace' },
+            cursor: { value: 'pointer' },
+          },
+        },
+      },
+      {
+        type: 'text',
+        name: 'row_name',
+        from: { data: 'source' },
+        encode: {
+          update: {
+            y: { scale: 'yscale', field: 'label', band: 0.5 },
+            x: { value: 80 },
+            align: { value: 'left' },
+            baseline: { value: 'middle' },
+            text: { field: 'partner_name' },
+            fill: { value: '#1d1d1f' },
+            fontSize: { value: 12 },
+            fontWeight: { value: 600 },
+            cursor: { value: 'pointer' },
+            limit: { value: 260 },
+          },
+        },
+      },
+      {
+        type: 'text',
+        name: 'row_detail',
+        from: { data: 'source' },
+        encode: {
+          update: {
+            y: { scale: 'yscale', field: 'label', band: 0.5 },
+            x: { value: 360 },
+            align: { value: 'left' },
+            baseline: { value: 'middle' },
+            text: { field: 'detail' },
+            fill: { value: '#6e6e73' },
+            fontSize: { value: 12 },
+            font: { value: 'IBM Plex Mono, Menlo, monospace' },
+            cursor: { value: 'pointer' },
+            limit: { value: 520 },
+          },
+        },
+      },
+    ],
+  };
+}
+
+const topOffenders = clickablePartnerBarsVega({
   title: 'Top offenders — silent failures by partner',
-  width: 'container',
-  height: { step: 28 },
-  data: {
-    url: {
-      ...ES_QL,
-      query: `FROM npe-synthetic-transaction-details
+  subtitle: 'Partner name · partnerID',
+  context: true,
+  valueField: 'silent_count',
+  valueTitle: 'Silent failures',
+  colorField: 'partner_tier',
+  rowPx: 28,
+  query: `FROM npe-synthetic-transaction-details
 ${TIME}
 | WHERE silent_failure == true
 | STATS silent_count = COUNT(*) BY partnerID, partner_name, partner_tier, partner_region, partner_owner
 | SORT silent_count DESC
-| LIMIT 10
-| EVAL label = CONCAT(partner_name, " (", partnerID, ")")`,
-    },
-  },
-  mark: { type: 'bar', tooltip: true, cornerRadiusEnd: 2 },
-  encoding: {
-    y: {
-      field: 'label',
-      type: 'nominal',
-      sort: '-x',
-      title: null,
-      axis: {
-        labelLimit: 320,
-        labelFontSize: 12,
-        labelColor: '#1d1d1f',
-        labelOverlap: false,
-        ticks: false,
-        domain: false,
-        minExtent: 200,
-      },
-    },
-    x: { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
-    color: {
-      field: 'partner_tier',
-      type: 'nominal',
-      title: 'Tier',
-      scale: {
-        domain: ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unknown'],
-        range: ['#e20074', '#0071e3', '#00bfb3', '#fec514', '#9a9aa0'],
-      },
-    },
-    tooltip: [
-      { field: 'partnerID', title: 'partnerID' },
-      { field: 'partner_name', title: 'Partner name' },
-      { field: 'partner_tier', title: 'Tier' },
-      { field: 'partner_region', title: 'Region' },
-      { field: 'partner_owner', title: 'NOC owner' },
-      { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
-    ],
-  },
-  config: {
-    view: { stroke: null },
-    axis: { grid: false, labelColor: '#1d1d1f' },
-  },
-};
+| LIMIT 10`,
+});
 
-const offendersTable = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  title: {
-    text: 'Offender board — partner names + silent rate',
-    subtitle: 'Sorted by silent failures · hover for tier / region / NOC owner',
-    subtitleFontSize: 11,
-    subtitleColor: '#6e6e73',
-    anchor: 'start',
-  },
-  width: 'container',
-  height: { step: 26 },
-  data: {
-    url: {
-      ...ES_QL,
-      query: `FROM npe-synthetic-transaction-details
+const offendersTable = clickablePartnerBarsVega({
+  title: 'Offender board — partner names + silent rate',
+  subtitle: 'Click a partner to drill down across the dashboard',
+  context: true,
+  valueField: 'silent_count',
+  valueTitle: 'Silent failures',
+  colorField: 'partner_tier',
+  showRate: true,
+  rowPx: 26,
+  query: `FROM npe-synthetic-transaction-details
 ${TIME}
 | STATS
     silent_count = COUNT(*) WHERE silent_failure == true,
@@ -324,164 +635,10 @@ ${TIME}
 | EVAL silent_rate = CASE(total > 0, silent_count * 1.0 / total, 0)
 | WHERE silent_count > 0
 | SORT silent_count DESC
-| LIMIT 15
-| EVAL label = CONCAT(partner_name, "  ·  ", partnerID)`,
-    },
-  },
-  layer: [
-    {
-      mark: { type: 'bar', cornerRadiusEnd: 2, tooltip: true },
-      encoding: {
-        y: {
-          field: 'label',
-          type: 'nominal',
-          sort: '-x',
-          title: null,
-          axis: {
-            labelLimit: 360,
-            labelFontSize: 12,
-            labelColor: '#1d1d1f',
-            labelFontWeight: 500,
-            labelOverlap: false,
-            ticks: false,
-            domain: false,
-            minExtent: 240,
-          },
-        },
-        x: {
-          field: 'silent_count',
-          type: 'quantitative',
-          title: 'Silent failures',
-          axis: { labelColor: '#1d1d1f', titleColor: '#6e6e73' },
-        },
-        color: {
-          field: 'partner_tier',
-          type: 'nominal',
-          title: 'Tier',
-          scale: {
-            domain: ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unknown'],
-            range: ['#e20074', '#0071e3', '#00bfb3', '#fec514', '#9a9aa0'],
-          },
-        },
-        tooltip: [
-          { field: 'partner_name', title: 'Partner name' },
-          { field: 'partnerID', title: 'partnerID' },
-          { field: 'partner_tier', title: 'Tier' },
-          { field: 'partner_region', title: 'Region' },
-          { field: 'partner_owner', title: 'NOC owner' },
-          { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
-          { field: 'silent_rate', type: 'quantitative', title: 'Silent rate', format: '.0%' },
-        ],
-      },
-    },
-    {
-      mark: {
-        type: 'text',
-        align: 'left',
-        baseline: 'middle',
-        dx: 6,
-        fontSize: 11,
-        fontWeight: 600,
-        color: '#1d1d1f',
-      },
-      encoding: {
-        y: {
-          field: 'label',
-          type: 'nominal',
-          sort: '-x',
-          axis: null,
-        },
-        x: { field: 'silent_count', type: 'quantitative' },
-        text: {
-          field: 'silent_rate',
-          type: 'quantitative',
-          format: '.0%',
-        },
-      },
-    },
-  ],
-  config: {
-    view: { stroke: null },
-    axis: { grid: true, gridColor: '#f0f0f2', labelColor: '#1d1d1f' },
-  },
-};
+| LIMIT 15`,
+});
 
-const lookupPanel = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  title: {
-    text: 'Partner lookup — names, tiers, regions, NOC owners',
-    subtitle: 'Full wholesale / MVNO directory',
-    subtitleFontSize: 11,
-    subtitleColor: '#6e6e73',
-    anchor: 'start',
-  },
-  width: 'container',
-  height: { step: 24 },
-  data: {
-    url: {
-      '%type%': 'esql',
-      '%context%': false,
-      query: `FROM npe-synthetic-partner-lookup
-| KEEP partnerID, partner_name, partner_tier, partner_region, partner_channel, partner_owner
-| SORT partner_name
-| LIMIT 30
-| EVAL label = CONCAT(partner_name, "  ·  ", partnerID)
-| EVAL detail = CONCAT(partner_tier, "  ·  ", partner_region, "  ·  ", partner_channel, "  →  ", partner_owner)`,
-    },
-  },
-  layer: [
-    {
-      mark: { type: 'bar', color: '#e8e8ed', cornerRadiusEnd: 2, tooltip: true },
-      encoding: {
-        y: {
-          field: 'label',
-          type: 'nominal',
-          sort: 'ascending',
-          title: null,
-          axis: {
-            labelLimit: 360,
-            labelFontSize: 12,
-            labelColor: '#1d1d1f',
-            labelFontWeight: 500,
-            labelOverlap: false,
-            ticks: false,
-            domain: false,
-            minExtent: 240,
-          },
-        },
-        x: { value: 1 },
-        tooltip: [
-          { field: 'partner_name', title: 'Partner name' },
-          { field: 'partnerID', title: 'partnerID' },
-          { field: 'partner_tier', title: 'Tier' },
-          { field: 'partner_region', title: 'Region' },
-          { field: 'partner_channel', title: 'Channel' },
-          { field: 'partner_owner', title: 'NOC owner' },
-        ],
-      },
-    },
-    {
-      mark: {
-        type: 'text',
-        align: 'left',
-        baseline: 'middle',
-        dx: 8,
-        fontSize: 12,
-        color: '#1d1d1f',
-        font: 'IBM Plex Mono, Menlo, monospace',
-      },
-      encoding: {
-        y: { field: 'label', type: 'nominal', sort: 'ascending', axis: null },
-        x: { value: 0 },
-        text: { field: 'detail', type: 'nominal' },
-      },
-    },
-  ],
-  config: {
-    view: { stroke: null },
-    axis: { grid: false, labelColor: '#1d1d1f' },
-  },
-};
+const lookupPanel = clickablePartnerDirectoryVega();
 
 
 // Cleaner table-like bars for region
