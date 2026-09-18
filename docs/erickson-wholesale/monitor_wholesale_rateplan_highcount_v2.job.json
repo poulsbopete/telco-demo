@@ -1,0 +1,244 @@
+{
+  "job_id": "monitor_wholesale_rateplan_highcount_v2",
+  "job_type": "anomaly_detector",
+  "job_version": "12.0.0",
+  "create_time": 1789150657908,
+  "model_snapshot_id": "1789743679",
+  "datafeed_config": {
+    "datafeed_id": "datafeed-monitor_wholesale_rateplan_highcount_v2",
+    "job_id": "monitor_wholesale_rateplan_highcount_v2",
+    "authorization": {
+      "roles": [
+        "superuser"
+      ]
+    },
+    "query_delay": "79464ms",
+    "chunking_config": {
+      "mode": "auto"
+    },
+    "indices_options": {
+      "ignore_unavailable": false,
+      "expand_wildcards": [
+        "open"
+      ],
+      "allow_no_indices": true,
+      "ignore_throttled": true
+    },
+    "query": {
+      "bool": {
+        "filter": [
+          {
+            "term": {
+              "brand": "WHOLESALE"
+            }
+          },
+          {
+            "term": {
+              "operation": "FTC"
+            }
+          },
+          {
+            "term": {
+              "logtype": "northbound"
+            }
+          }
+        ]
+      }
+    },
+    "frequency": "1m",
+    "indices": [
+      "npe_proclog_idx"
+    ],
+    "scroll_size": 1000,
+    "delayed_data_check_config": {
+      "enabled": true
+    },
+    "runtime_mappings": {
+      "rateplan": {
+        "type": "keyword",
+        "script": {
+          "source": """String req = params._source.fullrequest;if (params._source.logtype == null)    return;if (params._source.logtype != "northbound")
+ return; if (params._source.brand != "WHOLESALE")    return;if (req == null )    return;int pos = req.indexOf("\"paramName\" : \"RATEPLAN\"");if (pos < 0)
+ return; int valuePos= req.indexOf("\"paramValue\" : \"", pos); if (valuePos < 0) return; valuePos += 16; int endPos = req.indexOf("\"", valuePos); if(endPos < 0) return;emit(req.substring(valuePos, endPos));"""
+        }
+      },
+      "apic": {
+        "type": "keyword",
+        "script": {
+          "source": "String msg = params._source.messageid; String[] parts = msg.splitOnToken('-');if (parts.length >= 3)  emit(parts[2]);"
+        }
+      },
+      "partnerId": {
+        "type": "keyword",
+        "script": {
+          "source": """String req = params._source.fullrequest;if (params._source.logtype == null)    return;if (params._source.logtype != "northbound")
+ return; if (params._source.brand != "WHOLESALE")    return;if (req == null )    return;int pos = req.indexOf("\"paramName\" : \"partnerId\"");if (pos < 0)
+ return; int valuePos= req.indexOf("\"paramValue\" : \"", pos); if (valuePos < 0) return; valuePos += 16; int endPos = req.indexOf("\"", valuePos); if(endPos < 0) return;emit(req.substring(valuePos, endPos));"""
+        }
+      }
+    },
+    "state": "started",
+    "node": {
+      "id": "Q-TwsiP5T5W7NRWals5omg",
+      "name": "npesa-elasticsearch-es-elastic-processing-4",
+      "ephemeral_id": "Bqs9ei3MQB6jN0jRVltW4w",
+      "transport_address": "192.168.125.162:9300",
+      "attributes": {
+        "ml.machine_memory": "68719476736",
+        "ml.allocated_processors": "16",
+        "ml.allocated_processors_double": "16.0",
+        "ml.config_version": "12.0.0",
+        "ml.max_jvm_size": "34359738368"
+      }
+    },
+    "assignment_explanation": "",
+    "timing_stats": {
+      "job_id": "monitor_wholesale_rateplan_highcount_v2",
+      "search_count": 62800,
+      "bucket_count": 889,
+      "total_search_time_ms": 7554047,
+      "average_search_time_per_bucket_ms": 8497.24071991001,
+      "exponential_average_search_time_per_hour_ms": 13367.988727829501
+    },
+    "running_state": {
+      "real_time_configured": true,
+      "real_time_running": true,
+      "search_interval": {
+        "start_ms": 1789751580301,
+        "end_ms": 1789751640000
+      }
+    }
+  },
+  "description": "Wholesale change rateplan highcount anomaly",
+  "analysis_config": {
+    "bucket_span": "1h",
+    "detectors": [
+      {
+        "detector_description": "high_count partitionfield=partnerId",
+        "function": "high_count",
+        "partition_field_name": "partnerId",
+        "detector_index": 0
+      },
+      {
+        "detector_description": "high_count partitionfield=apic",
+        "function": "high_count",
+        "partition_field_name": "apic",
+        "detector_index": 1
+      },
+      {
+        "detector_description": "high_count by rateplan partitionfield=partnerId",
+        "function": "high_count",
+        "by_field_name": "rateplan",
+        "partition_field_name": "partnerId",
+        "detector_index": 2
+      },
+      {
+        "detector_description": "high_count by rateplan partitionfield=apic",
+        "function": "high_count",
+        "by_field_name": "rateplan",
+        "partition_field_name": "apic",
+        "detector_index": 3
+      }
+    ],
+    "influencers": [
+      "partnerId",
+      "rateplan",
+      "apic"
+    ],
+    "model_prune_window": "30d"
+  },
+  "analysis_limits": {
+    "model_memory_limit": "128mb",
+    "categorization_examples_limit": 4
+  },
+  "data_description": {
+    "time_field": "@timestamp",
+    "time_format": "epoch_ms"
+  },
+  "model_plot_config": {
+    "enabled": true,
+    "annotations_enabled": true
+  },
+  "model_snapshot_retention_days": 10,
+  "daily_model_snapshot_retention_after_days": 1,
+  "results_index_name": "shared",
+  "allow_lazy_open": false,
+  "data_counts": {
+    "job_id": "monitor_wholesale_rateplan_highcount_v2",
+    "processed_record_count": 31863428,
+    "processed_field_count": 94415553,
+    "input_bytes": 3022660561,
+    "input_field_count": 94415553,
+    "invalid_date_count": 0,
+    "missing_field_count": 1174731,
+    "out_of_order_timestamp_count": 0,
+    "empty_bucket_count": 6,
+    "sparse_bucket_count": 30,
+    "bucket_count": 889,
+    "earliest_record_timestamp": 1786553407365,
+    "latest_record_timestamp": 1789751639981,
+    "last_data_time": 1789751719646,
+    "latest_empty_bucket_timestamp": 1788426000000,
+    "latest_sparse_bucket_timestamp": 1789646400000,
+    "input_record_count": 31863428,
+    "log_time": 1789751719646,
+    "latest_bucket_timestamp": 1789750800000
+  },
+  "model_size_stats": {
+    "job_id": "monitor_wholesale_rateplan_highcount_v2",
+    "result_type": "model_size_stats",
+    "model_bytes": 9997104,
+    "peak_model_bytes": 10390418,
+    "model_bytes_exceeded": 0,
+    "model_bytes_memory_limit": 134217728,
+    "total_by_field_count": 426,
+    "total_over_field_count": 0,
+    "total_partition_field_count": 155,
+    "bucket_allocation_failures_count": 0,
+    "memory_status": "ok",
+    "assignment_memory_basis": "current_model_bytes",
+    "output_memory_allocator_bytes": 11711,
+    "categorized_doc_count": 0,
+    "total_category_count": 0,
+    "frequent_category_count": 0,
+    "rare_category_count": 0,
+    "dead_category_count": 0,
+    "failed_category_count": 0,
+    "categorization_status": "ok",
+    "log_time": 1789750879912,
+    "timestamp": 1789750800000
+  },
+  "forecasts_stats": {
+    "total": 0,
+    "forecasted_jobs": 0
+  },
+  "state": "opened",
+  "node": {
+    "id": "Q-TwsiP5T5W7NRWals5omg",
+    "name": "npesa-elasticsearch-es-elastic-processing-4",
+    "ephemeral_id": "Bqs9ei3MQB6jN0jRVltW4w",
+    "transport_address": "192.168.125.162:9300",
+    "attributes": {
+      "ml.allocated_processors": "16",
+      "ml.allocated_processors_double": "16.0",
+      "ml.config_version": "12.0.0",
+      "ml.max_jvm_size": "34359738368",
+      "ml.machine_memory": "68719476736",
+      "k8s_node_name": "eda-pool01-pobccdeda03-wn001",
+      "xpack.installed": "true",
+      "transform.config_version": "10.0.0"
+    }
+  },
+  "assignment_explanation": "",
+  "open_time": "601035s",
+  "timing_stats": {
+    "job_id": "monitor_wholesale_rateplan_highcount_v2",
+    "bucket_count": 888,
+    "total_bucket_processing_time_ms": 92932,
+    "minimum_bucket_processing_time_ms": 12,
+    "maximum_bucket_processing_time_ms": 1828,
+    "average_bucket_processing_time_ms": 104.65315315315316,
+    "exponential_average_bucket_processing_time_ms": 111.44287957200946,
+    "exponential_average_bucket_processing_time_per_hour_ms": 44
+  }
+}

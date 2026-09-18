@@ -23,6 +23,6 @@ Your `thr128kbps` → `thr16kbps` example on a SUCCESS transaction is a strong M
 | AIOps / ES\|QL `CHANGE_POINT` | When the % of `thr16kbps` stepped |
 | Categorization on payload fragments | Broader unknown pattern families |
 
-We have a pilot job shape and synthetic SUCCESS payloads with this exact drift ready to walk through on the demo cluster.
+We have a pilot job shape and synthetic SUCCESS payloads with this exact drift ready to walk through on the demo cluster. After reviewing `monitor_wholesale_rateplan_highcount_v2` + `example4test.xlsx`: your live job already proves runtime extraction at scale (~32M records); the gap is content fields (`feature` / `tierName` / `speed`) and data-view mirroring for Discover. Note: in the 1k sample, 2412001 is multi-modal (`thr256kbps`, `capped`, `notifyonly`, …) — partition by feature+tier (and/or partner) or use a golden expected-speed map for the contracts you care about.
 
 Happy to schedule a working session to (a) mirror one Wholesale runtime field set onto the Discover data view, and (b) stand up the rare(speed)|partition(feature) pilot against a sample of production-shaped SUCCESS events.
