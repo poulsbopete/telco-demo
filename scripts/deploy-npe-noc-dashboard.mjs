@@ -263,7 +263,7 @@ function clickablePartnerBarsVega({
   showRate = false,
   rowPx = 28,
 }) {
-  const sort = sortDescending
+  const collectSort = sortDescending
     ? { field: valueField, order: 'descending' }
     : { field: 'partner_name', order: 'ascending' };
 
@@ -319,8 +319,10 @@ function clickablePartnerBarsVega({
   return {
     $schema: 'https://vega.github.io/schema/vega/v5.json',
     description: 'Click a partner to filter the dashboard by partnerID',
-    autosize: { type: 'fit', contains: 'padding' },
-    padding: 8,
+    // Kibana enables autosize by default; none + explicit width avoids the yellow banner
+    autosize: 'none',
+    width: 720,
+    padding: { left: 8, right: 48, top: 8, bottom: 8 },
     config: {
       kibana: { restoreSignalValuesOnRefresh: true },
       axis: { labelColor: '#1d1d1f', titleColor: '#6e6e73' },
@@ -350,6 +352,8 @@ function clickablePartnerBarsVega({
             as: 'label',
             expr: 'datum.partner_name + " · " + datum.partnerID',
           },
+          // Pre-sort data so y-domain order is stable (avoids unioned-domain sort warnings)
+          { type: 'collect', sort: collectSort },
         ],
       },
     ],
@@ -373,7 +377,8 @@ function clickablePartnerBarsVega({
       {
         name: 'yscale',
         type: 'band',
-        domain: { data: 'source', field: 'label', sort },
+        // Domain order follows collect transform — do not attach sort here
+        domain: { data: 'source', field: 'label' },
         range: { step: rowPx },
         paddingInner: 0.18,
         paddingOuter: 0.05,
@@ -435,8 +440,9 @@ function clickablePartnerDirectoryVega() {
   return {
     $schema: 'https://vega.github.io/schema/vega/v5.json',
     description: 'Partner directory — click a row to filter dashboard by partnerID',
-    autosize: { type: 'fit', contains: 'padding' },
-    padding: 8,
+    autosize: 'none',
+    width: 900,
+    padding: { left: 8, right: 8, top: 8, bottom: 8 },
     config: {
       kibana: { restoreSignalValuesOnRefresh: true },
       view: { stroke: null },
@@ -479,6 +485,7 @@ function clickablePartnerDirectoryVega() {
             ops: ['row_number'],
             as: ['rank'],
           },
+          { type: 'collect', sort: { field: 'partner_name', order: 'ascending' } },
         ],
       },
     ],
@@ -502,7 +509,7 @@ function clickablePartnerDirectoryVega() {
       {
         name: 'yscale',
         type: 'band',
-        domain: { data: 'source', field: 'label', sort: true },
+        domain: { data: 'source', field: 'label' },
         range: { step: 26 },
         paddingInner: 0.12,
       },
@@ -780,7 +787,7 @@ const objects = [
   buildDashboard(
     'npe-noc-silent-failures',
     'NPE NOC · Silent Failures & Top Offenders',
-    'NOC board: silent failures, Jian Yao pattern drift (feature×speed), partnerID lookup + regional map.',
+    'NOC board: silent failures + pattern drift. Click partner bars / lookup rows to filter by partnerID.',
     viz.map((v) => ({ vizId: v.id, ...v.layout })),
   ),
 ];
