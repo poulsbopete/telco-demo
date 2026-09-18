@@ -293,7 +293,15 @@ ${TIME}
 
 const offendersTable = {
   $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  title: 'Offender board — partner lookup + silent rate',
+  title: {
+    text: 'Offender board — partner lookup + silent rate',
+    subtitle: 'partnerID · Partner · Tier · Region · NOC owner · Silent · Rate',
+    subtitleFontSize: 11,
+    subtitleColor: '#6e6e73',
+    anchor: 'start',
+  },
+  width: 'container',
+  height: { step: 26 },
   data: {
     url: {
       ...ES_QL,
@@ -302,30 +310,110 @@ ${TIME}
 | STATS
     silent_count = COUNT(*) WHERE silent_failure == true,
     total = COUNT(*)
-  BY partnerID, partner_name, partner_tier, partner_region, partner_channel, partner_owner
+  BY partnerID, partner_name, partner_tier, partner_region, partner_owner
 | EVAL silent_rate = CASE(total > 0, silent_count * 1.0 / total, 0)
 | WHERE silent_count > 0
 | SORT silent_count DESC
-| LIMIT 15`,
+| LIMIT 15
+| EVAL row = CONCAT(
+    partnerID, "   ",
+    partner_name, "   ",
+    partner_tier, "   ",
+    partner_region, "   ",
+    partner_owner, "   silent=",
+    silent_count::keyword, "   ",
+    ROUND(100 * silent_rate), "%"
+  )`,
     },
   },
-  transform: [
-    { calculate: "format(datum.silent_rate, '.0%')", as: 'rate_pct' },
-    {
-      calculate:
-        "datum.partnerID + '  |  ' + datum.partner_name + '  |  ' + datum.partner_tier + '  |  ' + datum.partner_region + '  |  ' + datum.partner_owner + '  |  silent=' + toString(datum.silent_count) + '  rate=' + datum.rate_pct",
-      as: 'row',
-    },
-  ],
-  mark: { type: 'text', align: 'left', baseline: 'middle', fontSize: 12, font: 'Menlo, monospace', color: '#1d1d1f' },
+  mark: {
+    type: 'text',
+    align: 'left',
+    baseline: 'middle',
+    fontSize: 13,
+    font: 'IBM Plex Mono, Menlo, monospace',
+    color: '#1d1d1f',
+    dx: 4,
+  },
   encoding: {
-    y: { field: 'row', type: 'nominal', sort: { field: 'silent_count', order: 'descending' }, axis: null },
+    y: {
+      field: 'partner_name',
+      type: 'nominal',
+      sort: { field: 'silent_count', order: 'descending' },
+      axis: null,
+    },
     text: { field: 'row', type: 'nominal' },
+    tooltip: [
+      { field: 'partnerID', title: 'partnerID' },
+      { field: 'partner_name', title: 'Partner' },
+      { field: 'partner_tier', title: 'Tier' },
+      { field: 'partner_region', title: 'Region' },
+      { field: 'partner_owner', title: 'NOC owner' },
+      { field: 'silent_count', type: 'quantitative', title: 'Silent failures' },
+      { field: 'silent_rate', type: 'quantitative', title: 'Silent rate', format: '.0%' },
+    ],
   },
-  autosize: 'none',
-  height: { step: 22 },
   config: { view: { stroke: null } },
 };
+
+const lookupPanel = {
+  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
+  title: {
+    text: 'Partner lookup — partnerID → name / tier / region / channel / NOC',
+    subtitle: 'Full wholesale / MVNO directory (synthetic)',
+    subtitleFontSize: 11,
+    subtitleColor: '#6e6e73',
+    anchor: 'start',
+  },
+  width: 'container',
+  height: { step: 24 },
+  data: {
+    url: {
+      '%type%': 'esql',
+      '%context%': false,
+      query: `FROM npe-synthetic-partner-lookup
+| KEEP partnerID, partner_name, partner_tier, partner_region, partner_channel, partner_owner
+| SORT partner_name
+| LIMIT 30
+| EVAL row = CONCAT(
+    partnerID, "   ",
+    partner_name, "   [",
+    partner_tier, "]   ",
+    partner_region, " / ",
+    partner_channel, "   → ",
+    partner_owner
+  )`,
+    },
+  },
+  mark: {
+    type: 'text',
+    align: 'left',
+    baseline: 'middle',
+    fontSize: 13,
+    font: 'IBM Plex Mono, Menlo, monospace',
+    color: '#1d1d1f',
+    dx: 4,
+  },
+  encoding: {
+    y: {
+      field: 'partner_name',
+      type: 'nominal',
+      sort: 'ascending',
+      axis: null,
+    },
+    text: { field: 'row', type: 'nominal' },
+    tooltip: [
+      { field: 'partnerID', title: 'partnerID' },
+      { field: 'partner_name', title: 'Partner' },
+      { field: 'partner_tier', title: 'Tier' },
+      { field: 'partner_region', title: 'Region' },
+      { field: 'partner_channel', title: 'Channel' },
+      { field: 'partner_owner', title: 'NOC owner' },
+    ],
+  },
+  config: { view: { stroke: null } },
+};
+
 
 // Cleaner table-like bars for region
 const byRegion = {
@@ -376,36 +464,6 @@ ${TIME}
       { field: 'silent_count', type: 'quantitative' },
     ],
   },
-  config: { view: { stroke: null } },
-};
-
-const lookupPanel = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  title: 'Partner lookup table (partnerID → name / tier / region / NOC)',
-  data: {
-    url: {
-      '%type%': 'esql',
-      '%context%': false,
-      query: `FROM npe-synthetic-partner-lookup
-| KEEP partnerID, partner_name, partner_tier, partner_region, partner_channel, partner_owner
-| SORT partner_name
-| LIMIT 30`,
-    },
-  },
-  transform: [
-    {
-      calculate:
-        "datum.partnerID + '   ' + datum.partner_name + '   [' + datum.partner_tier + ']   ' + datum.partner_region + ' / ' + datum.partner_channel + '   → ' + datum.partner_owner",
-      as: 'row',
-    },
-  ],
-  mark: { type: 'text', align: 'left', baseline: 'middle', fontSize: 11, font: 'Menlo, monospace', color: '#1d1d1f' },
-  encoding: {
-    y: { field: 'row', type: 'nominal', sort: 'ascending', axis: null },
-    text: { field: 'row', type: 'nominal' },
-  },
-  autosize: 'none',
-  height: { step: 18 },
   config: { view: { stroke: null } },
 };
 
@@ -487,8 +545,8 @@ const viz = [
   { id: 'npe-noc-top-offenders', title: 'Top offenders', spec: topOffenders, layout: { x: 24, y: 22, w: 24, h: 14 } },
   { id: 'npe-noc-by-region', title: 'By region', spec: byRegion, layout: { x: 0, y: 36, w: 24, h: 8 } },
   { id: 'npe-noc-trend', title: 'Trend', spec: trend, layout: { x: 24, y: 36, w: 24, h: 8 } },
-  { id: 'npe-noc-offender-board', title: 'Offender board', spec: offendersTable, layout: { x: 0, y: 44, w: 48, h: 12 } },
-  { id: 'npe-noc-partner-lookup', title: 'Partner lookup', spec: lookupPanel, layout: { x: 0, y: 56, w: 48, h: 14 } },
+  { id: 'npe-noc-offender-board', title: 'Offender board', spec: offendersTable, layout: { x: 0, y: 44, w: 48, h: 16 } },
+  { id: 'npe-noc-partner-lookup', title: 'Partner lookup', spec: lookupPanel, layout: { x: 0, y: 60, w: 48, h: 18 } },
 ];
 
 const objects = [
