@@ -317,7 +317,7 @@ ${TIME}
       as: 'row',
     },
   ],
-  mark: { type: 'text', align: 'left', baseline: 'middle', fontSize: 12, font: 'Menlo, monospace', color: '#f5f5f7' },
+  mark: { type: 'text', align: 'left', baseline: 'middle', fontSize: 12, font: 'Menlo, monospace', color: '#1d1d1f' },
   encoding: {
     y: { field: 'row', type: 'nominal', sort: { field: 'silent_count', order: 'descending' }, axis: null },
     text: { field: 'row', type: 'nominal' },
@@ -399,9 +399,9 @@ const lookupPanel = {
       as: 'row',
     },
   ],
-  mark: { type: 'text', align: 'left', baseline: 'middle', fontSize: 11, font: 'Menlo, monospace', color: '#c8c8cc' },
+  mark: { type: 'text', align: 'left', baseline: 'middle', fontSize: 11, font: 'Menlo, monospace', color: '#1d1d1f' },
   encoding: {
-    y: { field: 'partner_name', type: 'nominal', sort: 'ascending', axis: null },
+    y: { field: 'row', type: 'nominal', sort: 'ascending', axis: null },
     text: { field: 'row', type: 'nominal' },
   },
   autosize: 'none',
