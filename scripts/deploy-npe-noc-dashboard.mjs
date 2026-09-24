@@ -198,12 +198,27 @@ ${TIME}
 };
 
 const patternByFeatureSpeed = {
-  $schema: 'https://vega.github.io/schema/vega-lite/v5.json',
-  title: 'Silent pattern change — feature × speed (Jian Yao example)',
-  data: {
-    url: {
-      ...ES_QL,
-      query: `FROM npe-synthetic-transaction-details
+  $schema: 'https://vega.github.io/schema/vega/v5.json',
+  description: 'Feature × speed pattern change (Jian Yao silent failure example)',
+  // No width/height — Kibana autosize:fit fills the panel without the yellow warning
+  autosize: { type: 'fit', contains: 'padding' },
+  padding: 8,
+  config: { view: { stroke: null }, axis: { labelColor: '#1d1d1f', titleColor: '#6e6e73' } },
+  title: {
+    text: 'Silent pattern change — feature × speed',
+    subtitle: 'Jian Yao example · SUCCESS txns by feature/speed (pink = drifted)',
+    subtitleFontSize: 11,
+    subtitleColor: '#6e6e73',
+    anchor: 'start',
+    color: '#1d1d1f',
+    fontSize: 14,
+  },
+  data: [
+    {
+      name: 'source',
+      url: {
+        ...ES_QL,
+        query: `FROM npe-synthetic-transaction-details
 ${TIME}
 | WHERE status == "SUCCESS" AND feature IS NOT NULL AND speed IS NOT NULL
 | STATS txn = COUNT(*), drifted = COUNT(*) WHERE silent_pattern_deviation == true
@@ -211,44 +226,78 @@ ${TIME}
 | EVAL label = CONCAT(feature, " · ", speed)
 | SORT drifted DESC, txn DESC
 | LIMIT 12`,
+      },
+      transform: [{ type: 'collect', sort: { field: 'txn', order: 'descending' } }],
     },
-  },
-  mark: { type: 'bar', tooltip: true, cornerRadiusEnd: 2 },
-  encoding: {
-    y: {
-      field: 'label',
-      type: 'nominal',
-      sort: '-x',
+  ],
+  scales: [
+    {
+      name: 'yscale',
+      type: 'band',
+      domain: { data: 'source', field: 'label' },
+      range: 'height',
+      paddingInner: 0.18,
+      paddingOuter: 0.05,
+    },
+    {
+      name: 'xscale',
+      type: 'linear',
+      domain: { data: 'source', field: 'txn' },
+      range: 'width',
+      nice: true,
+      zero: true,
+    },
+    {
+      name: 'color',
+      type: 'linear',
+      domain: { data: 'source', field: 'drifted' },
+      range: ['#d2d2d7', '#e20074'],
+    },
+  ],
+  axes: [
+    {
+      orient: 'left',
+      scale: 'yscale',
       title: null,
-      axis: {
-        labelLimit: 220,
-        labelFontSize: 11,
-        labelColor: '#1d1d1f',
-        labelOverlap: false,
-        ticks: false,
-        domain: false,
-        minExtent: 160,
+      domain: false,
+      ticks: false,
+      labelLimit: 200,
+      labelFontSize: 11,
+      labelColor: '#1d1d1f',
+    },
+    {
+      orient: 'bottom',
+      scale: 'xscale',
+      title: 'SUCCESS txns',
+      grid: true,
+      gridColor: '#f0f0f2',
+      tickCount: 4,
+      labelFontSize: 11,
+    },
+  ],
+  marks: [
+    {
+      type: 'rect',
+      from: { data: 'source' },
+      encode: {
+        update: {
+          y: { scale: 'yscale', field: 'label' },
+          height: { scale: 'yscale', band: 1 },
+          x: { scale: 'xscale', value: 0 },
+          x2: { scale: 'xscale', field: 'txn' },
+          fill: { scale: 'color', field: 'drifted' },
+          cornerRadiusTopRight: { value: 2 },
+          cornerRadiusBottomRight: { value: 2 },
+          tooltip: {
+            signal:
+              '{"feature": datum.feature, "speed": datum.speed, "tier": datum.tierName, "SUCCESS txns": datum.txn, "Drifted": datum.drifted}',
+          },
+        },
       },
     },
-    x: { field: 'txn', type: 'quantitative', title: 'SUCCESS txns' },
-    color: {
-      field: 'drifted',
-      type: 'quantitative',
-      title: 'Drifted',
-      scale: { range: ['#d2d2d7', '#e20074'] },
-    },
-    tooltip: [
-      { field: 'feature', title: 'feature' },
-      { field: 'speed', title: 'speed' },
-      { field: 'tierName', title: 'tier' },
-      { field: 'txn', type: 'quantitative', title: 'SUCCESS txns' },
-      { field: 'drifted', type: 'quantitative', title: 'Pattern deviations' },
-    ],
-  },
-  width: 'container',
-  height: { step: 26 },
-  config: { view: { stroke: null }, axis: { grid: false, labelColor: '#1d1d1f' } },
+  ],
 };
+
 
 /** Full Vega (not Lite) so kibanaAddFilter works on click — filters whole dashboard by partnerID */
 function clickablePartnerBarsVega({
@@ -319,9 +368,8 @@ function clickablePartnerBarsVega({
   return {
     $schema: 'https://vega.github.io/schema/vega/v5.json',
     description: 'Click a partner to filter the dashboard by partnerID',
-    // Kibana enables autosize by default; none + explicit width avoids the yellow banner
-    autosize: 'none',
-    width: 720,
+    // Fit panel; omit width/height so Kibana does not show the autosize warning
+    autosize: { type: 'fit', contains: 'padding' },
     padding: { left: 8, right: 48, top: 8, bottom: 8 },
     config: {
       kibana: { restoreSignalValuesOnRefresh: true },
@@ -377,9 +425,8 @@ function clickablePartnerBarsVega({
       {
         name: 'yscale',
         type: 'band',
-        // Domain order follows collect transform — do not attach sort here
         domain: { data: 'source', field: 'label' },
-        range: { step: rowPx },
+        range: 'height',
         paddingInner: 0.18,
         paddingOuter: 0.05,
       },
@@ -440,8 +487,7 @@ function clickablePartnerDirectoryVega() {
   return {
     $schema: 'https://vega.github.io/schema/vega/v5.json',
     description: 'Partner directory — click a row to filter dashboard by partnerID',
-    autosize: 'none',
-    width: 900,
+    autosize: { type: 'fit', contains: 'padding' },
     padding: { left: 8, right: 8, top: 8, bottom: 8 },
     config: {
       kibana: { restoreSignalValuesOnRefresh: true },
@@ -510,7 +556,7 @@ function clickablePartnerDirectoryVega() {
         name: 'yscale',
         type: 'band',
         domain: { data: 'source', field: 'label' },
-        range: { step: 26 },
+        range: 'height',
         paddingInner: 0.12,
       },
     ],
