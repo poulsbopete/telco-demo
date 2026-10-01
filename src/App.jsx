@@ -11,11 +11,13 @@ import { WorkshopLabEmbed } from './components/WorkshopLabEmbed';
 import { ExecutiveOutcomesBanner } from './components/shared/ExecutiveOutcomesBanner';
 import { CcrArchitectureExplainer } from './components/CcrArchitectureExplainer';
 import { AutomobileTelematicsDemo } from './components/AutomobileTelematicsDemo';
+import { SilentFailuresDemo } from './components/SilentFailuresDemo';
 
 const MODULES = [
   { id: 'live', label: 'iPhone Launch', navLabel: 'Launch', live: true },
   { id: 'telematics', label: 'Telematics', live: true },
   { id: 'adaptive-networks', label: 'Networks', live: true },
+  { id: 'silent-failures', label: 'Silent Failures', navLabel: 'Silent', live: true },
   { id: 'incident-response', label: 'Response' },
   { id: 'search', label: 'Search' },
   { id: 'observability', label: 'Scale' },
@@ -32,6 +34,7 @@ const MODULE_COMPONENTS = {
   live: LiveElasticDemo,
   telematics: AutomobileTelematicsDemo,
   'adaptive-networks': AdaptiveNetworksDemo,
+  'silent-failures': SilentFailuresDemo,
   'incident-response': IncidentResponseDemo,
   search: ChatSimulator,
   observability: ObservabilityDashboard,
