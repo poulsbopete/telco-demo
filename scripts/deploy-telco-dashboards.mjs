@@ -20,7 +20,7 @@ import { existsSync } from 'fs';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { buildTelcoRegionMapEsql, buildTelematicsGatewayMapEsql, TELEMATICS_GATEWAY_INDEX } from '../lib/telco-regions-geo.js';
-import { TELEMATICS_GATEWAY_LOCATIONS } from '../src/lib/telematics-fleet.js';
+import { buildFleetSnapshot } from '../src/lib/telematics-fleet.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -42,7 +42,7 @@ const TARGET_DEFAULTS = {
     kibanaUrl:
       process.env.VITE_KIBANA_URL
       || process.env.KIBANA_URL
-      || 'https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud',
+      || 'https://elastic-observability-f74145.kb.centralus.azure.elastic.cloud',
     apiKey: process.env.KIBANA_API_KEY || process.env.ES_API_KEY,
   },
   search: {
@@ -129,9 +129,9 @@ function buildGeoMapVegaSpec({
 }
 
 function buildGatewayDocs() {
-  const now = new Date().toISOString();
-  return TELEMATICS_GATEWAY_LOCATIONS.map((gw, i) => ({
-    '@timestamp': now,
+  const { gateways, generatedAt } = buildFleetSnapshot();
+  return gateways.map((gw) => ({
+    '@timestamp': generatedAt,
     gateway_id: gw.id,
     gateway_name: gw.name,
     city: gw.city,
@@ -140,9 +140,21 @@ function buildGatewayDocs() {
     latitude: gw.latitude,
     longitude: gw.longitude,
     location: { lat: gw.latitude, lon: gw.longitude },
-    connected_vehicles: 12000 + i * 850,
-    messages_per_min: 4800 + i * 420,
-    status: i % 11 === 0 ? 'offline' : i % 5 === 0 ? 'degraded' : 'healthy',
+    connected_vehicles: gw.connectedVehicles,
+    messages_per_min: gw.messagesPerMin,
+    status: gw.status,
+    network_type: gw.networkType,
+    d2d_sessions: gw.d2dSessions,
+    d2d_share: gw.d2dShare,
+    gateway_routed: gw.gatewayRouted,
+    failover_active: gw.failoverActive,
+    connectivity_path: gw.connectivityPath,
+    open_tickets: gw.openTickets,
+    ticket_reason: gw.ticketReason || '',
+    streaming_satisfaction: gw.streamingSatisfaction,
+    streaming_drop_pct: gw.streamingDropPct,
+    avg_latency_ms: gw.avgLatencyMs,
+    packet_loss_pct: gw.packetLossPct,
   }));
 }
 
@@ -186,6 +198,18 @@ async function ensureTelematicsGatewayIndex() {
       city: { type: 'keyword' },
       country: { type: 'keyword' },
       region: { type: 'keyword' },
+      network_type: { type: 'keyword' },
+      d2d_sessions: { type: 'integer' },
+      d2d_share: { type: 'float' },
+      gateway_routed: { type: 'integer' },
+      failover_active: { type: 'boolean' },
+      connectivity_path: { type: 'keyword' },
+      open_tickets: { type: 'integer' },
+      ticket_reason: { type: 'keyword' },
+      streaming_satisfaction: { type: 'float' },
+      streaming_drop_pct: { type: 'float' },
+      avg_latency_ms: { type: 'integer' },
+      packet_loss_pct: { type: 'float' },
     },
   };
 
@@ -635,7 +659,7 @@ ${TELCO_SERVICE_EVAL}
     dashboardId: 'telco-demo-automotive-telematics',
     title: 'Automotive Telematics & IoT',
     description:
-      'Connected-vehicle telemetry remapped from otel-demo microservices — ingest volume, subsystem errors, event bus, and edge network faults.',
+      'Connected-vehicle telemetry on f74145 — regional gateways, direct-to-device failover, care tickets on drops, and in-cabin streaming satisfaction (OTLP + Prometheus).',
     timeFrom: O11Y_DASHBOARD_TIME_FROM,
     visualizations: [
       {
@@ -653,9 +677,127 @@ ${TELCO_SERVICE_EVAL}
             { field: 'city', type: 'nominal', title: 'City' },
             { field: 'country', type: 'nominal', title: 'Country' },
             { field: 'region', type: 'nominal', title: 'Region' },
+            { field: 'd2d_sessions', type: 'quantitative', title: 'D2D sessions', format: ',.0f' },
+            { field: 'open_tickets', type: 'quantitative', title: 'Open tickets', format: ',.0f' },
+            { field: 'streaming_satisfaction', type: 'quantitative', title: 'Streaming sat', format: '.2f' },
+            { field: 'connectivity_path', type: 'nominal', title: 'Path' },
           ],
         }),
         layout: { x: 0, y: 0, w: 48, h: 14 },
+      },
+      {
+        id: 'telco-telematics-d2d-by-region',
+        title: 'Direct-to-Device Sessions by Gateway',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Direct-to-Device Sessions by Gateway',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              '%type%': 'esql',
+              '%context%': false,
+              query: `FROM ${TELEMATICS_GATEWAY_INDEX}
+| STATS d2d = SUM(d2d_sessions), tickets = SUM(open_tickets) BY gateway_name, status, failover_active
+| SORT d2d DESC
+| LIMIT 15`,
+            },
+          },
+          mark: 'bar',
+          encoding: {
+            y: { field: 'gateway_name', type: 'nominal', sort: '-x', title: 'Gateway' },
+            x: { field: 'd2d', type: 'quantitative', title: 'D2D sessions', axis: { format: '~s' } },
+            color: {
+              field: 'status',
+              type: 'nominal',
+              scale: { domain: ['healthy', 'degraded', 'offline'], range: ['#008009', '#bf4800', '#cc0000'] },
+              legend: { orient: 'bottom' },
+            },
+            tooltip: [
+              { field: 'gateway_name', type: 'nominal', title: 'Gateway' },
+              { field: 'd2d', type: 'quantitative', title: 'D2D sessions', format: ',.0f' },
+              { field: 'tickets', type: 'quantitative', title: 'Open tickets', format: ',.0f' },
+              { field: 'status', type: 'nominal', title: 'Status' },
+              { field: 'failover_active', type: 'nominal', title: 'Failover' },
+            ],
+          },
+        },
+        layout: { x: 0, y: 14, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-telematics-streaming-qoe',
+        title: 'In-Cabin Streaming Satisfaction vs Drop Rate',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'In-Cabin Streaming Satisfaction vs Drop Rate',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              '%type%': 'esql',
+              '%context%': false,
+              query: `FROM ${TELEMATICS_GATEWAY_INDEX}
+| KEEP gateway_name, region, streaming_satisfaction, streaming_drop_pct, open_tickets, status
+| SORT streaming_drop_pct DESC
+| LIMIT 25`,
+            },
+          },
+          mark: { type: 'circle', opacity: 0.85 },
+          encoding: {
+            x: { field: 'streaming_drop_pct', type: 'quantitative', title: 'Stream drop %' },
+            y: { field: 'streaming_satisfaction', type: 'quantitative', title: 'Satisfaction /5', scale: { domain: [1, 5] } },
+            size: { field: 'open_tickets', type: 'quantitative', title: 'Tickets', scale: { range: [40, 400] } },
+            color: {
+              field: 'status',
+              type: 'nominal',
+              scale: { domain: ['healthy', 'degraded', 'offline'], range: ['#008009', '#bf4800', '#cc0000'] },
+              legend: { orient: 'bottom' },
+            },
+            tooltip: [
+              { field: 'gateway_name', type: 'nominal', title: 'Gateway' },
+              { field: 'region', type: 'nominal', title: 'Region' },
+              { field: 'streaming_satisfaction', type: 'quantitative', title: 'Satisfaction', format: '.2f' },
+              { field: 'streaming_drop_pct', type: 'quantitative', title: 'Drop %', format: '.1f' },
+              { field: 'open_tickets', type: 'quantitative', title: 'Tickets', format: ',.0f' },
+            ],
+          },
+        },
+        layout: { x: 24, y: 14, w: 24, h: 12 },
+      },
+      {
+        id: 'telco-telematics-open-tickets',
+        title: 'Open Care Tickets by Gateway',
+        spec: {
+          $schema: 'https://vega.github.io/schema/vega-lite/v6.json',
+          title: 'Open Care Tickets by Gateway',
+          autosize: { type: 'fit', contains: 'padding' },
+          config: { view: { stroke: null } },
+          data: {
+            url: {
+              '%type%': 'esql',
+              '%context%': false,
+              query: `FROM ${TELEMATICS_GATEWAY_INDEX}
+| WHERE open_tickets > 0
+| KEEP gateway_name, city, region, open_tickets, ticket_reason, status, connectivity_path
+| SORT open_tickets DESC
+| LIMIT 20`,
+            },
+          },
+          mark: 'bar',
+          encoding: {
+            y: { field: 'gateway_name', type: 'nominal', sort: '-x', title: 'Gateway' },
+            x: { field: 'open_tickets', type: 'quantitative', title: 'Open tickets' },
+            color: { value: '#bf4800' },
+            tooltip: [
+              { field: 'gateway_name', type: 'nominal', title: 'Gateway' },
+              { field: 'city', type: 'nominal', title: 'City' },
+              { field: 'open_tickets', type: 'quantitative', title: 'Tickets', format: ',.0f' },
+              { field: 'ticket_reason', type: 'nominal', title: 'Reason' },
+              { field: 'connectivity_path', type: 'nominal', title: 'Path' },
+            ],
+          },
+        },
+        layout: { x: 0, y: 26, w: 48, h: 10 },
       },
       {
         id: 'telco-telematics-volume',
@@ -683,7 +825,7 @@ ${TELCO_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 14, w: 48, h: 10 },
+        layout: { x: 0, y: 36, w: 48, h: 10 },
       },
       {
         id: 'telco-telematics-by-subsystem',
@@ -724,7 +866,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 24, w: 24, h: 12 },
+        layout: { x: 0, y: 46, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-error-rate',
@@ -765,7 +907,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 24, y: 24, w: 24, h: 12 },
+        layout: { x: 24, y: 46, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-event-bus',
@@ -794,7 +936,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 36, w: 24, h: 12 },
+        layout: { x: 0, y: 58, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-fleet-provisioning',
@@ -823,7 +965,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 24, y: 36, w: 24, h: 12 },
+        layout: { x: 24, y: 58, w: 24, h: 12 },
       },
       {
         id: 'telco-telematics-edge-faults',
@@ -860,7 +1002,7 @@ ${TELEMATICS_SERVICE_EVAL}
             ],
           },
         },
-        layout: { x: 0, y: 48, w: 48, h: 10 },
+        layout: { x: 0, y: 70, w: 48, h: 10 },
       },
     ],
   },
