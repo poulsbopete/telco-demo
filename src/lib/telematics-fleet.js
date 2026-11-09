@@ -51,6 +51,45 @@ export function buildFleetSnapshot() {
     const avgLatencyMs = Math.round(seededRandom(seed + 4, status === 'degraded' ? 180 : 45, status === 'degraded' ? 420 : 120));
     const packetLossPct = Number(seededRandom(seed + 5, status === 'offline' ? 8 : 0.01, status === 'degraded' ? 2.5 : 0.4).toFixed(2));
 
+    // Next-gen IoT: share of sessions on direct-to-device (eSIM / 5G SA) vs regional gateway
+    const baseD2dShare = seededRandom(seed + 8, 0.08, 0.28);
+    const failoverActive = status !== 'healthy';
+    const d2dShare = Number(Math.min(0.85, baseD2dShare + (failoverActive ? 0.35 : 0)).toFixed(2));
+    const d2dSessions = Math.round(connectedVehicles * d2dShare);
+    const gatewayRouted = connectedVehicles - d2dSessions;
+
+    const streamingDropPct = Number(
+      seededRandom(
+        seed + 9,
+        status === 'offline' ? 6 : status === 'degraded' ? 2.5 : 0.2,
+        status === 'offline' ? 18 : status === 'degraded' ? 9 : 1.8,
+      ).toFixed(1),
+    );
+    const streamingSatisfaction = Number(
+      Math.max(
+        1.5,
+        seededRandom(seed + 10, 4.4, 4.9) - streamingDropPct * 0.12 - (failoverActive ? 0.35 : 0),
+      ).toFixed(2),
+    );
+
+    const openTickets =
+      status === 'offline'
+        ? Math.round(seededRandom(seed + 11, 2, 6))
+        : status === 'degraded'
+          ? Math.round(seededRandom(seed + 11, 1, 3))
+          : streamingDropPct > 4
+            ? 1
+            : 0;
+
+    const ticketReason =
+      status === 'offline'
+        ? 'Gateway offline — failover to D2D + care ticket'
+        : status === 'degraded'
+          ? 'Latency SLA breach — partial D2D steer'
+          : streamingDropPct > 4
+            ? 'In-cabin streaming QoE drop — satisfaction risk'
+            : null;
+
     return {
       ...gw,
       status,
@@ -62,6 +101,15 @@ export function buildFleetSnapshot() {
       packetLossPct,
       firmwareVersion: `v${2 + (i % 3)}.${4 + (i % 5)}.${Math.floor(seededRandom(seed + 6, 0, 20))}`,
       lastSeenSec: status === 'offline' ? Math.round(seededRandom(seed + 7, 120, 900)) : Math.round(seededRandom(seed + 7, 2, 45)),
+      d2dShare,
+      d2dSessions,
+      gatewayRouted,
+      failoverActive,
+      connectivityPath: failoverActive ? 'direct-to-device' : 'hybrid',
+      streamingDropPct,
+      streamingSatisfaction,
+      openTickets,
+      ticketReason,
     };
   });
 
@@ -73,6 +121,31 @@ export function buildFleetSnapshot() {
     gateways.filter(g => g.status !== 'offline').reduce((s, g) => s + g.avgLatencyMs, 0)
       / Math.max(1, gateways.length - offline),
   );
+  const d2dSessions = gateways.reduce((s, g) => s + g.d2dSessions, 0);
+  const openTickets = gateways.reduce((s, g) => s + g.openTickets, 0);
+  const activeFailovers = gateways.filter(g => g.failoverActive).length;
+  const avgSatisfaction = Number(
+    (
+      gateways.reduce((s, g) => s + g.streamingSatisfaction, 0) / Math.max(1, gateways.length)
+    ).toFixed(2),
+  );
+  const incidents = gateways
+    .filter(g => g.openTickets > 0)
+    .map(g => ({
+      id: `inc-${g.id}`,
+      gatewayId: g.id,
+      name: g.name,
+      city: g.city,
+      region: g.region,
+      status: g.status,
+      tickets: g.openTickets,
+      reason: g.ticketReason,
+      d2dSessions: g.d2dSessions,
+      streamingSatisfaction: g.streamingSatisfaction,
+      streamingDropPct: g.streamingDropPct,
+      failoverActive: g.failoverActive,
+    }))
+    .sort((a, b) => b.tickets - a.tickets || a.streamingSatisfaction - b.streamingSatisfaction);
 
   return {
     generatedAt: new Date(now).toISOString(),
@@ -83,7 +156,13 @@ export function buildFleetSnapshot() {
       avgLatencyMs: avgLatency,
       degradedGateways: degraded,
       offlineGateways: offline,
+      d2dSessions,
+      d2dSharePct: Number(((d2dSessions / Math.max(1, totalVehicles)) * 100).toFixed(1)),
+      openTickets,
+      activeFailovers,
+      avgStreamingSatisfaction: avgSatisfaction,
     },
+    incidents,
     gateways,
   };
 }
