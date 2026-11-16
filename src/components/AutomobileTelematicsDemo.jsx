@@ -57,7 +57,10 @@ export function AutomobileTelematicsDemo() {
   const [loading, setLoading] = useState(false);
 
   const kibanaUrl = getOtelDemoKibanaUrl();
-  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, { query: buildTelematicsPipelineDiscoverEsql() });
+  const discoverUrl = kibanaDiscoverUrl(kibanaUrl, {
+    query: buildTelematicsPipelineDiscoverEsql(),
+    tabLabel: 'Discover',
+  });
   const dashboardUrl = kibanaTelematicsDashboardUrl(kibanaUrl);
   const apmUrl = kibanaApmServicesUrl(kibanaUrl);
   const metricsUrl = kibanaMetricsExplorerUrl(kibanaUrl);
@@ -67,7 +70,7 @@ export function AutomobileTelematicsDemo() {
 
   const kibanaLinks = [
     { href: dashboardUrl, label: 'Dashboard', primary: true, title: 'Automotive telematics dashboard on otel-demo' },
-    { href: discoverUrl, label: 'Discover' },
+    { href: discoverUrl, label: 'Discover', title: 'Open Discover in ES|QL with telematics query' },
     { href: apmUrl, label: 'APM' },
     { href: metricsUrl, label: 'Hosts', title: 'Infrastructure Hosts (metrics)' },
     { href: mlUrl, label: 'ML', title: 'Telematics anomaly detection jobs' },
