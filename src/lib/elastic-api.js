@@ -436,7 +436,8 @@ export function kibanaTelematicsDashboardUrl(kibanaBase) {
 
 export function kibanaApmServicesUrl(kibanaBase) {
   const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
-  return `${base}/app/apm/services?rangeFrom=now-24h&rangeTo=now`;
+  // Prefer telematics environment so Service inventory shows vehicle-gateway, D2D, etc.
+  return `${base}/app/apm/services?environment=telematics&comparisonEnabled=true&rangeFrom=now-24h&rangeTo=now`;
 }
 
 export function kibanaMetricsExplorerUrl(kibanaBase) {

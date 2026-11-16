@@ -16,7 +16,8 @@
     "deploy:dashboard:observability": "node scripts/deploy-telco-dashboards.mjs observability",
     "deploy:dashboard:telematics": "node scripts/deploy-telco-dashboards.mjs telematics",
     "deploy:dashboard:search": "node scripts/deploy-telco-dashboards.mjs search",
-    "deploy:dashboard:security": "node scripts/deploy-telco-dashboards.mjs security"
+    "deploy:dashboard:security": "node scripts/deploy-telco-dashboards.mjs security",
+    "inject:telematics": "node scripts/inject-telematics-otlp.mjs"
   },
   "dependencies": {
     "cors": "^2.8.6",

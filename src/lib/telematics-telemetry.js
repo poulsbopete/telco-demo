@@ -1,17 +1,17 @@
-/** Data sources for the Telematics tab — otel-demo OpenTelemetry + Prometheus pipeline */
+/** Data sources for the Telematics tab — f74145 OpenTelemetry + Prometheus pipeline */
 
 export const TELEMATICS_TELEMETRY_SOURCES = [
   {
     id: 'otel-logs',
     label: 'OpenTelemetry logs',
-    detail: 'Gateway + direct-to-device ingest remapped from otel-demo checkout · payment · cart services',
+    detail: 'vehicle-gateway · direct-to-device · fleet-provisioning · streaming-qoe',
     destination: 'logs-generic.otel-default',
   },
   {
     id: 'otel-traces',
     label: 'OpenTelemetry traces',
-    detail: 'APM service maps and failover path latency — same OTLP pipeline',
-    destination: 'traces-apm.*',
+    detail: 'APM Service inventory — telematics environment (D2D failover + QoE latency)',
+    destination: 'traces-apm.* · environment=telematics',
   },
   {
     id: 'prometheus',
@@ -28,4 +28,4 @@ export const TELEMATICS_TELEMETRY_SOURCES = [
 ];
 
 export const TELEMATICS_TELEMETRY_SUMMARY =
-  'Correlate regional gateways and next-gen direct-to-device sessions on the same otel-demo cluster — OpenTelemetry + Prometheus, with alerts that open tickets and steer failover when hubs degrade.';
+  'Correlate regional gateways and next-gen direct-to-device on f74145 — APM services in the telematics environment, OpenTelemetry + Prometheus, with alerts that open tickets and steer failover when hubs degrade.';
