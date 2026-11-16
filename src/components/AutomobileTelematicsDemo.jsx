@@ -67,7 +67,7 @@ export function AutomobileTelematicsDemo() {
     { href: dashboardUrl, label: 'Dashboard', primary: true, title: 'Automotive telematics dashboard on otel-demo' },
     { href: discoverUrl, label: 'Discover' },
     { href: apmUrl, label: 'APM' },
-    { href: metricsUrl, label: 'Metrics' },
+    { href: metricsUrl, label: 'Hosts', title: 'Infrastructure Hosts (metrics)' },
     { href: mlUrl, label: 'ML' },
     { href: o11yUrl, label: 'Overview' },
   ];
