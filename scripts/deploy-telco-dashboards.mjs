@@ -26,6 +26,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
 
 loadEnv({ path: resolve(ROOT, '.env.local') });
+loadEnv({ path: resolve(ROOT, '.env.otel-elastic'), override: false });
 
 const TARGET = process.argv[2];
 
@@ -33,17 +34,25 @@ if (TARGET === 'search' && existsSync(resolve(ROOT, '../telco-agent/.env'))) {
   loadEnv({ path: resolve(ROOT, '../telco-agent/.env'), override: true });
 }
 
+function resolveApiKey(...keys) {
+  for (const k of keys) {
+    const v = (process.env[k] || '').replace(/^ApiKey\s+/i, '').trim();
+    if (v) return v;
+  }
+  return '';
+}
+
 const TARGET_DEFAULTS = {
   observability: {
     kibanaUrl: process.env.VITE_KIBANA_URL || process.env.KIBANA_URL,
-    apiKey: process.env.KIBANA_API_KEY || process.env.ES_API_KEY,
+    apiKey: resolveApiKey('KIBANA_API_KEY', 'ELASTIC_OTEL_API_KEY', 'ELASTICSEARCH_API_KEY', 'ES_API_KEY'),
   },
   telematics: {
     kibanaUrl:
       process.env.VITE_KIBANA_URL
       || process.env.KIBANA_URL
       || 'https://elastic-observability-f74145.kb.centralus.azure.elastic.cloud',
-    apiKey: process.env.KIBANA_API_KEY || process.env.ES_API_KEY,
+    apiKey: resolveApiKey('KIBANA_API_KEY', 'ELASTIC_OTEL_API_KEY', 'ELASTICSEARCH_API_KEY', 'ES_API_KEY'),
   },
   search: {
     kibanaUrl: process.env.KIBANA_BASE_URL || process.env.VITE_SEARCH_KIBANA_URL || process.env.SEARCH_KIBANA_URL,
@@ -977,28 +986,32 @@ ${TELEMATICS_SERVICE_EVAL}
           config: { view: { stroke: null } },
           data: {
             url: {
-              ...ES_QL,
-              query: `FROM logs.otel.adaptive-networks*
-| WHERE @timestamp >= ?_tstart AND @timestamp <= ?_tend AND severity_text == "ERROR"
+              // f74145 has no logs.otel.adaptive-networks* — use seeded IoT gateway fleet
+              '%type%': 'esql',
+              '%context%': false,
+              query: `FROM telco-demo-iot-gateways
+| WHERE status IN ("degraded", "offline") OR open_tickets > 0 OR failover_active == true
 | EVAL fault = CASE(
-    body.text LIKE "*SW_MATM*", "MAC Flap",
-    body.text LIKE "*SPANTREE*", "STP",
-    body.text LIKE "*BGP-3*", "BGP",
-    body.text LIKE "*INTF-4*", "Interface",
+    status == "offline", "Gateway offline",
+    status == "degraded", "Gateway degraded",
+    ticket_reason LIKE "*streaming*", "Streaming QoE / tickets",
+    failover_active == true OR ticket_reason LIKE "*failover*" OR ticket_reason LIKE "*D2D*", "D2D failover",
+    open_tickets > 0, "Care tickets open",
     "Other")
-| STATS errors = COUNT(*) BY fault
-| SORT errors DESC
+| STATS gateways = COUNT(*), tickets = SUM(open_tickets) BY fault
+| SORT tickets DESC, gateways DESC
 | LIMIT 10`,
             },
           },
           mark: 'bar',
           encoding: {
             y: { field: 'fault', type: 'nominal', sort: '-x', title: 'Fault type' },
-            x: { field: 'errors', type: 'quantitative', title: 'Events' },
+            x: { field: 'tickets', type: 'quantitative', title: 'Open tickets' },
             color: { value: '#00bfb3' },
             tooltip: [
               { field: 'fault', type: 'nominal', title: 'Fault' },
-              { field: 'errors', type: 'quantitative', title: 'Events', format: ',.0f' },
+              { field: 'gateways', type: 'quantitative', title: 'Gateways', format: ',.0f' },
+              { field: 'tickets', type: 'quantitative', title: 'Open tickets', format: ',.0f' },
             ],
           },
         },
