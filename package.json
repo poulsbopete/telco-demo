@@ -18,6 +18,7 @@
     "deploy:dashboard:search": "node scripts/deploy-telco-dashboards.mjs search",
     "deploy:dashboard:security": "node scripts/deploy-telco-dashboards.mjs security",
     "inject:telematics": "node scripts/inject-telematics-otlp.mjs",
+    "inject:telematics:hosts": "node scripts/inject-telematics-hosts.mjs",
     "deploy:ml:telematics": "node scripts/deploy-telematics-ml-jobs.mjs"
   },
   "dependencies": {

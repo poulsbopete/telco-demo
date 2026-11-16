@@ -443,8 +443,8 @@ export function kibanaApmServicesUrl(kibanaBase) {
 export function kibanaMetricsExplorerUrl(kibanaBase) {
   const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
   // Serverless / modern Kibana — Metrics Explorer (/app/metrics/explorer) 404s;
-  // Infrastructure → Hosts is the replacement for Prometheus / host metrics.
-  return `${base}/app/metrics/hosts?dateRange=(from:now-24h,to:now)`;
+  // Infrastructure → Hosts filtered to IoT automobile telematics hosts (iot-*).
+  return `${base}/app/metrics/hosts?hostKuery=host.name%20:%20iot-*&dateRange=(from:now-24h,to:now)`;
 }
 
 /** Telematics anomaly jobs (group=telematics) — created by scripts/deploy-telematics-ml-jobs.mjs */
