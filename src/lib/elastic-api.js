@@ -402,7 +402,7 @@ export function kibanaSearchDocumentUrl(kibanaBase, { engine, documentId, query,
 }
 
 /** otel-demo observability cluster (default for live demo links) */
-export const OTEL_DEMO_KIBANA_URL = 'https://otel-demo-a5630c.kb.us-east-1.aws.elastic.cloud';
+export const OTEL_DEMO_KIBANA_URL = 'https://elastic-observability-f74145.kb.centralus.azure.elastic.cloud';
 
 export function getOtelDemoKibanaUrl() {
   return (import.meta.env.VITE_KIBANA_URL || OTEL_DEMO_KIBANA_URL).replace(/\/$/, '');
@@ -441,7 +441,9 @@ export function kibanaApmServicesUrl(kibanaBase) {
 
 export function kibanaMetricsExplorerUrl(kibanaBase) {
   const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
-  return `${base}/app/metrics/explorer?rangeFrom=now-24h&rangeTo=now`;
+  // Serverless / modern Kibana — Metrics Explorer (/app/metrics/explorer) 404s;
+  // Infrastructure → Hosts is the replacement for Prometheus / host metrics.
+  return `${base}/app/metrics/hosts?dateRange=(from:now-24h,to:now)`;
 }
 
 export function kibanaMlAnomaliesUrl(kibanaBase) {
