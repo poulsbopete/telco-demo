@@ -72,7 +72,7 @@ export function AutomobileTelematicsDemo() {
     { href: dashboardUrl, label: 'Dashboard', primary: true, title: 'Automotive telematics dashboard on otel-demo' },
     { href: discoverUrl, label: 'Discover', title: 'Open Discover in ES|QL with telematics query' },
     { href: apmUrl, label: 'APM' },
-    { href: metricsUrl, label: 'Hosts', title: 'Infrastructure Hosts (metrics)' },
+    { href: metricsUrl, label: 'IOT Automobiles', title: 'Infrastructure · connected vehicle hosts' },
     { href: mlUrl, label: 'ML', title: 'Telematics anomaly detection jobs' },
     { href: mlExplorerUrl, label: 'Explorer', title: 'Anomaly Explorer · telematics jobs' },
     { href: o11yUrl, label: 'Overview' },
