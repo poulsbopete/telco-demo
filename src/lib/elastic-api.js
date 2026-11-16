@@ -447,10 +447,31 @@ export function kibanaMetricsExplorerUrl(kibanaBase) {
   return `${base}/app/metrics/hosts?dateRange=(from:now-24h,to:now)`;
 }
 
+/** Telematics anomaly jobs (group=telematics) — created by scripts/deploy-telematics-ml-jobs.mjs */
+export const TELEMATICS_ML_JOB_IDS = [
+  'telematics-trace-errors',
+  'telematics-span-volume',
+  'telematics-streaming-qoe',
+  'telematics-gateway-tickets',
+];
+
 export function kibanaMlAnomaliesUrl(kibanaBase) {
   const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
-  // Serverless ML — classic /anomaly_detection 404s; AIOps log rate analysis works on live OTel logs
-  return `${base}/app/ml/aiops/log_rate_analysis`;
+  // Telematics tab: jump to Manage jobs filtered to the telematics group (not generic AIOps)
+  return kibanaTelematicsMlJobsUrl(base);
+}
+
+/** Anomaly detection jobs list filtered to group "telematics" */
+export function kibanaTelematicsMlJobsUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  return `${base}/app/ml/jobs?_a=(jobs:(queryText:'groups:(telematics)'))`;
+}
+
+/** Anomaly Explorer scoped to telematics jobs */
+export function kibanaTelematicsMlExplorerUrl(kibanaBase) {
+  const base = (kibanaBase || getOtelDemoKibanaUrl()).replace(/\/$/, '');
+  const ids = TELEMATICS_ML_JOB_IDS.join(',');
+  return `${base}/app/ml/explorer?_g=(ml:(jobIds:!(${ids})),time:(from:now-7d,to:now))`;
 }
 
 export function kibanaMlOverviewUrl(kibanaBase) {
