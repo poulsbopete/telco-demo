@@ -88,8 +88,8 @@ function buildResource(gw) {
       'telemetry.sdk.language': 'nodejs',
       'telemetry.sdk.name': 'opentelemetry',
       'data_stream.type': 'metrics',
-      // Hosts UI entity filter: data_stream.dataset == hostmetricsreceiver.otel
-      'data_stream.dataset': 'hostmetricsreceiver.otel',
+      // Elastic appends ".otel" → hostmetricsreceiver.otel (Hosts UI entity filter)
+      'data_stream.dataset': 'hostmetricsreceiver',
       'data_stream.namespace': 'default',
       'telematics.gateway_name': gw.name,
       'telematics.city': gw.city,
