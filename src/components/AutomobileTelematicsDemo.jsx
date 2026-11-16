@@ -23,7 +23,6 @@ import {
   kibanaApmServicesUrl,
   kibanaMetricsExplorerUrl,
   kibanaMlAnomaliesUrl,
-  kibanaTelematicsMlExplorerUrl,
   kibanaO11yOverviewUrl,
   getOtelDemoKibanaUrl,
   OTEL_DEMO_KIBANA_URL,
@@ -65,7 +64,6 @@ export function AutomobileTelematicsDemo() {
   const apmUrl = kibanaApmServicesUrl(kibanaUrl);
   const metricsUrl = kibanaMetricsExplorerUrl(kibanaUrl);
   const mlUrl = kibanaMlAnomaliesUrl(kibanaUrl);
-  const mlExplorerUrl = kibanaTelematicsMlExplorerUrl(kibanaUrl);
   const o11yUrl = kibanaO11yOverviewUrl(kibanaUrl);
 
   const kibanaLinks = [
@@ -74,7 +72,6 @@ export function AutomobileTelematicsDemo() {
     { href: apmUrl, label: 'APM' },
     { href: metricsUrl, label: 'IOT Automobiles', title: 'Infrastructure · connected vehicle hosts' },
     { href: mlUrl, label: 'ML', title: 'Telematics anomaly detection jobs' },
-    { href: mlExplorerUrl, label: 'Explorer', title: 'Anomaly Explorer · telematics jobs' },
     { href: o11yUrl, label: 'Overview' },
   ];
 
